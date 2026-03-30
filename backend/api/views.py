@@ -30,7 +30,6 @@ class CoordenadorViewSet(viewsets.ModelViewSet):
 
         """pega o usuario do coordenador"""
         usuario = coordenador.usuario
-        
         usuario.delete()
 
         return Response(status= status.HTTP_204_NO_CONTENT)
@@ -46,13 +45,14 @@ class CoordenadorViewSet(viewsets.ModelViewSet):
         nome = serializer.validated_data['nome']
         email = serializer.validated_data['email']
         senha = serializer.validated_data['senha']
+        telefone = serializer.validated_data.get('telefone')
 
         """Aqui estou conecatando direto no banco e chamando a procedure"""
 
         with connection.cursor() as cursor:
             cursor.execute(
-                'CALL sp_cadastrar_coordenador_com_usuario(%s, %s, %s)',
-                [nome,email,senha]
+                'CALL sp_cadastrar_coordenador_com_usuario(%s, %s, %s, %s)',
+                [nome,email,senha, telefone]
             )
         """Capturando o objeto criado, depois chamando o serializer de coordenador
         pra deixar ele no formado correto e respondendo pro front esse json"""
