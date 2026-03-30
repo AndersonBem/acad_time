@@ -1,0 +1,80 @@
+INSTRUCOES DO PROJETO
+
+1. GITIGNORE
+Antes de subir o projeto corretamente no GitHub, gere um .gitignore.
+Sugestão:
+Python, Django, VisualStudioCode, macOS, Windows
+
+2. ESTRUTURA DO PROJETO
+A pasta backend contém a API em Django.
+A pasta frontend contém o front separado com HTML, CSS e JavaScript.
+
+3. VENV
+Cada integrante precisa criar ou usar a própria venv localmente dentro da pasta backend.
+cd backend
+python -m venv venv
+
+4. ATIVAR A VENV
+No PowerShell:
+cd backend
+.\venv\Scripts\Activate.ps1
+
+5. INSTALAR AS DEPENDENCIAS
+Ainda dentro da pasta backend:
+pip install -r requirements.txt
+
+6. ARQUIVO .ENV
+Dentro da pasta backend existe um arquivo .env.
+Esse arquivo precisa ser ajustado antes de rodar o projeto.
+
+Campos principais:
+- SECRET_KEY
+(
+    Rodar no terminal dentro da basta bandend com a venv rodando:
+        python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+)
+- DEBUG
+- ALLOWED_HOSTS
+- DB_NAME
+- DB_USER
+- DB_PASSWORD
+- DB_HOST
+- DB_PORT
+
+7. BANCO DE DADOS
+O setup já deixa o PostgreSQL preparado para uso com o banco acad_time.
+Mas você ainda precisa:
+- conferir se o banco foi criado no PostgreSQL
+- preencher usuario e senha no .env
+- confirmar host e porta corretos
+
+8. SETTINGS
+O settings.py já foi preparado para:
+- usar PostgreSQL
+- ler variáveis do .env
+- usar corsheaders no desenvolvimento
+- incluir rest_framework e o app api
+
+9. FLUXO DE DESENVOLVIMENTO(BACKEND)
+A ideia é seguir o fluxo estudado:
+- criar models
+- registrar no admin se precisar
+- criar serializers
+- criar viewsets/views
+- registrar rotas no router e urls
+
+10. CORS
+O CORS continua habilitado para desenvolvimento local.
+Isso ajuda quando o frontend estiver rodando separado em outra porta.
+
+11. RODAR O BACKEND
+Depois de configurar o .env:
+(primeira vez, depois apenas se modificar o banco)
+python manage.py makemigrations
+python manage.py migrate
+
+(sempre)
+python manage.py runserver 7000
+
+12. RODAR O FRONTEND
+A pasta frontend pode ser aberta com Live Server no VS Code, ou outra forma de servidor local.
