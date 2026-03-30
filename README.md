@@ -12,8 +12,6 @@ Este projeto foi preparado para trabalhar com:
 - Django como API
 - frontend separado
 - PostgreSQL
-- consumo da API via fetch
-- organização no estilo estudado na Alura
 
 ## Observações
 
