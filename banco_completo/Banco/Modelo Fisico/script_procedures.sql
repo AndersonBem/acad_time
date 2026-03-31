@@ -79,19 +79,29 @@ $$;
 CREATE PROCEDURE sp_cadastrar_coordenador_com_usuario(
     p_nome varchar,
     p_email varchar,
-    p_senha text
+    p_senha text,
+    p_telefone varchar DEFAULT NULL
 )
 LANGUAGE plpgsql
 AS
 $$
-DECLARE v_id integer;
+DECLARE 
+    v_id integer;
 BEGIN
-    INSERT INTO "Usuario"(nome,email,"senhaHash")
-    VALUES(p_nome,p_email,p_senha)
+    -- Cria o usuário
+    INSERT INTO "Usuario"(nome, email, "senhaHash")
+    VALUES(p_nome, p_email, p_senha)
     RETURNING "idUsuario" INTO v_id;
 
+    -- Cria o coordenador
     INSERT INTO "Coordenador"
-    VALUES(v_id,true);
+    VALUES(v_id, true);
+
+    -- Se telefone foi informado, cadastra
+    IF p_telefone IS NOT NULL THEN
+        INSERT INTO "Telefone"(numero, "idUsuario")
+        VALUES(p_telefone, v_id);
+    END IF;
 END;
 $$;
 
