@@ -1,8 +1,9 @@
 from rest_framework import status,viewsets
 from rest_framework.response import Response
 from django.db import connection
+from django.contrib.auth.hashers import make_password
 from api.models import Usuario, Coordenador
-from api.serializers import UsuarioSerializer, CoordenadorSerializer, CoordenadorCreateSerializer
+from api.serializers import UsuarioSerializer, CoordenadorSerializer, CoordenadorCreateSerializer,CoordenadorUpdateSerializer
 
 class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
     """Listando usuários, sem permitir criação, deleteção e etc, esses metodos
@@ -19,6 +20,8 @@ class CoordenadorViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'create':
             return CoordenadorCreateSerializer
+        if self.action in ['update', 'partial_update']:
+            return CoordenadorUpdateSerializer
         return CoordenadorSerializer
     
     """Quando apagar o coordenador, precisa apagar o usuario, se não ele vai manter o usuario sem ter relação com as
@@ -44,7 +47,11 @@ class CoordenadorViewSet(viewsets.ModelViewSet):
         """capturando os dados de acordo com o pedido na procedure"""
         nome = serializer.validated_data['nome']
         email = serializer.validated_data['email']
+
+        """Lógica para pegar a senha e passar ela pelo hash"""
         senha = serializer.validated_data['senha']
+        senha_hash = make_password(senha)
+
         telefone = serializer.validated_data.get('telefone')
 
         """Aqui estou conecatando direto no banco e chamando a procedure"""
@@ -52,7 +59,7 @@ class CoordenadorViewSet(viewsets.ModelViewSet):
         with connection.cursor() as cursor:
             cursor.execute(
                 'CALL sp_cadastrar_coordenador_com_usuario(%s, %s, %s, %s)',
-                [nome,email,senha, telefone]
+                [nome,email,senha_hash, telefone]
             )
         """Capturando o objeto criado, depois chamando o serializer de coordenador
         pra deixar ele no formado correto e respondendo pro front esse json"""
@@ -61,5 +68,36 @@ class CoordenadorViewSet(viewsets.ModelViewSet):
 
         return Response(response_serializer.data, status= status.HTTP_201_CREATED)
 
+    def update(self, request, *args, **kwargs):
+        coordenador = self.get_object()
 
+        serializer = self.get_serializer(data = request.data)
+        serializer.is_valid(raise_exception = True)
+
+        nome = serializer.validated_data.get('nome')
+        email = serializer.validated_data.get('email')
+        status_coordenador = serializer.validated_data.get('status')
+
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                'CALL sp_atualizar_coordenador_com_usuario(%s, %s, %s, %s)',
+                [
+                    coordenador.usuario.id_usuario,
+                    nome,
+                    email,
+                    status_coordenador
+                ]
+            )
+        
+        coordenador_atualizado = Coordenador.objects.get(
+            usuario__id_usuario = coordenador.usuario.id_usuario
+        )
+
+        response_serializer = CoordenadorSerializer(coordenador_atualizado)
+
+        return Response(response_serializer.data, status =status.HTTP_200_OK)
+    
+    def partial_update(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
 
