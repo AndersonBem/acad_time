@@ -46,9 +46,37 @@ class CoordenadorUpdateSerializer(serializers.Serializer):
         return attrs
 
 class AlunoSerializer(serializers.ModelSerializer):
+
+    id = serializers.ReadOnlyField(source = 'usuario.id_usuario')
+    nome = serializers.ReadOnlyField(source = 'usuario.nome')
+    email = serializers.ReadOnlyField(source = 'usuario.email')
+
     class Meta:
         model = Aluno
-        fields = '__all__'
+        fields = ['id','nome', 'email', 'total_horas', 'matricula']
+
+"""Serializer para post, precisa por usar procedure para salvar"""
+class AlunoCreateSerializer(serializers.Serializer):
+    """criação de coordenador usando a procedure"""
+    nome = serializers.CharField(max_length= 150)
+    email = serializers.EmailField(max_length = 150)
+    senha = serializers.CharField(write_only = True)
+    matricula = serializers.CharField(max_length = 30)
+
+"""Serializer para edição, precisa por usar procedure para salvar"""
+
+class AlunoUpdateSerializer(serializers.Serializer):
+    nome = serializers.CharField(max_length= 150, required = False)
+    email = serializers.EmailField(max_length= 150, required = False)
+    matricula = serializers.CharField(max_length = 30, required = False)
+
+    def validate(self, attrs):
+        if not attrs:
+            raise serializers.ValidationError(
+                'Envie pelo menos um campo para atualização'
+            )
+        return attrs
+
 
 class SuperAdminSerializer(serializers.ModelSerializer):
     class Meta:
