@@ -79,7 +79,11 @@ class AlunoUpdateSerializer(serializers.Serializer):
 
 
 class SuperAdminSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField(source = 'usuario.id_usuario')
+    nome = serializers.ReadOnlyField(source = 'usuario.nome')
+    email = serializers.ReadOnlyField(source = 'usuario.email')
+    
     class Meta:
         model= SuperAdmin
-        fields = '__all__'
+        fields = ['id','nome', 'email']
 

@@ -2,11 +2,12 @@ from rest_framework import status,viewsets
 from rest_framework.response import Response
 from django.db import connection, IntegrityError, DatabaseError
 from django.contrib.auth.hashers import make_password
-from api.models import Usuario, Coordenador, Aluno
+from api.models import Usuario, Coordenador, Aluno, SuperAdmin
 from api.serializers import (
     UsuarioSerializer, 
     CoordenadorSerializer, CoordenadorCreateSerializer, CoordenadorUpdateSerializer, 
-    AlunoSerializer, AlunoCreateSerializer,AlunoUpdateSerializer)
+    AlunoSerializer, AlunoCreateSerializer,AlunoUpdateSerializer,
+    SuperAdminSerializer)
 
 class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
     """Listando usuários, sem permitir criação, deleteção e etc, esses metodos
@@ -288,4 +289,8 @@ class AlunoViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
 
-        
+"""SuperAdmin deve ser criado apenas diretamente no banco,
+   não vamos permitir criação via api"""
+class SuperAdminViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = SuperAdmin.objects.all()
+    serializer_class = SuperAdminSerializer
