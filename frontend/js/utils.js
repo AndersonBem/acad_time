@@ -1,12 +1,12 @@
 async function fazerRequisicao(url, metodo = 'GET', dados = null) {
     const opcoes = {
-        method: metodo,
-        headers: {
-            'Content-Type': 'application/json'
-        }
+        method: metodo
     };
 
     if (dados) {
+        opcoes.headers = {
+            'Content-Type': 'application/json'
+        };
         opcoes.body = JSON.stringify(dados);
     }
 

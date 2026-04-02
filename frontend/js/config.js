@@ -1,7 +1,10 @@
 const CONFIG = {
-    BASE_URL: 'http://127.0.0.1:8001',
+    BASE_URL: 'https://acad-time.onrender.com',
+    //BASE_URL: 'http://127.0.0.1:7000/',
     ENDPOINTS: {
-        usuarios: '/api/usuarios/',
-        coordenadores: '/api/coordenadores/'
+        usuarios: '/usuarios/',
+        coordenadores: '/coordenador/',
+        alunos: '/aluno/',
+        superadmin: '/superadmin/'
     }
 };

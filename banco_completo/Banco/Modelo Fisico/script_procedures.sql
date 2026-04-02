@@ -105,6 +105,143 @@ BEGIN
 END;
 $$;
 
+--  Edição de coordenador, sem mudar os telefones
+CREATE PROCEDURE sp_atualizar_coordenador_com_usuario(
+    p_id_usuario integer,
+    p_nome varchar DEFAULT NULL,
+    p_email varchar DEFAULT NULL,
+    p_status boolean DEFAULT NULL
+)
+LANGUAGE plpgsql
+AS
+$$
+DECLARE
+    v_existe_coordenador integer;
+    v_email_em_uso integer;
+BEGIN
+    -- Verifica se o coordenador existe
+    SELECT COUNT(*)
+    INTO v_existe_coordenador
+    FROM public."Coordenador"
+    WHERE "idUsuario" = p_id_usuario;
+
+    IF v_existe_coordenador = 0 THEN
+        RAISE EXCEPTION 'Coordenador não encontrado.';
+    END IF;
+
+    -- Verifica se o novo email já está sendo usado por outro usuário
+    IF p_email IS NOT NULL AND btrim(p_email) <> '' THEN
+        SELECT COUNT(*)
+        INTO v_email_em_uso
+        FROM public."Usuario"
+        WHERE email = p_email
+          AND "idUsuario" <> p_id_usuario;
+
+        IF v_email_em_uso > 0 THEN
+            RAISE EXCEPTION 'Já existe outro usuário com este email.';
+        END IF;
+    END IF;
+
+    -- Atualiza os dados de Usuario
+    UPDATE public."Usuario"
+    SET
+        nome = CASE
+            WHEN p_nome IS NOT NULL AND btrim(p_nome) <> '' THEN p_nome
+            ELSE nome
+        END,
+        email = CASE
+            WHEN p_email IS NOT NULL AND btrim(p_email) <> '' THEN p_email
+            ELSE email
+        END
+    WHERE "idUsuario" = p_id_usuario;
+
+    -- Atualiza os dados de Coordenador
+    UPDATE public."Coordenador"
+    SET
+        status = CASE
+            WHEN p_status IS NOT NULL THEN p_status
+            ELSE status
+        END
+    WHERE "idUsuario" = p_id_usuario;
+END;
+$$;
+
+-- Update aluno e usuario
+CREATE PROCEDURE sp_atualizar_aluno_com_usuario(
+    p_id_usuario integer,
+    p_nome varchar DEFAULT NULL,
+    p_email varchar DEFAULT NULL,
+    p_matricula varchar DEFAULT NULL
+)
+LANGUAGE plpgsql
+AS
+$$
+DECLARE
+    v_existe_aluno integer;
+    v_email_em_uso integer;
+    v_matricula_em_uso integer;
+BEGIN
+    -- Verifica se o aluno existe
+    SELECT COUNT(*)
+    INTO v_existe_aluno
+    FROM public."Aluno"
+    WHERE "idUsuario" = p_id_usuario;
+
+    IF v_existe_aluno = 0 THEN
+        RAISE EXCEPTION 'Aluno não encontrado.';
+    END IF;
+
+    -- Verifica se o novo email já está sendo usado por outro usuário
+    IF p_email IS NOT NULL AND btrim(p_email) <> '' THEN
+        SELECT COUNT(*)
+        INTO v_email_em_uso
+        FROM public."Usuario"
+        WHERE email = p_email
+          AND "idUsuario" <> p_id_usuario;
+
+        IF v_email_em_uso > 0 THEN
+            RAISE EXCEPTION 'Já existe outro usuário com este email.';
+        END IF;
+    END IF;
+
+    -- Verifica se a nova matrícula já está sendo usada por outro aluno
+    IF p_matricula IS NOT NULL AND btrim(p_matricula) <> '' THEN
+        SELECT COUNT(*)
+        INTO v_matricula_em_uso
+        FROM public."Aluno"
+        WHERE matricula = p_matricula
+          AND "idUsuario" <> p_id_usuario;
+
+        IF v_matricula_em_uso > 0 THEN
+            RAISE EXCEPTION 'Já existe outro aluno com esta matrícula.';
+        END IF;
+    END IF;
+
+    -- Atualiza os dados de Usuario
+    UPDATE public."Usuario"
+    SET
+        nome = CASE
+            WHEN p_nome IS NOT NULL AND btrim(p_nome) <> '' THEN p_nome
+            ELSE nome
+        END,
+        email = CASE
+            WHEN p_email IS NOT NULL AND btrim(p_email) <> '' THEN p_email
+            ELSE email
+        END
+    WHERE "idUsuario" = p_id_usuario;
+
+    -- Atualiza os dados de Aluno
+    UPDATE public."Aluno"
+    SET
+        matricula = CASE
+            WHEN p_matricula IS NOT NULL AND btrim(p_matricula) <> '' THEN p_matricula
+            ELSE matricula
+        END
+    WHERE "idUsuario" = p_id_usuario;
+END;
+$$;
+
+
 
 -- Matricula um aluno em um curso, impedindo matrícula duplicada.
 CREATE PROCEDURE sp_matricular_aluno_em_curso(

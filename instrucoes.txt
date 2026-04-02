@@ -2,8 +2,11 @@ INSTRUCOES DO PROJETO
 
 1. GITIGNORE
 Antes de subir o projeto corretamente no GitHub, gere um .gitignore.
-Sugestão:
-Python, Django, VisualStudioCode, macOS, Windows
+Entre nesse site: 
+https://www.toptal.com/developers/gitignore
+Digite django e copie o texto todo que mostrar e cole no arquivo .gitignore
+Esse arquivo deve esta na pasta raiz do projeto(acad_time), na mesma pasta que esta as pastas backend, 
+frontend e etc
 
 2. ESTRUTURA DO PROJETO
 A pasta backend contém a API em Django.
@@ -11,70 +14,48 @@ A pasta frontend contém o front separado com HTML, CSS e JavaScript.
 
 3. VENV
 Cada integrante precisa criar ou usar a própria venv localmente dentro da pasta backend.
-cd backend
-python -m venv venv
+No terminal entre na pasta do backend:
+    cd backend
+Crie a venv local com esse comando
+    python -m venv venv
 
 4. ATIVAR A VENV
 No PowerShell:
-cd backend
-.\venv\Scripts\Activate.ps1
+cd backend (precisa está na pasta backend)
+    .\venv\Scripts\Activate.ps1
 
 5. INSTALAR AS DEPENDENCIAS
 Ainda dentro da pasta backend:
-pip install -r requirements.txt
+no terminal:
+    pip install -r requirements.txt
 
 6. ARQUIVO .ENV
-Dentro da pasta backend existe um arquivo .env.
+Dentro da pasta backend precisa criar um arquivo .env
 Esse arquivo precisa ser ajustado antes de rodar o projeto.
+vc primeiro precisa entrar no terminal, dentro da pasta backend rodar o comando:
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
 
-Campos principais:
-- SECRET_KEY
-(
-    Rodar no terminal dentro da basta bandend com a venv rodando:
-        python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-)
-- DEBUG
-- ALLOWED_HOSTS
-- DB_NAME
-- DB_USER
-- DB_PASSWORD
-- DB_HOST
-- DB_PORT
+ele vai gerar a chave secreta que vai ser usada dentro do arquivo .env
+Arquivo .env
 
-7. BANCO DE DADOS
-O setup já deixa o PostgreSQL preparado para uso com o banco acad_time.
-Mas você ainda precisa:
-- conferir se o banco foi criado no PostgreSQL
-- preencher usuario e senha no .env
-- confirmar host e porta corretos
+SECRET_KEY= (chave secreta aqui)
+DEBUG=True
+ALLOWED_HOSTS=127.0.0.1,localhost
 
-8. SETTINGS
-O settings.py já foi preparado para:
-- usar PostgreSQL
-- ler variáveis do .env
-- usar corsheaders no desenvolvimento
-- incluir rest_framework e o app api
+DATABASE_URL= 
 
-9. FLUXO DE DESENVOLVIMENTO(BACKEND)
-A ideia é seguir o fluxo estudado:
-- criar models
-- registrar no admin se precisar
-- criar serializers
-- criar viewsets/views
-- registrar rotas no router e urls
+Em database_url vcs precisam me perguntar a url do banco
 
-10. CORS
-O CORS continua habilitado para desenvolvimento local.
-Isso ajuda quando o frontend estiver rodando separado em outra porta.
 
-11. RODAR O BACKEND
+7. RODAR O BACKEND
 Depois de configurar o .env:
 (primeira vez, depois apenas se modificar o banco)
-python manage.py makemigrations
-python manage.py migrate
+Terminal dentro de backend:
+    python manage.py migrate
 
-(sempre)
-python manage.py runserver 7000
+8. Sempre que quiser a API funcionando
+Terminal dentro de backend:
+    python manage.py runserver 7000
 
-12. RODAR O FRONTEND
+19. RODAR O FRONTEND
 A pasta frontend pode ser aberta com Live Server no VS Code, ou outra forma de servidor local.
