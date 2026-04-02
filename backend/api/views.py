@@ -1,9 +1,13 @@
 from rest_framework import status,viewsets
 from rest_framework.response import Response
-from django.db import connection
+from django.db import connection, IntegrityError, DatabaseError
 from django.contrib.auth.hashers import make_password
-from api.models import Usuario, Coordenador
-from api.serializers import UsuarioSerializer, CoordenadorSerializer, CoordenadorCreateSerializer,CoordenadorUpdateSerializer
+from api.models import Usuario, Coordenador, Aluno, SuperAdmin
+from api.serializers import (
+    UsuarioSerializer, 
+    CoordenadorSerializer, CoordenadorCreateSerializer, CoordenadorUpdateSerializer, 
+    AlunoSerializer, AlunoCreateSerializer,AlunoUpdateSerializer,
+    SuperAdminSerializer)
 
 class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
     """Listando usuários, sem permitir criação, deleteção e etc, esses metodos
@@ -55,11 +59,36 @@ class CoordenadorViewSet(viewsets.ModelViewSet):
         telefone = serializer.validated_data.get('telefone')
 
         """Aqui estou conecatando direto no banco e chamando a procedure"""
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    'CALL sp_cadastrar_coordenador_com_usuario(%s, %s, %s, %s)',
+                    [nome,email,senha_hash, telefone]
+                )
+        except IntegrityError as e:
+            erro = str(e)
 
-        with connection.cursor() as cursor:
-            cursor.execute(
-                'CALL sp_cadastrar_coordenador_com_usuario(%s, %s, %s, %s)',
-                [nome,email,senha_hash, telefone]
+            if 'Usuario_email_key' in erro:
+                return Response(
+                    {"erro": "Email já está em uso"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            return Response(
+                {"erro": "Erro ao cadastrar coordenador"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except DatabaseError as e:
+            erro = str(e)
+
+            if 'Já existe outro usuário com este email' in erro:
+                return Response(
+                    {"erro": "Email já está em uso"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            return Response(
+                {"erro": "Erro ao atualizar coordenador"},
+                status=status.HTTP_400_BAD_REQUEST
             )
         """Capturando o objeto criado, depois chamando o serializer de coordenador
         pra deixar ele no formado correto e respondendo pro front esse json"""
@@ -78,16 +107,40 @@ class CoordenadorViewSet(viewsets.ModelViewSet):
         email = serializer.validated_data.get('email')
         status_coordenador = serializer.validated_data.get('status')
 
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    'CALL sp_atualizar_coordenador_com_usuario(%s, %s, %s, %s)',
+                    [
+                        coordenador.usuario.id_usuario,
+                        nome,
+                        email,
+                        status_coordenador
+                    ]
+                )
+        except IntegrityError as e:
+            erro = str(e)
+            if 'Usuario_email_key' in erro:
+                return Response(
+                    {"erro": "Email já está em uso"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            return Response(
+                {"erro": "Erro ao cadastrar aluno"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except DatabaseError as e:
+            erro = str(e)
 
-        with connection.cursor() as cursor:
-            cursor.execute(
-                'CALL sp_atualizar_coordenador_com_usuario(%s, %s, %s, %s)',
-                [
-                    coordenador.usuario.id_usuario,
-                    nome,
-                    email,
-                    status_coordenador
-                ]
+            if 'Já existe outro usuário com este email' in erro:
+                return Response(
+                    {"erro": "Email já está em uso"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            return Response(
+                {"erro": "Erro ao atualizar aluno"},
+                status=status.HTTP_400_BAD_REQUEST
             )
         
         coordenador_atualizado = Coordenador.objects.get(
@@ -101,3 +154,143 @@ class CoordenadorViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
 
+class AlunoViewSet(viewsets.ModelViewSet):
+    """repete coordenadorviewset, com modificações pertinentes"""
+    queryset = Aluno.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return AlunoCreateSerializer
+        if self.action in ['update', 'partial_update']:
+            return AlunoUpdateSerializer
+        return AlunoSerializer
+    
+    def destroy(self, request, *args, **kwargs):
+        aluno = self.get_object()
+
+        usuario = aluno.usuario
+        usuario.delete()
+
+        return Response(status= status.HTTP_204_NO_CONTENT)
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data = request.data)
+        serializer.is_valid(raise_exception = True)
+        nome = serializer.validated_data['nome']
+        email = serializer.validated_data['email']
+        senha = serializer.validated_data['senha']
+        senha_hash = make_password(senha)
+        matricula = serializer.validated_data['matricula']
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    'CALL sp_cadastrar_aluno_com_usuario(%s, %s, %s, %s)',
+                    [nome, email, senha_hash, matricula]
+                )
+        except IntegrityError as e:
+            erro = str(e)
+
+            if 'Usuario_email_key' in erro:
+                return Response(
+                    {"erro": "Email já está em uso"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            elif 'Aluno_matricula_key' in erro:
+                return Response(
+                    {"erro": "Matrícula já está em uso"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            return Response(
+                {"erro": "Erro ao cadastrar aluno"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except DatabaseError as e:
+            erro = str(e)
+
+            if 'Já existe outro usuário com este email' in erro:
+                return Response(
+                    {"erro": "Email já está em uso"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            return Response(
+                {"erro": "Erro ao criar aluno"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        aluno = Aluno.objects.get(usuario__email = email)
+        response_serializer = AlunoSerializer(aluno)
+
+        return Response(response_serializer.data, status= status.HTTP_201_CREATED)
+    
+    def update(self, request, *args, **kwargs):
+        aluno = self.get_object()
+        serializer = self.get_serializer(data = request.data)
+        serializer.is_valid(raise_exception = True)
+
+        nome = serializer.validated_data.get('nome')
+        email = serializer.validated_data.get('email')
+        matricula = serializer.validated_data.get('matricula')
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    'CALL sp_atualizar_aluno_com_usuario(%s, %s, %s, %s)',
+                    [
+                        aluno.usuario.id_usuario,
+                        nome,
+                        email,
+                        matricula
+                    ]
+                )
+        except IntegrityError as e:
+            erro = str(e)
+
+            if 'Usuario_email_key' in erro:
+                return Response(
+                    {"erro": "Email já está em uso"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            elif 'Aluno_matricula_key' in erro:
+                return Response(
+                    {"erro": "Matrícula já está em uso"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            return Response(
+                {"erro": "Erro ao atualizar aluno"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except DatabaseError as e:
+            erro = str(e)
+
+            if 'Já existe outro usuário com este email' in erro:
+                return Response(
+                    {"erro": "Email já está em uso"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            return Response(
+                {"erro": "Erro ao atualizar aluno"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        aluno_atualizado = Aluno.objects.get(
+            usuario__id_usuario = aluno.usuario.id_usuario
+        )
+
+        response_serializer = AlunoSerializer(aluno_atualizado)
+        return Response(response_serializer.data, status= status.HTTP_200_OK)
+    
+    def partial_update(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+"""SuperAdmin deve ser criado apenas diretamente no banco,
+   não vamos permitir criação via api"""
+class SuperAdminViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = SuperAdmin.objects.all()
+    serializer_class = SuperAdminSerializer
