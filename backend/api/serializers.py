@@ -87,3 +87,6 @@ class SuperAdminSerializer(serializers.ModelSerializer):
         model= SuperAdmin
         fields = ['id','nome', 'email']
 
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    senha = serializers.CharField(write_only = True)
