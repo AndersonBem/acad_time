@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang='pt-br'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Cursos</title>
+
+    <link rel="stylesheet" href="../css/global.css">  
+    <link rel="stylesheet" href="../css/cadastrarCurso.css">
+
+</head>
+
+<body class="pagina-cadastro-curso">
+  <div class="layout">
+    <div class="menu-lateral">
+        <div class ="logo-box">
+            <img src = "../assets/Logo.png" alt="Logo AcadTime" class="Logo">
+    </div>
+
+    <aside class="sidebar">
+      <ul>
+        <li>Dashboard</li>
+        <li class="active">Cursos</li>
+        <li>Coordenadores</li>
+      </ul>
+    </aside>
+</div>
+
+    <main class="container">
+      <h1 id="titulo-pagina">Cadastro/Edição de Curso</h1>
+      <p>Preencha os campos para criar ou editar um curso</p>
+
+      <div class="card-form">
+        <h3>Cadastro/Edição de curso</h3>
+
+        <form id="form-curso">
+          <div class="campo">
+            <label for="nome">Nome do Curso</label>
+            <input type="text" id="nome" name="nome">
+          </div>
+
+          <div class="linha-dupla">
+            <div class="campo">
+              <label for="codigo">Código/Identificação</label>
+              <input type="text" id="codigo" name="codigo">
+            </div>
+
+            <div class="campo">
+              <label>Status</label>
+              <div class="radio-group">
+                <input type="radio" id="ativo" name="status" value="ativo">
+                <label for="ativo">Ativo</label>
+
+                <input type="radio" id="inativo" name="status" value="inativo">
+                <label for="inativo">Inativo</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="linha-dupla">
+            <div class="campo campo-carga">
+              <label for="cargaHoraria">Carga horária total exigida</label>
+              <div class="input-com-texto">
+                <input type="text" id="cargaHoraria" name="cargaHoraria">
+                <span>Horas</span>
+              </div>
+            </div>
+
+            <div class="campo">
+              <label for="coordenador">Coordenador</label>
+              <input type="text" id="coordenador" name="coordenador">
+            </div>
+          </div>
+
+          <div class="campo">
+            <label for="descricao">Descrição (Opcional)</label>
+            <textarea id="descricao" name="descricao" rows="5"></textarea>
+          </div>
+
+          <div class="acoes-form">
+            <button type="button" class="btn-cancelar" onclick="window.location.href='cursos.html'">
+              Cancelar
+            </button>
+            <button type="submit" class="btn-salvar">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/utils.js"></script>
+
+  <script>
+    const form = document.getElementById("form-curso");
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    if (id) {
+      document.getElementById("titulo-pagina").textContent = "Cadastro/Edição de Curso";
+    }
+
+    if (id) {
+      const cursos = JSON.parse(localStorage.getItem("cursos")) || [];
+      const curso = cursos.find(c => c.id == id);
+
+      if (curso) {
+        document.getElementById("nome").value = curso.nome || "";
+        document.getElementById("codigo").value = curso.codigo || "";
+        document.getElementById("cargaHoraria").value = curso.cargaHoraria || "";
+        document.getElementById("coordenador").value = curso.coordenador || "";
+        document.getElementById("descricao").value = curso.descricao || "";
+
+        if (curso.status === "ativo") {
+          document.getElementById("ativo").checked = true;
+        } else if (curso.status === "inativo") {
+          document.getElementById("inativo").checked = true;
+        }
+      }
+    }
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const nome = document.getElementById("nome").value;
+      const codigo = document.getElementById("codigo").value;
+      const cargaHoraria = document.getElementById("cargaHoraria").value;
+      const coordenador = document.getElementById("coordenador").value;
+      const descricao = document.getElementById("descricao").value;
+      const status = document.querySelector('input[name="status"]:checked')?.value;
+
+      let cursos = JSON.parse(localStorage.getItem("cursos")) || [];
+
+      if (id) {
+        cursos = cursos.map(curso =>
+          curso.id == id
+            ? {
+                ...curso,
+                nome,
+                codigo,
+                cargaHoraria,
+                coordenador,
+                descricao,
+                status
+              }
+            : curso
+        );
+      } else {
+        const novoCurso = {
+          id: Date.now(),
+          nome,
+          codigo,
+          cargaHoraria,
+          coordenador,
+          descricao,
+          status
+        };
+
+        cursos.push(novoCurso);
+      }
+
+      localStorage.setItem("cursos", JSON.stringify(cursos));
+      window.location.href = "cursos.html";
+    });
+  </script>
+</body>
+</html>
+
+            
