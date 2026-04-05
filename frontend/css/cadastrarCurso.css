@@ -3,26 +3,26 @@
   background: #f5f5f5;
 }
 
-.pagina-cadastro-curso .layout {
+.layout {
   display: flex;
   min-height: 100vh;
 }
 
-.pagina-cadastro-curso .container {
+.container {
   flex: 1;
   padding: 32px;
   color: #0d3b82;
 }
 
-.pagina-cadastro-curso .container h1 {
+.container h1 {
   margin-bottom: 6px;
 }
 
-.pagina-cadastro-curso .container p {
+.container p {
   margin-bottom: 20px;
 }
 
-.pagina-cadastro-curso .card-form {
+.card-form {
   background: white;
   border-radius: 12px;
   padding: 24px;
@@ -30,62 +30,62 @@
   max-width: 900px;
 }
 
-.pagina-cadastro-curso .card-form h3 {
+.card-form h3 {
   margin-bottom: 24px;
 }
 
-.pagina-cadastro-curso .campo {
+.campo {
   display: flex;
   flex-direction: column;
   margin-bottom: 18px;
 }
 
-.pagina-cadastro-curso .linha-dupla {
+.linha-dupla {
   display: flex;
   gap: 24px;
 }
 
-.pagina-cadastro-curso .linha-dupla .campo {
+.linha-dupla .campo {
   flex: 1;
 }
 
-.pagina-cadastro-curso input[type="text"],
-.pagina-cadastro-curso textarea {
+input[type="text"],
+textarea {
   padding: 10px 12px;
   border: 1px solid #d3d3d3;
   border-radius: 8px;
   font-size: 14px;
 }
 
-.pagina-cadastro-curso textarea {
+textarea {
   resize: none;
 }
 
-.pagina-cadastro-curso .radio-group {
+.radio-group {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-top: 10px;
 }
 
-.pagina-cadastro-curso .input-com-texto {
+.input-com-texto {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.pagina-cadastro-curso .input-com-texto input {
+.input-com-texto input {
   flex: 1;
 }
 
-.pagina-cadastro-curso .acoes-form {
+.acoes-form {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
   margin-top: 20px;
 }
 
-.pagina-cadastro-curso .btn-cancelar {
+.btn-cancelar {
   background: #d9d9d9;
   border: none;
   padding: 10px 18px;
@@ -93,7 +93,7 @@
   cursor: pointer;
 }
 
-.pagina-cadastro-curso .btn-salvar {
+.btn-salvar {
   background: #d98a1f;
   color: white;
   border: none;
@@ -101,3 +101,4 @@
   border-radius: 10px;
   cursor: pointer;
 }
+

@@ -5,14 +5,14 @@
   align-items: center;
 }
 
-.topo-cursos input,
-.topo-cursos select {
+input,
+select {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 8px;
 }
 
-.topo-cursos button {
+button {
   background: orange;
   color: white;
   border: none;

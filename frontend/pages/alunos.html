@@ -14,10 +14,12 @@
   <div class="layout">
     <div class="menu-lateral">
         <div class ="logo-box">
-            <a href = "dashboard.html"><img src = "../assets/Logo.png" alt="Logo AcadTime" class="Logo"></a>  
+          <a href = "dashboard.html"><img src = "../assets/Logo.png" alt="Logo AcadTime" class="Logo"></a>       
     </div>
 
-<aside class="sidebar">
+
+
+    <aside class="sidebar">
       <ul>
         <li>Dashboard</li>
         <li><a href="cursos.html">Cursos</a></li>
@@ -26,13 +28,11 @@
         <li><a href="horasComplementares.html">Horas Complementares</a></li>
       </ul>
     </aside>
-
-    
 </div>
 
     <main class="content">
-      <h1>Listagem de Cursos</h1>
-      <p>Gerencie os cursos cadastrados aqui</p>
+      <h1>Listagem de Alunos</h1>
+      <p>Gerencie os alunos cadastrados aqui</p>
 
       <div class="card">
         <div class="topo-cursos">
@@ -44,33 +44,33 @@
             <option value="inativo">Inativos</option>
           </select>
 
-          <button onclick="window.location.href='cadastrarCurso.html'">
-            + Cadastrar Novo Curso
+          <button onclick="window.location.href='cadastrarAluno.html'">
+            + Cadastrar Novo Aluno
           </button>
         </div>
 
         <table>
           <thead>
             <tr>
-              <th>Nome do Curso</th>
+              <th>Nome do Aluno</th>
               <th>Status</th>
-              <th>Coordenadores</th>
+              <th>Curso vinculado</th>
               <th>Ações</th>
             </tr>
           </thead>
 
-          <tbody id="lista-cursos">
-            
-          </tbody>
+          <tbody id="lista-alunos">
+               
+            </tbody>
         </table>
-      </div>
+    </div>
+
     </main>
-  </div>
 
-  <script src="../js/config.js"></script>
-  <script src="../js/utils.js"></script>
-  <script src="../js/cursos.js"></script>
-
+    <script src="../js/config.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/alunos.js"></script>
+    
 
 </body>
 </html>

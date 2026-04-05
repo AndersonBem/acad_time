@@ -14,14 +14,18 @@
   <div class="layout">
     <div class="menu-lateral">
         <div class ="logo-box">
-            <img src = "../assets/Logo.png" alt="Logo AcadTime" class="Logo">
+            <a href = "dashboard.html"><img src = "../assets/Logo.png" alt="Logo AcadTime" class="Logo"></a>  
     </div>
+
+
 
     <aside class="sidebar">
       <ul>
         <li>Dashboard</li>
-        <li class="active">Cursos</li>
-        <li>Coordenadores</li>
+        <li><a href="cursos.html">Cursos</a></li>
+        <li><a href="coordenadores.html">Coordenadores</a></li>
+        <li><a href="alunos.html">Alunos</a></li>
+        <li><a href="horasComplementares.html">Horas Complementares</a></li>
       </ul>
     </aside>
 </div>
@@ -163,6 +167,12 @@
       window.location.href = "cursos.html";
     });
   </script>
+  <script>
+      function toggleMenu() {
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.classList.toggle('open');}
+    </script>
+
 </body>
 </html>
 
