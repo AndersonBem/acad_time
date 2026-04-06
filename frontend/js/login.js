@@ -12,7 +12,7 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
 
     const dados = {
         email: email,
-        password: senha
+        senha: senha
     };
 
     const url = CONFIG.BASE_URL.replace(/\/$/, '') + CONFIG.ENDPOINTS.login;
