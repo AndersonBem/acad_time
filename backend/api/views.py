@@ -1,13 +1,16 @@
 from rest_framework import status,viewsets
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.db import connection, IntegrityError, DatabaseError
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from api.models import Usuario, Coordenador, Aluno, SuperAdmin
 from api.serializers import (
     UsuarioSerializer, 
     CoordenadorSerializer, CoordenadorCreateSerializer, CoordenadorUpdateSerializer, 
     AlunoSerializer, AlunoCreateSerializer,AlunoUpdateSerializer,
-    SuperAdminSerializer)
+    SuperAdminSerializer, LoginSerializer)
+from api.jwt_utils import gerar_access_token
 
 class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
     """Listando usuários, sem permitir criação, deleteção e etc, esses metodos
@@ -292,5 +295,62 @@ class AlunoViewSet(viewsets.ModelViewSet):
 """SuperAdmin deve ser criado apenas diretamente no banco,
    não vamos permitir criação via api"""
 class SuperAdminViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [IsAuthenticated]
     queryset = SuperAdmin.objects.all()
     serializer_class = SuperAdminSerializer
+
+class LoginAPIView(APIView):
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status= status.HTTP_400_BAD_REQUEST
+            )
+        email = serializer.validated_data['email']
+        senha = serializer.validated_data['senha']
+
+        try:
+            usuario = Usuario.objects.get(email = email)
+        except Usuario.DoesNotExist:
+            return Response(
+                {'erro': 'Email ou senha inválidos.'},
+                status= status.HTTP_401_UNAUTHORIZED
+            )
+        
+        if not check_password(senha, usuario.senha_hash):
+            return Response(
+                {'erro': 'Email ou senha inválidos.'},
+                status= status.HTTP_401_UNAUTHORIZED
+            )
+        tipo_usuario = self.descobrir_tipo_usuario(usuario)
+        access_token = gerar_access_token(usuario, tipo_usuario)
+
+        return Response(
+            {
+                'mensagem': 'Login realizado com sucesso.',
+                'access': access_token,
+                'usuario': {
+                    'id': usuario.id_usuario,
+                    'nome': usuario.nome,
+                    'email': usuario.email,
+                    'tipo': tipo_usuario,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    
+    def descobrir_tipo_usuario(self, usuario):
+        if hasattr(usuario, 'aluno'):
+            return 'aluno'
+        
+        if hasattr(usuario, 'coordenador'):
+            return 'coordenador'
+
+        if hasattr(usuario, 'superadmin'):
+            return 'superadmin'
+
+        return 'usuario'
