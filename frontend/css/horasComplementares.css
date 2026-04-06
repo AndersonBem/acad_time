@@ -1,0 +1,174 @@
+.card-horas {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.campo label {
+  font-weight: 600;
+  color: #1f2f5c;
+}
+
+.campo select,
+.campo input,
+.input-com-texto input,
+.regra textarea {
+  width: 100%;
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  box-sizing: border-box;
+  background: white;
+}
+
+.campo select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.campo-inline {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.campo-inline label {
+  font-weight: 600;
+  color: #1f2f5c;
+}
+
+.input-com-texto {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-com-texto input {
+  width: 80px;
+}
+
+.input-com-texto span {
+  color: #1f2f5c;
+  font-weight: 500;
+}
+
+.cabecalho-regras,
+.linha-regra {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.4fr 0.6fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.cabecalho-regras {
+  font-weight: bold;
+  color: #1f2f5c;
+  border-top: 1px solid #ddd;
+  padding-top: 16px;
+}
+
+.linha-regra {
+  border-top: 1px solid #eee;
+  padding-top: 16px;
+}
+
+.categoria strong {
+  color: #1f2f5c;
+  font-size: 18px;
+}
+
+.categoria p {
+  margin: 8px 0 0 0;
+  font-size: 13px;
+  color: #555;
+  line-height: 1.4;
+}
+
+.limite {
+  padding-top: 6px;
+}
+
+.regra textarea {
+  min-height: 70px;
+  resize: none;
+}
+
+.status {
+  display: flex;
+  justify-content: center;
+  padding-top: 12px;
+}
+
+.acoes-horas {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  background-color: #cfcfcf;
+  border-radius: 999px;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.slider::before {
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  top: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.switch input:checked + .slider {
+  background-color: #113e98;
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(22px);
+}
+
+.acoes-horas{
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-salvar-alt {
+  background: #d98a1f;
+  color: white;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: flex-end;
+}

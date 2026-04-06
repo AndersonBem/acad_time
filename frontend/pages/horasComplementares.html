@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang='pt-br'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Cursos</title>
+
+    <link rel="stylesheet" href="../css/global.css">    
+    <link rel="stylesheet" href="../css/cadastrarCurso.css"> 
+    <link rel="stylesheet" href="../css/horasComplementares.css"> 
+
+</head>
+
+<body>
+  <div class="layout">
+    <div class="menu-lateral">
+        <div class ="logo-box">
+            <a href = "dashboard.html"><img src = "../assets/Logo.png" alt="Logo AcadTime" class="Logo"></a>  
+    </div>
+
+
+    <aside class="sidebar">
+      <ul>
+        <li>Dashboard</li>
+        <li><a href="cursos.html">Cursos</a></li>
+        <li><a href="coordenadores.html">Coordenadores</a></li>
+        <li><a href="alunos.html">Alunos</a></li>
+        <li><a href="horasComplementares.html">Horas Complementares</a></li>
+      </ul>
+    </aside>
+</div>
+
+<main class = "content">
+    <h1>Regras de Atividades por Curso</h1>
+
+    <div class="card card-horas">
+        <div class="campo"
+            <label for="curso">Curso</label>
+            <select id="curso">
+                <option>Analise e Desenvolvimento de Sistemas</option>
+                <option>Farmacia</option>
+                <option>Gastronomia</option>
+                <option>Psicologia</option>
+            </select>
+    </div>
+
+    <div class="campo-inline">
+          <label for="cargaMinima">Carga horária mínima para conclusão de curso:</label>
+          <div class="input-com-texto">
+            <input type="text" id="cargaMinima" value="100">
+            <span>Horas</span>
+          </div>
+        </div>
+
+        <div class="cabecalho-regras">
+          <div>Categorias de Atividades</div>
+          <div>Limites de Horas</div>
+          <div>Regras Específicas de Validação</div>
+          <div>Status</div>
+        </div>
+
+        <div class="linha-regra">
+          <div class="categoria">
+            <strong>Ensino / Acadêmico</strong>
+            <p>Monitoria<br>Disciplinas extracurriculares<br>Cursos livres (online ou presenciais)</p>
+          </div>
+          <div class="limite">
+            <div class="input-com-texto">
+              <input type="text" value="20">
+              <span>Horas</span>
+            </div>
+          </div>
+          <div class="regra">
+            <textarea></textarea>
+          </div>
+          <div class="status">
+            <label class="switch">
+              <input type="checkbox" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="linha-regra">
+          <div class="categoria">
+            <strong>Pesquisa</strong>
+            <p>Iniciação científica<br>Participação em projetos de pesquisa<br>Publicação de artigos/resumos</p>
+          </div>
+          <div class="limite">
+            <div class="input-com-texto">
+              <input type="text" value="20">
+              <span>Horas</span>
+            </div>
+          </div>
+          <div class="regra">
+            <textarea></textarea>
+          </div>
+          <div class="status">
+            <label class="switch">
+              <input type="checkbox" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="linha-regra">
+          <div class="categoria">
+            <strong>Extensão</strong>
+            <p>Ações comunitárias<br>Programas de extensão universitária<br>Voluntariado</p>
+          </div>
+          <div class="limite">
+            <div class="input-com-texto">
+              <input type="text" value="20">
+              <span>Horas</span>
+            </div>
+          </div>
+          <div class="regra">
+            <textarea></textarea>
+          </div>
+          <div class="status">
+            <label class="switch">
+              <input type="checkbox" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="linha-regra">
+          <div class="categoria">
+            <strong>Eventos Acadêmicos</strong>
+            <p>Palestras<br>Workshops<br>Congressos e simpósios</p>
+          </div>
+          <div class="limite">
+            <div class="input-com-texto">
+              <input type="text" value="20">
+              <span>Horas</span>
+            </div>
+          </div>
+          <div class="regra">
+            <textarea></textarea>
+          </div>
+          <div class="status">
+            <label class="switch">
+              <input type="checkbox">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="linha-regra">
+          <div class="categoria">
+            <strong>Atividades Profissionais</strong>
+            <p>Estágios (não obrigatórios)<br>Trabalho na área<br>Trainee</p>
+          </div>
+          <div class="limite">
+            <div class="input-com-texto">
+              <input type="text" value="20">
+              <span>Horas</span>
+            </div>
+          </div>
+          <div class="regra">
+            <textarea></textarea>
+          </div>
+          <div class="status">
+            <label class="switch">
+              <input type="checkbox" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="acoes-horas">
+          <button class="btn-salvar-alt">SALVAR ALTERAÇÕES</button>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+<script src="../js/config.js"></script>
+<script src="../js/utils.js"></script>
+<script src="../js/horasComplementares.js"></script>
+
+
+</body>
+</html>
