@@ -4,7 +4,7 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
     const email = document.getElementById('email').value.trim();
     const senha = document.getElementById('senha').value.trim();
 
-    // 🔒 validação básica
+  
     if (!email || !senha) {
         alert('Preencha todos os campos!');
         return;
@@ -15,9 +15,10 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
         password: senha
     };
 
+    const url = CONFIG.BASE_URL.replace(/\/$/, '') + CONFIG.ENDPOINTS.login;
+
     try {
-        // aqui vai o backend
-        const response = await fetch('', {
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -25,32 +26,28 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
             body: JSON.stringify(dados)
         });
 
-        // converter resposta
         const resultado = await response.json();
 
-        //  resposta da API
         console.log('Resposta da API:', resultado);
 
         if (response.ok) {
+            const token = resultado.access;
+            const usuario = resultado.usuario;
 
-            // token
-            const token = resultado.token;
-
-            //  salvar no local Storege
             if (token) {
-                localStorage.setItem('token', token);
-                console.log('Token salvo com sucesso!');
-            } else {
-                console.warn('Token não veio na resposta!');
+                localStorage.setItem('access_token', token);
             }
 
-            alert('Login realizado com sucesso!');
+            if (usuario) {
+                localStorage.setItem('usuario_logado', JSON.stringify(usuario));
+            }
 
-            //  deixa preparado pro futuro
-            // window.location.href = '/dashboard.html';
+            alert(resultado.mensagem || 'Login realizado com sucesso.');
 
+            // Exemplo de redirecionamento
+            // window.location.href = '../pages/dashboard.html';
         } else {
-            alert('Erro ao logar: ' + (resultado.message || 'Credenciais inválidas'));
+            alert(resultado.erro || 'Email ou senha inválidos.');
         }
 
     } catch (error) {
