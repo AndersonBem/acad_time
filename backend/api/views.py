@@ -10,7 +10,7 @@ from api.serializers import (
     CoordenadorSerializer, CoordenadorCreateSerializer, CoordenadorUpdateSerializer, 
     AlunoSerializer, AlunoCreateSerializer,AlunoUpdateSerializer,
     SuperAdminSerializer, LoginSerializer)
-from api.jwt_utils import gerar_acess_token
+from api.jwt_utils import gerar_access_token
 
 class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
     """Listando usuários, sem permitir criação, deleteção e etc, esses metodos
@@ -327,7 +327,7 @@ class LoginAPIView(APIView):
                 status= status.HTTP_401_UNAUTHORIZED
             )
         tipo_usuario = self.descobrir_tipo_usuario(usuario)
-        access_token = gerar_acess_token(usuario, tipo_usuario)
+        access_token = gerar_access_token(usuario, tipo_usuario)
 
         return Response(
             {

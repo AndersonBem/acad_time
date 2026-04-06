@@ -2,7 +2,7 @@ import jwt
 from datetime import datetime, timezone
 from django.conf import settings
 
-def gerar_acess_token(usuario, tipo_usuario):
+def gerar_access_token(usuario, tipo_usuario):
     agora = datetime.now(timezone.utc)
     exp = agora + settings.JWT_ACCESS_TOKEN_LIFETIME
 

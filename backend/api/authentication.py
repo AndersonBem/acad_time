@@ -9,7 +9,7 @@ class JWTUsuarioAuthentication(authentication.BaseAuthentication):
 
         if not auth_header:
             return None
-        partes = auth_header.slit()
+        partes = auth_header.split()
 
         if len(partes) != 2 or partes[0].lower() != 'bearer':
             raise exceptions.AuthenticationFailed('Header Authorization inválido.')
@@ -20,7 +20,7 @@ class JWTUsuarioAuthentication(authentication.BaseAuthentication):
             payload = jwt.decode(
                 token,
                 settings.JWT_SECRET_KEY,
-                algorithms = [settings.JWT_ALGORITH]
+                algorithms = [settings.JWT_ALGORITHM]
             )
         except jwt.ExpiredSignatureError:
             raise exceptions.AuthenticationFailed('Token expirado.')
