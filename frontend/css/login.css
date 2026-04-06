@@ -1,0 +1,178 @@
+/* Reset remover os estilos padrões do navegador */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Body */
+body {
+    background: linear-gradient(130deg, #15487D, #F4F2F2);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Container principal*/
+.login-container {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+}
+
+/* Logo AcadTime */
+.logo {
+    width: 400px;
+    flex-shrink: 0;
+}
+
+/* Controlar o tamanho do form*/
+.form-side {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Div de Login e borda preta*/
+.login-box {
+    width: 100%;
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid #000409;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+}
+
+/* Titulo*/
+h2 {
+    text-align: center;
+    color: #003366;
+    margin-bottom: 25px;
+}
+
+/* Input*/
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #003366;
+    font-size: 14px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #eee;
+}
+
+/* Esqueceu senha */
+.forgot-password {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+.forgot-password a {
+    font-size: 12px;
+    color: #003366;
+}
+
+/* Botão de login */
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    background-color: #f39200;
+    color: #003366;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-login:hover {
+    background-color: #e68a00;
+}
+
+
+ /*Responsividade */
+ 
+
+/* Tablet */
+@media (max-width: 768px) {
+    .login-container {
+        flex-direction: column; 
+        align-items: center;
+        text-align: center;
+        gap: 30px;
+    }
+
+    .form-side {
+        justify-content: center;
+    }
+
+    .logo {
+        width: 220px;
+    }
+
+    .login-box {
+        padding: 25px;
+    }
+}
+
+/* Celular */
+@media (max-width: 480px) {
+    body {
+        padding: 20px;
+        align-items: flex-start;
+    }
+
+    .login-container {
+        width: 100%;
+    }
+
+    .logo {
+        width: 180px;
+        margin-bottom: 10px;
+    }
+
+    .login-box {
+        padding: 20px;
+        border-radius: 15px;
+    }
+
+    h2 {
+        font-size: 18px;
+    }
+
+    .btn-login {
+        font-size: 14px;
+        padding: 10px;
+    }
+}
+
+/* Para telas grandes */
+@media (min-width: 1200px) {
+    .login-container {
+        max-width: 900px;
+        gap: 100px; 
+    }
+
+    .logo {
+        width: 380px; 
+    }
+
+    .login-box {
+        padding: 40px;
+    }
+}
