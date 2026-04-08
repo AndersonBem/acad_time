@@ -93,6 +93,22 @@ COORDENADOR
 
 Rota: /coordenador/
 
+OBS: está mostrando o curso ao qual ele tem vinculo tbm
+   
+    {
+        "id": 13,
+        "nome": "Gabriel Dias",
+        "email": "gabriel@email.com",
+        "status": true,
+        "telefone": "81999999999",
+        "cursos": [
+            {
+                "curso": "ADS"
+            }
+        ]
+    }
+
+
 Métodos:
 GET /coordenador/
 GET /coordenador/{id}/

@@ -278,7 +278,8 @@ AS
 $$
 BEGIN
     INSERT INTO "CoordenacaoCurso"
-    VALUES(p_curso,p_coord,CURRENT_DATE,NULL);
+    ("Curso_idCurso", "Coordenador_idUsuario", "dataInicio", "dataFim")
+    VALUES (p_curso, p_coord, CURRENT_DATE, NULL);
 END;
 $$;
 

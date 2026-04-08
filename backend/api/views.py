@@ -21,7 +21,10 @@ class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
 class CoordenadorViewSet(viewsets.ModelViewSet):
     """Tabela especifica que herda de usuario, aqui vai permitir os metodos
     que usuarioviewset não possue"""
-    queryset = Coordenador.objects.all()
+    queryset = Coordenador.objects.select_related('usuario').prefetch_related(
+        'coordenacoes__curso',
+        'telefone_set'
+    )
 
     """Definindo se o serializer_class vai ser de POST ou GET"""
     def get_serializer_class(self):

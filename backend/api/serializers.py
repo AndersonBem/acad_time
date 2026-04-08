@@ -1,23 +1,34 @@
 from rest_framework import serializers
 from api.models import (Usuario, Coordenador, Aluno, 
-                        SuperAdmin, Matricula)
+                        SuperAdmin, Matricula, CoordenacaoCurso)
 
+"""Serializer geral para get"""
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
         fields = '__all__'
 
-"""Serializer geral para get"""
+class CoordenacaoCursoResumoSerializer(serializers.ModelSerializer):
+    curso = serializers.ReadOnlyField(source = 'curso.nome')
+    class Meta:
+        model = CoordenacaoCurso
+        fields = ['curso']
+
 class CoordenadorSerializer(serializers.ModelSerializer):
 
     id = serializers.ReadOnlyField(source = 'usuario.id_usuario')
     nome = serializers.ReadOnlyField(source = 'usuario.nome')
     email = serializers.ReadOnlyField(source = 'usuario.email')
     telefone = serializers.SerializerMethodField()
+    cursos = CoordenacaoCursoResumoSerializer(
+        source = 'coordenacoes',
+        many = True,
+        read_only = True
+    )
 
     class Meta:
         model = Coordenador
-        fields = ['id','nome', 'email', 'status', 'telefone']
+        fields = ['id','nome', 'email', 'status', 'telefone', 'cursos']
 
     def get_telefone(self, obj):
         telefone = obj.telefone_set.first()
@@ -30,7 +41,6 @@ class CoordenadorCreateSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length = 150)
     senha = serializers.CharField(write_only = True)
     telefone= serializers.CharField(max_length=20, required = False, allow_null = True, allow_blank = True)
-
 
 """Serializer para edição, precisa por usar procedure para salvar"""
 
@@ -53,7 +63,6 @@ class MatriculaResumoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Matricula
         fields = ['curso', 'status']
-
 
 class AlunoSerializer(serializers.ModelSerializer):
 

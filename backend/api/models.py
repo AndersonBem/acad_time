@@ -127,8 +127,9 @@ class Matricula(models.Model):
 
 
 class CoordenacaoCurso(models.Model):
+    id_coordenacao_curso = models.AutoField(db_column='idCoordenacaoCurso', primary_key=True)
     curso = models.ForeignKey(Curso, models.DO_NOTHING, db_column='Curso_idCurso')
-    coordenador = models.ForeignKey(Coordenador, models.DO_NOTHING, db_column='Coordenador_idUsuario')
+    coordenador = models.ForeignKey(Coordenador, models.DO_NOTHING, db_column='Coordenador_idUsuario', related_name='coordenacoes')
     data_inicio = models.DateField(db_column='dataInicio')
     data_fim = models.DateField(db_column='dataFim', blank=True, null=True)
 
