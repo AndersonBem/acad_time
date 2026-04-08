@@ -43,9 +43,7 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
             }
 
             alert(resultado.mensagem || 'Login realizado com sucesso.');
-
-            // Exemplo de redirecionamento
-            // window.location.href = '../pages/dashboard.html';
+            window.location.href = '../pages/alunos.html';
         } else {
             alert(resultado.erro || 'Email ou senha inválidos.');
         }

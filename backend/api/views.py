@@ -159,8 +159,11 @@ class CoordenadorViewSet(viewsets.ModelViewSet):
 
 class AlunoViewSet(viewsets.ModelViewSet):
     """repete coordenadorviewset, com modificações pertinentes"""
-    queryset = Aluno.objects.all()
-
+    permission_classes = [IsAuthenticated]
+    queryset = Aluno.objects.select_related('usuario').prefetch_related(
+        'matriculas__curso',
+        'matriculas__status_matricula'
+    )
     def get_serializer_class(self):
         if self.action == 'create':
             return AlunoCreateSerializer

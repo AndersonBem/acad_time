@@ -262,7 +262,8 @@ BEGIN
     END IF;
 
     INSERT INTO "Matricula"
-    VALUES(p_curso,p_aluno,CURRENT_DATE,p_status);
+    ("Curso_idCurso", "Aluno_idUsuario", "dataMatricula", "idStatusMatricula")
+    VALUES (p_curso, p_aluno, CURRENT_DATE, p_status);
 END;
 $$;
 

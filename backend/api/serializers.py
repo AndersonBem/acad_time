@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from api.models import Usuario, Coordenador, Aluno, SuperAdmin
+from api.models import (Usuario, Coordenador, Aluno, 
+                        SuperAdmin, Matricula)
 
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
@@ -45,15 +46,29 @@ class CoordenadorUpdateSerializer(serializers.Serializer):
             )
         return attrs
 
+class MatriculaResumoSerializer(serializers.ModelSerializer):
+    curso = serializers.ReadOnlyField(source ='curso.nome')
+    status = serializers.ReadOnlyField(source = 'status_matricula.nome')
+
+    class Meta:
+        model = Matricula
+        fields = ['curso', 'status']
+
+
 class AlunoSerializer(serializers.ModelSerializer):
 
     id = serializers.ReadOnlyField(source = 'usuario.id_usuario')
     nome = serializers.ReadOnlyField(source = 'usuario.nome')
     email = serializers.ReadOnlyField(source = 'usuario.email')
+    cursos = MatriculaResumoSerializer(
+        source = 'matriculas',
+        many = True,
+        read_only = True
+    )
 
     class Meta:
         model = Aluno
-        fields = ['id','nome', 'email', 'total_horas', 'matricula']
+        fields = ['id','nome', 'email', 'total_horas', 'matricula', 'cursos']
 
 """Serializer para post, precisa por usar procedure para salvar"""
 class AlunoCreateSerializer(serializers.Serializer):
@@ -77,7 +92,6 @@ class AlunoUpdateSerializer(serializers.Serializer):
             )
         return attrs
 
-
 class SuperAdminSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source = 'usuario.id_usuario')
     nome = serializers.ReadOnlyField(source = 'usuario.nome')
@@ -90,3 +104,4 @@ class SuperAdminSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     senha = serializers.CharField(write_only = True)
+

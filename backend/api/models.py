@@ -13,6 +13,10 @@ class Usuario(models.Model):
 
     def __str__(self):
         return self.nome
+    
+    @property
+    def is_authenticated(self):
+        return True
 
 
 class Coordenador(models.Model):
@@ -98,6 +102,7 @@ class StatusMatricula(models.Model):
 
 
 class Matricula(models.Model):
+    id_matricula = models.AutoField(db_column='idMatricula', primary_key=True)
     curso = models.ForeignKey(Curso, models.DO_NOTHING, db_column='Curso_idCurso')
     aluno = models.ForeignKey(
         Aluno,
