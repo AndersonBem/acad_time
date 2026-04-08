@@ -43,11 +43,13 @@ CREATE TABLE IF NOT EXISTS public."Curso"
 
 CREATE TABLE IF NOT EXISTS public."Matricula"
 (
+    "idMatricula" integer NOT NULL GENERATED ALWAYS AS IDENTITY,
     "Curso_idCurso" integer NOT NULL,
     "Aluno_idUsuario" integer NOT NULL,
     "dataMatricula" date NOT NULL,
     "idStatusMatricula" integer NOT NULL,
-    CONSTRAINT pk_curso_aluno PRIMARY KEY ("Curso_idCurso", "Aluno_idUsuario")
+    PRIMARY KEY ("idMatricula"),
+    CONSTRAINT uq_matricula_curso_aluno UNIQUE ("Curso_idCurso", "Aluno_idUsuario")
 );
 
 CREATE TABLE IF NOT EXISTS public."CoordenacaoCurso"

@@ -73,7 +73,9 @@ INSERT INTO "StatusMatricula" (nome) VALUES
 -- =====================
 -- MATRICULA
 -- =====================
-INSERT INTO "Matricula" VALUES
+INSERT INTO "Matricula"
+("Curso_idCurso", "Aluno_idUsuario", "dataMatricula", "idStatusMatricula")
+VALUES
 (1,1,'2023-01-01',1),
 (1,2,'2023-01-01',1),
 (2,3,'2023-01-01',1),
