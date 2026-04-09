@@ -225,4 +225,12 @@ RENAME CONSTRAINT uq_matricula_curso_aluno TO uq_inscricao_curso_aluno;
 ALTER TABLE public."Inscricao"
 RENAME COLUMN "dataMatricula" TO "dataInscricao";
 
+ALTER TABLE public."CoordenacaoCurso"
+DROP CONSTRAINT uq_coordenador_curso;
+
+CREATE UNIQUE INDEX uq_coordenador_curso_ativo
+ON public."CoordenacaoCurso" ("Curso_idCurso", "Coordenador_idUsuario")
+WHERE "dataFim" IS NULL;
+
+
 END;

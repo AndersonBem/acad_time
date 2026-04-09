@@ -136,7 +136,6 @@ class CoordenacaoCurso(models.Model):
     class Meta:
         managed = False
         db_table = 'CoordenacaoCurso'
-        unique_together = (('curso', 'coordenador'),)
 
     def __str__(self):
         return f'{self.coordenador} - {self.curso}'

@@ -7,7 +7,8 @@ const CONFIG = {
         alunos: '/aluno/',
         superadmin: '/superadmin/',
         login: '/login/',
-        inscricao: '/inscricao/'
+        inscricao: '/inscricao/',
+        coordenacaoCurso: '/coordenacaoCurso/'
     }
 };
 
@@ -330,4 +331,116 @@ Entrada (POST/PATCH):
 
 Saída (GET):
 - retorna dados amigáveis (nome do aluno, nome do curso, status)
+*/
+
+/*
+========================
+COORDENAÇÃO (VÍNCULO COORDENADOR-CURSO)
+========================
+
+Endpoint:
+GET /coordenacaoCurso/
+GET /coordenacaoCurso/{id}/
+POST /coordenacaoCurso/
+PATCH /coordenacaoCurso/{id}/
+
+Descrição:
+Representa o vínculo entre um coordenador e um curso.
+Permite histórico de vínculos (um coordenador pode entrar, sair e voltar ao mesmo curso).
+
+Regra principal:
+- NÃO permite mais de um vínculo ativo (data_fim = null) para o mesmo coordenador e curso
+- vínculos antigos são preservados (histórico)
+
+========================
+GET /coordenacaoCurso/
+========================
+Retorna lista de vínculos.
+
+Resposta:
+[
+  {
+    "id_coordenacao_curso": 1,
+    "curso": 2,
+    "nome_curso": "ADS",
+    "coordenador": 3,
+    "nome_coordenador": "Maria Souza",
+    "data_inicio": "2026-04-09",
+    "data_fim": null,
+    "status": "ativo"
+  }
+]
+
+========================
+GET /coordenacaoCurso/{id}/
+========================
+Retorna um vínculo específico.
+
+Resposta:
+{
+  "id_coordenacao_curso": 1,
+  "curso": 2,
+  "nome_curso": "ADS",
+  "coordenador": 3,
+  "nome_coordenador": "Maria Souza",
+  "data_inicio": "2026-04-09",
+  "data_fim": null,
+  "status": "ativo"
+}
+
+========================
+POST /coordenacaoCurso/
+========================
+Cria um novo vínculo coordenador-curso.
+
+Body:
+{
+  "coordenador": 3,
+  "curso": 2
+}
+
+Observações:
+- coordenador e curso devem ser IDs existentes
+- data_inicio é gerada automaticamente pelo backend
+- cria sempre um NOVO vínculo (não reutiliza antigos)
+- não permite criar se já existir vínculo ativo para o mesmo coordenador e curso
+
+Possíveis erros:
+- coordenador ou curso inexistente
+- já existe vínculo ativo para esse coordenador e curso
+
+========================
+PATCH /coordenacaoCurso/{id}/
+========================
+Encerra um vínculo existente.
+
+Body:
+{
+  "data_fim": "2026-05-01"
+}
+
+Observações:
+- usado para encerrar vínculo (definir data_fim)
+- não permite alterar coordenador ou curso
+- data_fim não pode ser anterior à data_inicio
+- para reativar, deve ser feito um novo POST (novo vínculo)
+
+========================
+DELETE /coordenacaoCurso/{id}/
+========================
+Não permitido.
+Retorna erro 405 (Method Not Allowed).
+
+========================
+Resumo
+========================
+Entrada (POST/PATCH):
+- usa IDs (coordenador, curso)
+- PATCH usa data_fim para encerrar vínculo
+
+Saída (GET):
+- retorna dados amigáveis (nome do coordenador, nome do curso)
+- status é calculado automaticamente:
+  - "ativo" → data_fim = null
+  - "encerrado" → data_fim preenchida
 */

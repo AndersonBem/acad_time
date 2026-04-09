@@ -4,15 +4,16 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.db import connection, IntegrityError, DatabaseError
 from django.contrib.auth.hashers import make_password, check_password
-from api.models import Usuario, Coordenador, Aluno, SuperAdmin, Inscricao
+from api.models import (Usuario, Coordenador, Aluno,
+                        SuperAdmin, Inscricao, CoordenacaoCurso)
 from api.serializers import (
     UsuarioSerializer, 
     CoordenadorSerializer, CoordenadorCreateSerializer, CoordenadorUpdateSerializer, 
     AlunoSerializer, AlunoCreateSerializer,AlunoUpdateSerializer,
     SuperAdminSerializer, LoginSerializer, InscricaoReadSerializer,
-    InscricaoCreateSerializer, InscricaoUpdateSerializer)
+    InscricaoCreateSerializer, InscricaoUpdateSerializer, CoordenacaoCursoCreateSerializer,
+    CoordenacaoCursoUpdateSerializer,CoordenacaoCursoReadSerializer)
 from api.jwt_utils import gerar_access_token
-from datetime import date
 
 class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
     """Listando usuários, sem permitir criação, deleteção e etc, esses metodos
@@ -162,10 +163,30 @@ class CoordenadorViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
 
+class CoordenadorCursoViewSet(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+    queryset = CoordenacaoCurso.objects.select_related(
+        'coordenador',
+        'curso',
+        'coordenador__usuario'
+    ).order_by('id_coordenacao_curso')
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return CoordenacaoCursoCreateSerializer
+        if self.action in ['update', 'partial_update']:
+            return CoordenacaoCursoUpdateSerializer
+        return CoordenacaoCursoReadSerializer
+    
+    def destroy(self, request, *args, **kwargs):
+        return Response(
+            {'erro': 'Exclusão de vinculo não é permitida.'},
+            status= status.HTTP_405_METHOD_NOT_ALLOWED
+        )
+    
 
 class InscricaoViewSet(viewsets.ModelViewSet):
-    """MUDAR"""
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     queryset = Inscricao.objects.select_related(
         'aluno',
         'curso',
