@@ -101,16 +101,16 @@ class StatusMatricula(models.Model):
         return self.nome
 
 
-class Matricula(models.Model):
-    id_matricula = models.AutoField(db_column='idMatricula', primary_key=True)
+class Inscricao(models.Model):
+    id_inscricao = models.AutoField(db_column='idInscricao', primary_key=True)
     curso = models.ForeignKey(Curso, models.DO_NOTHING, db_column='Curso_idCurso')
     aluno = models.ForeignKey(
         Aluno,
         models.DO_NOTHING,
         db_column='Aluno_idUsuario',
-        related_name='matriculas'  # 👈 aqui
+        related_name='inscricoes'  
     )
-    data_matricula = models.DateField(db_column='dataMatricula')
+    data_inscricao = models.DateField(db_column='dataInscricao')
     status_matricula = models.ForeignKey(
         StatusMatricula,
         models.DO_NOTHING,
@@ -119,7 +119,7 @@ class Matricula(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'Matricula'
+        db_table = 'Inscricao'
         unique_together = (('curso', 'aluno'),)
 
     def __str__(self):
@@ -127,15 +127,15 @@ class Matricula(models.Model):
 
 
 class CoordenacaoCurso(models.Model):
+    id_coordenacao_curso = models.AutoField(db_column='idCoordenacaoCurso', primary_key=True)
     curso = models.ForeignKey(Curso, models.DO_NOTHING, db_column='Curso_idCurso')
-    coordenador = models.ForeignKey(Coordenador, models.DO_NOTHING, db_column='Coordenador_idUsuario')
+    coordenador = models.ForeignKey(Coordenador, models.DO_NOTHING, db_column='Coordenador_idUsuario', related_name='coordenacoes')
     data_inicio = models.DateField(db_column='dataInicio')
     data_fim = models.DateField(db_column='dataFim', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'CoordenacaoCurso'
-        unique_together = (('curso', 'coordenador'),)
 
     def __str__(self):
         return f'{self.coordenador} - {self.curso}'

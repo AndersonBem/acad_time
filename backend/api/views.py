@@ -4,12 +4,15 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.db import connection, IntegrityError, DatabaseError
 from django.contrib.auth.hashers import make_password, check_password
-from api.models import Usuario, Coordenador, Aluno, SuperAdmin
+from api.models import (Usuario, Coordenador, Aluno,
+                        SuperAdmin, Inscricao, CoordenacaoCurso)
 from api.serializers import (
     UsuarioSerializer, 
     CoordenadorSerializer, CoordenadorCreateSerializer, CoordenadorUpdateSerializer, 
     AlunoSerializer, AlunoCreateSerializer,AlunoUpdateSerializer,
-    SuperAdminSerializer, LoginSerializer)
+    SuperAdminSerializer, LoginSerializer, InscricaoReadSerializer,
+    InscricaoCreateSerializer, InscricaoUpdateSerializer, CoordenacaoCursoCreateSerializer,
+    CoordenacaoCursoUpdateSerializer,CoordenacaoCursoReadSerializer)
 from api.jwt_utils import gerar_access_token
 
 class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
@@ -21,7 +24,10 @@ class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
 class CoordenadorViewSet(viewsets.ModelViewSet):
     """Tabela especifica que herda de usuario, aqui vai permitir os metodos
     que usuarioviewset não possue"""
-    queryset = Coordenador.objects.all()
+    queryset = Coordenador.objects.select_related('usuario').prefetch_related(
+        'coordenacoes__curso',
+        'telefone_set'
+    )
 
     """Definindo se o serializer_class vai ser de POST ou GET"""
     def get_serializer_class(self):
@@ -157,12 +163,56 @@ class CoordenadorViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
 
+class CoordenadorCursoViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = CoordenacaoCurso.objects.select_related(
+        'coordenador',
+        'curso',
+        'coordenador__usuario'
+    ).order_by('id_coordenacao_curso')
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return CoordenacaoCursoCreateSerializer
+        if self.action in ['update', 'partial_update']:
+            return CoordenacaoCursoUpdateSerializer
+        return CoordenacaoCursoReadSerializer
+    
+    def destroy(self, request, *args, **kwargs):
+        return Response(
+            {'erro': 'Exclusão de vinculo não é permitida.'},
+            status= status.HTTP_405_METHOD_NOT_ALLOWED
+        )
+    
+
+class InscricaoViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = Inscricao.objects.select_related(
+        'aluno',
+        'curso',
+        'aluno__usuario',
+        'status_matricula'
+    )
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return InscricaoCreateSerializer
+        if self.action  in ['update', 'partial_update']:
+            return InscricaoUpdateSerializer
+        return InscricaoReadSerializer
+    
+    def destroy(self, request, *args, **kwargs):
+        return Response(
+            {'erro': 'Exclusão de inscrição não é permitida.'},
+            status= status.HTTP_405_METHOD_NOT_ALLOWED
+        )
+
 class AlunoViewSet(viewsets.ModelViewSet):
     """repete coordenadorviewset, com modificações pertinentes"""
     permission_classes = [IsAuthenticated]
     queryset = Aluno.objects.select_related('usuario').prefetch_related(
-        'matriculas__curso',
-        'matriculas__status_matricula'
+        'inscricoes__curso',
+        'inscricoes__status_matricula'
     )
     def get_serializer_class(self):
         if self.action == 'create':

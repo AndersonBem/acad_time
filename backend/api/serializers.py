@@ -1,23 +1,121 @@
 from rest_framework import serializers
+from datetime import date
 from api.models import (Usuario, Coordenador, Aluno, 
-                        SuperAdmin, Matricula)
+                        SuperAdmin, CoordenacaoCurso, Inscricao)
 
+"""Serializer geral para get"""
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
         fields = '__all__'
 
-"""Serializer geral para get"""
+"""Serializer apenas para leitura das informações"""
+class InscricaoReadSerializer(serializers.ModelSerializer):
+    nome_curso = serializers.ReadOnlyField(source = 'curso.nome')
+    nome_aluno = serializers.ReadOnlyField(source = 'aluno.usuario.nome')
+    numero_matricula = serializers.ReadOnlyField(source = 'aluno.matricula')
+    status_matricula = serializers.ReadOnlyField(source = 'status_matricula.nome')
+    
+    class Meta:
+        model = Inscricao
+        fields = ['id_inscricao', 'nome_curso', 'nome_aluno','numero_matricula' ,'data_inscricao','status_matricula']
+"""Serializer de criação da inscricão"""
+class InscricaoCreateSerializer(serializers.ModelSerializer):
+    class Meta: 
+        model = Inscricao
+        fields = ['aluno', 'curso', 'status_matricula']
+
+    def create(self, validated_data):
+        validated_data['data_inscricao'] = date.today()
+        return super().create(validated_data)
+    
+    def validate(self, attrs):
+        aluno = attrs.get('aluno')
+        curso = attrs.get('curso')
+
+        if Inscricao.objects.filter(aluno = aluno, curso = curso).exists():
+            raise serializers.ValidationError('Este aluno já está vinculado a este curso')
+
+        return attrs
+    
+"""Serializer de update, apenas do status"""
+class InscricaoUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Inscricao
+        fields = ['status_matricula']
+
+
+"""Serializer apenas para leitura das informações"""
+class CoordenacaoCursoReadSerializer(serializers.ModelSerializer):
+    nome_curso = serializers.ReadOnlyField(source = 'curso.nome')
+    nome_coordenador = serializers.ReadOnlyField(source = 'coordenador.usuario.nome')
+    status = serializers.SerializerMethodField()
+    class Meta:
+        model = CoordenacaoCurso
+        fields = ['id_coordenacao_curso','curso', 'nome_curso','coordenador', 'nome_coordenador', 'data_inicio', 'data_fim', 'status']
+
+    def get_status(self, obj):
+        if obj.data_fim:
+            return 'encerrado'
+        return 'ativo'
+    
+"""Serializer apenas criação do vinculo coordenador curso"""
+class CoordenacaoCursoCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CoordenacaoCurso
+        fields = ['curso', 'coordenador']
+
+    def validate(self, attrs):
+        coordenador = attrs.get('coordenador')
+        curso = attrs.get('curso')
+
+        if CoordenacaoCurso.objects.filter(
+                                            coordenador=coordenador,
+                                            curso=curso,
+                                            data_fim__isnull=True
+                                        ).exists():
+            raise serializers.ValidationError('Este coordenador já está vinculado a este curso')
+
+        return attrs
+    
+    def create(self, validated_data):
+        validated_data['data_inicio'] = date.today()
+        return super().create(validated_data)
+
+"""Serializer apenas para encerramento do vinculo coordenador curso"""
+class CoordenacaoCursoUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CoordenacaoCurso
+        fields = ['data_fim']
+    
+    def validate_data_fim(self, value):
+        if value is None:
+            raise serializers.ValidationError('Informe uma data_fim para encerrar o vínculo.')
+        if self.instance and value and value< self.instance.data_inicio:
+            raise serializers.ValidationError('A data_fim não pode ser anterior à data_inicio.')
+        return value
+
+class CoordenacaoCursoResumoSerializer(serializers.ModelSerializer):
+    curso = serializers.ReadOnlyField(source = 'curso.nome')
+    class Meta:
+        model = CoordenacaoCurso
+        fields = ['curso']
+
 class CoordenadorSerializer(serializers.ModelSerializer):
 
     id = serializers.ReadOnlyField(source = 'usuario.id_usuario')
     nome = serializers.ReadOnlyField(source = 'usuario.nome')
     email = serializers.ReadOnlyField(source = 'usuario.email')
     telefone = serializers.SerializerMethodField()
+    cursos = CoordenacaoCursoResumoSerializer(
+        source = 'coordenacoes',
+        many = True,
+        read_only = True
+    )
 
     class Meta:
         model = Coordenador
-        fields = ['id','nome', 'email', 'status', 'telefone']
+        fields = ['id','nome', 'email', 'status', 'telefone', 'cursos']
 
     def get_telefone(self, obj):
         telefone = obj.telefone_set.first()
@@ -30,7 +128,6 @@ class CoordenadorCreateSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length = 150)
     senha = serializers.CharField(write_only = True)
     telefone= serializers.CharField(max_length=20, required = False, allow_null = True, allow_blank = True)
-
 
 """Serializer para edição, precisa por usar procedure para salvar"""
 
@@ -46,22 +143,21 @@ class CoordenadorUpdateSerializer(serializers.Serializer):
             )
         return attrs
 
-class MatriculaResumoSerializer(serializers.ModelSerializer):
+class InscricaoResumoSerializer(serializers.ModelSerializer):
     curso = serializers.ReadOnlyField(source ='curso.nome')
     status = serializers.ReadOnlyField(source = 'status_matricula.nome')
 
     class Meta:
-        model = Matricula
+        model = Inscricao
         fields = ['curso', 'status']
-
 
 class AlunoSerializer(serializers.ModelSerializer):
 
     id = serializers.ReadOnlyField(source = 'usuario.id_usuario')
     nome = serializers.ReadOnlyField(source = 'usuario.nome')
     email = serializers.ReadOnlyField(source = 'usuario.email')
-    cursos = MatriculaResumoSerializer(
-        source = 'matriculas',
+    cursos = InscricaoResumoSerializer(
+        source = 'inscricoes',
         many = True,
         read_only = True
     )

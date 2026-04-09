@@ -90,7 +90,9 @@ VALUES
 -- =====================
 -- COORDENAÇÃO CURSO
 -- =====================
-INSERT INTO "CoordenacaoCurso" VALUES
+INSERT INTO "CoordenacaoCurso"
+("Curso_idCurso", "Coordenador_idUsuario", "dataInicio", "dataFim")
+VALUES
 (1,13,'2023-01-01',NULL),
 (2,14,'2023-01-01',NULL),
 (3,15,'2023-01-01',NULL),
