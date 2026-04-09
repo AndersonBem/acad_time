@@ -164,7 +164,7 @@ class CoordenadorViewSet(viewsets.ModelViewSet):
         return self.update(request, *args, **kwargs)
 
 class CoordenadorCursoViewSet(viewsets.ModelViewSet):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     queryset = CoordenacaoCurso.objects.select_related(
         'coordenador',
         'curso',
