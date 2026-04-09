@@ -4,13 +4,15 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.db import connection, IntegrityError, DatabaseError
 from django.contrib.auth.hashers import make_password, check_password
-from api.models import Usuario, Coordenador, Aluno, SuperAdmin
+from api.models import Usuario, Coordenador, Aluno, SuperAdmin, Inscricao
 from api.serializers import (
     UsuarioSerializer, 
     CoordenadorSerializer, CoordenadorCreateSerializer, CoordenadorUpdateSerializer, 
     AlunoSerializer, AlunoCreateSerializer,AlunoUpdateSerializer,
-    SuperAdminSerializer, LoginSerializer)
+    SuperAdminSerializer, LoginSerializer, InscricaoReadSerializer,
+    InscricaoCreateSerializer, InscricaoUpdateSerializer)
 from api.jwt_utils import gerar_access_token
+from datetime import date
 
 class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
     """Listando usuários, sem permitir criação, deleteção e etc, esses metodos
@@ -160,12 +162,36 @@ class CoordenadorViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
 
+
+class InscricaoViewSet(viewsets.ModelViewSet):
+    """MUDAR"""
+    permission_classes = [AllowAny]
+    queryset = Inscricao.objects.select_related(
+        'aluno',
+        'curso',
+        'aluno__usuario',
+        'status_matricula'
+    )
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return InscricaoCreateSerializer
+        if self.action  in ['update', 'partial_update']:
+            return InscricaoUpdateSerializer
+        return InscricaoReadSerializer
+    
+    def destroy(self, request, *args, **kwargs):
+        return Response(
+            {'erro': 'Exclusão de inscrição não é permitida.'},
+            status= status.HTTP_405_METHOD_NOT_ALLOWED
+        )
+
 class AlunoViewSet(viewsets.ModelViewSet):
     """repete coordenadorviewset, com modificações pertinentes"""
     permission_classes = [IsAuthenticated]
     queryset = Aluno.objects.select_related('usuario').prefetch_related(
-        'matriculas__curso',
-        'matriculas__status_matricula'
+        'inscricoes__curso',
+        'inscricoes__status_matricula'
     )
     def get_serializer_class(self):
         if self.action == 'create':

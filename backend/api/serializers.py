@@ -1,12 +1,39 @@
 from rest_framework import serializers
+from datetime import date
 from api.models import (Usuario, Coordenador, Aluno, 
-                        SuperAdmin, Matricula, CoordenacaoCurso)
+                        SuperAdmin, CoordenacaoCurso, Inscricao)
 
 """Serializer geral para get"""
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
         fields = '__all__'
+
+"""Serializer apenas para leitura das informações"""
+class InscricaoReadSerializer(serializers.ModelSerializer):
+    nome_curso = serializers.ReadOnlyField(source = 'curso.nome')
+    nome_aluno = serializers.ReadOnlyField(source = 'aluno.usuario.nome')
+    numero_matricula = serializers.ReadOnlyField(source = 'aluno.matricula')
+    status_matricula = serializers.ReadOnlyField(source = 'status_matricula.nome')
+    
+    class Meta:
+        model = Inscricao
+        fields = ['id_inscricao', 'nome_curso', 'nome_aluno','numero_matricula' ,'data_inscricao','status_matricula']
+"""Serializer de criação da inscricão"""
+class InscricaoCreateSerializer(serializers.ModelSerializer):
+    class Meta: 
+        model = Inscricao
+        fields = ['aluno', 'curso', 'status_matricula']
+
+    def create(self, validated_data):
+        validated_data['data_inscricao'] = date.today()
+        return super().create(validated_data)
+    
+"""Serializer de update, apenas do status"""
+class InscricaoUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Inscricao
+        fields = ['status_matricula']
 
 class CoordenacaoCursoResumoSerializer(serializers.ModelSerializer):
     curso = serializers.ReadOnlyField(source = 'curso.nome')
@@ -56,12 +83,12 @@ class CoordenadorUpdateSerializer(serializers.Serializer):
             )
         return attrs
 
-class MatriculaResumoSerializer(serializers.ModelSerializer):
+class InscricaoResumoSerializer(serializers.ModelSerializer):
     curso = serializers.ReadOnlyField(source ='curso.nome')
     status = serializers.ReadOnlyField(source = 'status_matricula.nome')
 
     class Meta:
-        model = Matricula
+        model = Inscricao
         fields = ['curso', 'status']
 
 class AlunoSerializer(serializers.ModelSerializer):
@@ -69,8 +96,8 @@ class AlunoSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source = 'usuario.id_usuario')
     nome = serializers.ReadOnlyField(source = 'usuario.nome')
     email = serializers.ReadOnlyField(source = 'usuario.email')
-    cursos = MatriculaResumoSerializer(
-        source = 'matriculas',
+    cursos = InscricaoResumoSerializer(
+        source = 'inscricoes',
         many = True,
         read_only = True
     )

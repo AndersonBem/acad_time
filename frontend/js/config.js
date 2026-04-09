@@ -6,7 +6,8 @@ const CONFIG = {
         coordenadores: '/coordenador/',
         alunos: '/aluno/',
         superadmin: '/superadmin/',
-        login: '/login/'
+        login: '/login/',
+        inscricao: '/inscricao/'
     }
 };
 
@@ -231,4 +232,102 @@ Retorno:
     "nome": "Admin",
     "email": "email"
 }
+*/
+
+/*
+========================
+INSCRIÇÃO (VÍNCULO ALUNO-CURSO)
+========================
+
+Endpoint:
+GET /inscricao/
+GET /inscricao/{id}/
+POST /inscricao/
+PATCH /inscricao/{id}/
+
+Descrição:
+Representa o vínculo entre um aluno e um curso.
+Cada aluno só pode ter uma inscrição por curso (não permite duplicidade).
+
+========================
+GET /inscricao/
+========================
+Retorna lista de inscrições.
+
+Resposta:
+[
+  {
+    "id_inscricao": 1,
+    "nome_curso": "ADS",
+    "nome_aluno": "João Silva",
+    "numero_matricula": "2023001",
+    "data_inscricao": "2026-04-09",
+    "status_matricula": "ATIVO"
+  }
+]
+
+========================
+GET /inscricao/{id}/
+========================
+Retorna uma inscrição específica.
+
+Resposta:
+{
+  "id_inscricao": 1,
+  "nome_curso": "ADS",
+  "nome_aluno": "João Silva",
+  "numero_matricula": "2023001",
+  "data_inscricao": "2026-04-09",
+  "status_matricula": "ATIVO"
+}
+
+========================
+POST /inscricao/
+========================
+Cria uma nova inscrição (vínculo aluno-curso).
+
+Body:
+{
+  "aluno": 1,
+  "curso": 2,
+  "status_matricula": 1
+}
+
+Observações:
+- aluno, curso e status_matricula devem ser IDs existentes
+- data_inscricao é gerada automaticamente pelo backend
+- não permite duplicar inscrição para o mesmo aluno e curso
+
+Possíveis erros:
+- aluno ou curso inexistente
+- duplicidade (aluno já inscrito no curso)
+
+========================
+PATCH /inscricao/{id}/
+========================
+Atualiza apenas o status da inscrição.
+
+Body:
+{
+  "status_matricula": 2
+}
+
+Observações:
+- não permite alterar aluno ou curso
+- usado para ações como: trancar, cancelar, ativar
+
+========================
+DELETE /inscricao/{id}/
+========================
+Não permitido.
+Retorna erro 405 (Method Not Allowed).
+
+========================
+Resumo
+========================
+Entrada (POST/PATCH):
+- usa IDs (aluno, curso, status)
+
+Saída (GET):
+- retorna dados amigáveis (nome do aluno, nome do curso, status)
 */

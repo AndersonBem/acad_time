@@ -213,4 +213,16 @@ ON CONFLICT DO NOTHING;
 ALTER TABLE public."Submissao"
 ALTER COLUMN "statusSubmissao" SET DEFAULT 1;
 
+
+ALTER TABLE "Matricula" RENAME TO "Inscricao";
+
+ALTER TABLE "Inscricao"
+RENAME COLUMN "idMatricula" TO "idInscricao";
+
+ALTER TABLE "Inscricao"
+RENAME CONSTRAINT uq_matricula_curso_aluno TO uq_inscricao_curso_aluno;
+
+ALTER TABLE public."Inscricao"
+RENAME COLUMN "dataMatricula" TO "dataInscricao";
+
 END;
