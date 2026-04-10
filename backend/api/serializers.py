@@ -2,8 +2,7 @@ from rest_framework import serializers
 from datetime import date
 from api.models import (Usuario, Coordenador, Aluno, 
                         SuperAdmin, CoordenacaoCurso, Inscricao,
-                        TipoAtividade, RegraAtividade,StatusSubmissao,
-                        AtividadeComplementar,)
+                        Curso)
 
 """Serializer geral para get"""
 class UsuarioSerializer(serializers.ModelSerializer):
@@ -203,57 +202,7 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     senha = serializers.CharField(write_only = True)
 
-class TipoAtividadeSerializer(serializers.ModelSerializer):
+class CursoSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TipoAtividade
+        model = Curso
         fields = '__all__'
-
-class RegraAtividadeSerializer(serializers.ModelSerializer):
-    tipo_atividade_nome = serializers.ReadOnlyField(source= 'tipo_atividade.nome')
-    curso_nome = serializers.ReadOnlyField(source= 'curso.nome')
-
-    class Meta:
-        model = RegraAtividade
-        fields = [
-                    'id',
-                    'tipo_atividade',
-                    'tipo_atividade_nome',
-                    'curso',
-                    'curso_nome',
-                    'limite_horas',
-                    'exige_comprovante'
-                ]
-    
-    def validate(self, attrs):
-        tipo_atividade = attrs.get('tipo_atividade', self.instance.tipo_atividade if self.instance else None)
-        curso = attrs.get('curso', self.instance.curso if self.instance else None)
-
-        query = RegraAtividade.objects.filter(
-            tipo_atividade = tipo_atividade,
-            curso = curso
-        )
-        if self.instance:
-            query = query.exclude(id= self.instance.id)
-
-        if query.exists():
-            raise serializers.ValidationError('Esse curso já possui uma regra de atividade.')
-        return attrs
-    
-
-class StatusSubmissaoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = StatusSubmissao
-        fields = '__all__'
-
-class AtividadeComplementarSerializer(serializers.ModelSerializer):
-    tipo_atividade_nome = serializers.ReadOnlyField(source ='tipo_atividade.nome')
-    
-    class Meta:
-        model = AtividadeComplementar
-        fields = [
-            'id_atividade_complementar',
-            'descricao',
-            'carga_horaria_solicitada',
-            'tipo_atividade',
-            'tipo_atividade_nome'
-        ]
