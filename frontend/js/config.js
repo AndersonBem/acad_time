@@ -9,7 +9,10 @@ const CONFIG = {
         login: '/login/',
         inscricao: '/inscricao/',
         coordenacaoCurso: '/coordenacaoCurso/',
-        curso: '/curso/'
+        tipoAtividade: '/tipoAtividade/',
+        regraAtividade: '/regraAtividade/',
+        statusSubmissao: '/statusSubmissao/',
+        atividadeComplementar: '/atividadeComplementar/'
     }
 };
 
@@ -448,114 +451,435 @@ Saída (GET):
 
 /*
 ========================
-CURSO
+TIPO DE ATIVIDADE
 ========================
-
-⚠️ Observação importante:
-- O endpoint de curso NÃO gerencia vínculos.
-- Para vincular:
-  - aluno ↔ curso → usar /inscricao/
-  - coordenador ↔ curso → usar /coordenacaoCurso/
-- Este endpoint é apenas para dados do curso.
 
 Endpoint:
-GET /curso/
-GET /curso/{id}/
-POST /curso/
-PATCH /curso/{id}/
-DELETE /curso/{id}/
+GET /tipo-atividade/
+GET /tipo-atividade/{id}/
+POST /tipo-atividade/
+PATCH /tipo-atividade/{id}/
+DELETE /tipo-atividade/{id}/
 
 Descrição:
-Representa os dados base de um curso.
-Não inclui diretamente alunos ou coordenadores vinculados.
+Representa os tipos de atividades complementares aceitas no sistema.
+Ex: Curso, Palestra, Evento, Monitoria, etc.
 
 ========================
-GET /curso/
+GET /tipo-atividade/
 ========================
-Retorna lista de cursos.
+Retorna lista de tipos de atividade.
 
 Resposta:
 [
   {
-    "idCurso": 1,
-    "nome": "ADS",
-    "codigo": "ADS001",
-    "status": true,
-    "cargaHoraria": 200,
-    "descricao": "Curso de Análise e Desenvolvimento de Sistemas"
+    "id": 1,
+    "nome": "Curso"
+  },
+  {
+    "id": 2,
+    "nome": "Palestra"
   }
 ]
 
 ========================
-GET /curso/{id}/
+GET /tipo-atividade/{id}/
 ========================
-Retorna um curso específico.
+Retorna um tipo de atividade específico.
 
 Resposta:
 {
-  "idCurso": 1,
-  "nome": "ADS",
-  "codigo": "ADS001",
-  "status": true,
-  "cargaHoraria": 200,
-  "descricao": "Curso de Análise e Desenvolvimento de Sistemas"
+  "id": 1,
+  "nome": "Curso"
 }
 
 ========================
-POST /curso/
+POST /tipo-atividade/
 ========================
-Cria um novo curso.
+Cria um novo tipo de atividade.
 
 Body:
 {
-  "nome": "ADS",
-  "codigo": "ADS001",
-  "status": true,
-  "cargaHoraria": 200,
-  "descricao": "Curso de Análise e Desenvolvimento de Sistemas"
+  "nome": "Workshop"
 }
 
 Observações:
-- Todos os campos seguem o model diretamente
-- Não realiza vínculo com alunos ou coordenadores
+- nome deve ser único
+- não permite duplicidade de nomes
 
 Possíveis erros:
-- campos obrigatórios não informados
-- violação de regra de unicidade (se existir no banco)
+- nome já existente
 
 ========================
-PATCH /curso/{id}/
+PATCH /tipo-atividade/{id}/
 ========================
-Atualiza dados do curso.
+Atualiza o nome do tipo de atividade.
 
-Body (exemplo):
+Body:
 {
-  "nome": "ADS Atualizado",
-  "status": false
+  "nome": "Evento Acadêmico"
 }
 
 Observações:
-- Permite atualizar qualquer campo do curso
-- Não altera vínculos existentes
+- nome continua sendo único
+- não permite duplicidade
 
 ========================
-DELETE /curso/{id}/
+DELETE /tipo-atividade/{id}/
 ========================
-Remove um curso.
+Remove o tipo de atividade.
 
 Observações:
-- Pode afetar registros relacionados dependendo do comportamento do banco (CASCADE)
+- permitido, mas deve-se garantir que não esteja sendo utilizado em regras
 
 ========================
 Resumo
 ========================
 Entrada (POST/PATCH):
-- usa dados diretos do curso
+- recebe apenas o campo nome
 
 Saída (GET):
-- retorna dados simples do curso
+- retorna id e nome do tipo de atividade
+*/
 
-Vínculos:
-- aluno ↔ curso → /inscricao/
-- coordenador ↔ curso → /coordenacaoCurso/
+/*========================
+REGRA DE ATIVIDADE (VÍNCULO CURSO-TIPO DE ATIVIDADE)
+========================
+
+Endpoint:
+GET /regraAtividade/
+GET /regraAtividade/{id}/
+POST /regraAtividade/
+PATCH /regraAtividade/{id}/
+DELETE /regraAtividade/{id}/
+
+Descrição:
+Define as regras de atividades complementares para cada curso.
+Relaciona um curso a um tipo de atividade, definindo limites e exigências.
+
+Regra principal:
+- NÃO permite duplicidade de (curso + tipo_atividade)
+- cada combinação curso + tipo de atividade deve ser única
+
+========================
+GET /regraAtividade/
+========================
+Retorna lista de regras.
+
+Resposta:
+[
+  {
+    "id": 1,
+    "tipo_atividade": 2,
+    "tipo_atividade_nome": "Palestra",
+    "curso": 1,
+    "curso_nome": "ADS",
+    "limite_horas": 40,
+    "exige_comprovante": true
+  }
+]
+
+========================
+GET /regraAtividade/{id}/
+========================
+Retorna uma regra específica.
+
+Resposta:
+{
+  "id": 1,
+  "tipo_atividade": 2,
+  "tipo_atividade_nome": "Palestra",
+  "curso": 1,
+  "curso_nome": "ADS",
+  "limite_horas": 40,
+  "exige_comprovante": true
+}
+
+========================
+POST /regraAtividade/
+========================
+Cria uma nova regra de atividade para um curso.
+
+Body:
+{
+  "tipo_atividade": 2,
+  "curso": 1,
+  "limite_horas": 40,
+  "exige_comprovante": true
+}
+
+Observações:
+- tipo_atividade e curso devem ser IDs existentes
+- não permite criar regra duplicada para o mesmo curso e tipo de atividade
+
+Possíveis erros:
+- tipo_atividade ou curso inexistente
+- já existe regra para essa combinação (curso + tipo_atividade)
+
+========================
+PATCH /regraAtividade/{id}/
+========================
+Atualiza uma regra existente.
+
+Body:
+{
+  "limite_horas": 60,
+  "exige_comprovante": false
+}
+
+Observações:
+- pode alterar qualquer campo
+- não permite gerar duplicidade de (curso + tipo_atividade)
+
+========================
+DELETE /regraAtividade/{id}/
+========================
+Remove a regra de atividade.
+
+Observações:
+- permitido
+- deve-se garantir que não existam dependências futuras (ex: submissões)
+
+========================
+Resumo
+========================
+Entrada (POST/PATCH):
+- usa IDs (tipo_atividade, curso)
+- define limite_horas e exige_comprovante
+
+Saída (GET):
+- retorna dados enriquecidos:
+  - nome do tipo de atividade
+  - nome do curso
+
+Regra de negócio:
+- unicidade baseada em (curso + tipo_atividade)
+- id é apenas identificador técnico
+*/
+
+/*
+========================
+STATUS DE SUBMISSÃO
+========================
+
+Endpoint:
+GET /statusSubmissao/
+GET /statusSubmissao/{id}/
+POST /statusSubmissao/
+PATCH /statusSubmissao/{id}/
+DELETE /statusSubmissao/{id}/
+
+Descrição:
+Representa os possíveis status de uma submissão de atividade complementar.
+Ex: Pendente, Aprovado, Rejeitado.
+
+========================
+GET /statusSubmissao/
+========================
+Retorna lista de status disponíveis.
+
+Resposta:
+[
+  {
+    "id": 1,
+    "nome_status": "Pendente"
+  },
+  {
+    "id": 2,
+    "nome_status": "Aprovado"
+  },
+  {
+    "id": 3,
+    "nome_status": "Rejeitado"
+  }
+]
+
+========================
+GET /statusSubmissao/{id}/
+========================
+Retorna um status específico.
+
+Resposta:
+{
+  "id": 1,
+  "nome_status": "Pendente"
+}
+
+========================
+POST /statusSubmissao/
+========================
+Cria um novo status.
+
+Body:
+{
+  "nome_status": "Em análise"
+}
+
+Observações:
+- nome_status deve ser único (recomendado)
+- geralmente essa tabela é pré-populada e pouco alterada
+
+Possíveis erros:
+- nome duplicado
+
+========================
+PATCH /statusSubmissao/{id}/
+========================
+Atualiza o nome do status.
+
+Body:
+{
+  "nome_status": "Em revisão"
+}
+
+Observações:
+- mudanças podem impactar o entendimento do sistema
+- deve ser usado com cautela
+
+========================
+DELETE /statusSubmissao/{id}/
+========================
+Remove um status.
+
+Observações:
+- permitido, mas NÃO recomendado se já estiver em uso
+- pode causar inconsistência em submissões existentes
+
+========================
+Resumo
+========================
+Entrada (POST/PATCH):
+- recebe nome_status
+
+Saída (GET):
+- retorna id e nome do status
+
+Observação importante:
+- essa tabela é usada como referência para o fluxo de submissão
+- normalmente contém valores fixos (Pendente, Aprovado, Rejeitado)
+- não possui regras complexas de negócio
+*/
+
+/*
+========================
+ATIVIDADE COMPLEMENTAR
+========================
+
+Endpoint:
+GET /atividadeComplementar/
+GET /atividadeComplementar/{id}/
+POST /atividadeComplementar/
+PATCH /atividadeComplementar/{id}/
+DELETE /atividadeComplementar/{id}/
+
+Descrição:
+Representa a atividade complementar em si, ou seja, o material/registro acadêmico que poderá ser enviado posteriormente em uma submissão.
+
+Essa entidade NÃO representa o envio para análise.
+Ela representa apenas o conteúdo da atividade complementar cadastrada pelo aluno.
+
+Exemplos:
+- participação em palestra
+- curso realizado
+- evento acadêmico
+- atividade de extensão
+
+Fluxo no sistema:
+- primeiro a atividade complementar é cadastrada
+- depois ela pode ser enviada por meio da Submissão
+- a análise, aprovação, status, certificado e feedback do coordenador pertencem ao fluxo de Submissão, não à AtividadeComplementar
+
+========================
+GET /atividadeComplementar/
+========================
+Retorna lista de atividades complementares.
+
+Resposta:
+[
+  {
+    "id_atividade_complementar": 1,
+    "descricao": "Participação em palestra sobre segurança digital",
+    "carga_horaria_solicitada": 10,
+    "tipo_atividade": 2,
+    "tipo_atividade_nome": "Palestra"
+  }
+]
+
+========================
+GET /atividadeComplementar/{id}/
+========================
+Retorna uma atividade complementar específica.
+
+Resposta:
+{
+  "id_atividade_complementar": 1,
+  "descricao": "Participação em palestra sobre segurança digital",
+  "carga_horaria_solicitada": 10,
+  "tipo_atividade": 2,
+  "tipo_atividade_nome": "Palestra"
+}
+
+========================
+POST /atividadeComplementar/
+========================
+Cria uma nova atividade complementar.
+
+Body:
+{
+  "descricao": "Participação em palestra sobre segurança digital",
+  "carga_horaria_solicitada": 10,
+  "tipo_atividade": 2
+}
+
+Observações:
+- tipo_atividade deve ser um ID existente
+- essa entidade representa apenas a atividade em si, não o envio para análise
+
+Possíveis erros:
+- tipo_atividade inexistente
+- dados obrigatórios ausentes
+
+========================
+PATCH /atividadeComplementar/{id}/
+========================
+Atualiza uma atividade complementar existente.
+
+Body:
+{
+  "descricao": "Participação em palestra sobre LGPD",
+  "carga_horaria_solicitada": 12
+}
+
+Observações:
+- permite editar livremente os dados da atividade
+- não envolve status, aprovação ou análise
+
+========================
+DELETE /atividadeComplementar/{id}/
+========================
+Remove uma atividade complementar.
+
+Observações:
+- permitido no estado atual do sistema
+- futuramente, caso exista submissão vinculada, pode ser necessário revisar essa regra
+
+========================
+Resumo
+========================
+Entrada (POST/PATCH):
+- usa tipo_atividade por ID
+- recebe descrição e carga_horaria_solicitada
+
+Saída (GET):
+- retorna:
+  - id_atividade_complementar
+  - descricao
+  - carga_horaria_solicitada
+  - tipo_atividade
+  - tipo_atividade_nome
+
+Regra de negócio:
+- AtividadeComplementar representa o item acadêmico entregue pelo aluno
+- o envio dessa atividade para análise acontece em Submissão
+- status, aprovação, certificado e feedback não pertencem a esta entidade
 */
