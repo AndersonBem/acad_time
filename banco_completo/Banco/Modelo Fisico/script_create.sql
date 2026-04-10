@@ -247,4 +247,24 @@ ADD PRIMARY KEY (id)
 ALTER TABLE "RegraAtividade"
 ADD CONSTRAINT uq_regra UNIQUE ("TipoAtividade_idTipoAtividade", "Curso_idCurso");
 
+ALTER TABLE "Submissao"
+ADD COLUMN "idCurso" integer;
+
+
+ALTER TABLE "Submissao"
+ADD CONSTRAINT fk_submissao_curso
+FOREIGN KEY ("idCurso") REFERENCES "Curso"("idCurso");
+
+ALTER TABLE "Submissao"
+ALTER COLUMN "idCurso" SET NOT NULL;
+
+
+ALTER TABLE "Certificado"
+ADD COLUMN "textoExtraidoOcr" varchar(250),
+ADD COLUMN "cargaHorariaOcr" varchar(250),
+ADD COLUMN "dataCertificadoOcr" varchar(250),
+ADD COLUMN "cursoOcr" varchar(250),
+ADD COLUMN "instituicaoOcr" varchar(250),
+ADD COLUMN "dataUpload" date;
+
 END;

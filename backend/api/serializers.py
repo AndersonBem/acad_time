@@ -3,7 +3,7 @@ from datetime import date
 from api.models import (Usuario, Coordenador, Aluno, 
                         SuperAdmin, CoordenacaoCurso, Inscricao,
                         TipoAtividade, RegraAtividade,StatusSubmissao,
-                        AtividadeComplementar,)
+                        AtividadeComplementar,Submissao)
 
 """Serializer geral para get"""
 class UsuarioSerializer(serializers.ModelSerializer):
@@ -256,4 +256,28 @@ class AtividadeComplementarSerializer(serializers.ModelSerializer):
             'carga_horaria_solicitada',
             'tipo_atividade',
             'tipo_atividade_nome'
+        ]
+
+class SubmissaoReadSerializer(serializers.ModelSerializer):
+    aluno_nome = serializers.ReadOnlyField(source = 'aluno.usuario.nome')
+    curso_nome = serializers.ReadOnlyField(source = 'curso.nome')
+    coordenador_nome = serializers.ReadOnlyField(source = 'coordenador.usuario.nome')
+    status_submissao_nome = serializers.ReadOnlyField(source = 'status_submissao.nome_status')
+    
+    class Meta:
+        model = Submissao
+        fields = [
+            'id_submissao',
+            'data_envio',
+            'observacao_coordenador',
+            'aluno',
+            'aluno_nome',
+            'curso',
+            'curso_nome',
+            'atividade_complementar',
+            'status_submissao',
+            'status_submissao_nome',
+            'certificado',
+            'coordenador',
+            'coordenador_nome'
         ]
