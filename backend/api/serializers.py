@@ -2,7 +2,7 @@ from rest_framework import serializers
 from datetime import date
 from api.models import (Usuario, Coordenador, Aluno, 
                         SuperAdmin, CoordenacaoCurso, Inscricao,
-                        TipoAtividade, RegraAtividade)
+                        TipoAtividade, RegraAtividade,StatusSubmissao,)
 
 """Serializer geral para get"""
 class UsuarioSerializer(serializers.ModelSerializer):
@@ -237,3 +237,9 @@ class RegraAtividadeSerializer(serializers.ModelSerializer):
         if query.exists():
             raise serializers.ValidationError('Esse curso já possui uma regra de atividade.')
         return attrs
+    
+
+class StatusSubmissaoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StatusSubmissao
+        fields = '__all__'

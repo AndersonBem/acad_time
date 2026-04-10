@@ -6,7 +6,8 @@ from django.db import connection, IntegrityError, DatabaseError
 from django.contrib.auth.hashers import make_password, check_password
 from api.models import (Usuario, Coordenador, Aluno,
                         SuperAdmin, Inscricao, CoordenacaoCurso,
-                        TipoAtividade,RegraAtividade,)
+                        TipoAtividade,RegraAtividade, StatusSubmissao,
+                        )
 from api.serializers import (
     UsuarioSerializer, 
     CoordenadorSerializer, CoordenadorCreateSerializer, CoordenadorUpdateSerializer, 
@@ -14,7 +15,8 @@ from api.serializers import (
     SuperAdminSerializer, LoginSerializer, InscricaoReadSerializer,
     InscricaoCreateSerializer, InscricaoUpdateSerializer, CoordenacaoCursoCreateSerializer,
     CoordenacaoCursoUpdateSerializer,CoordenacaoCursoReadSerializer,
-    TipoAtividadeSerializer,RegraAtividadeSerializer,)
+    TipoAtividadeSerializer,RegraAtividadeSerializer,StatusSubmissaoSerializer,
+    )
 from api.jwt_utils import gerar_access_token
 
 class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
@@ -419,3 +421,8 @@ class RegraAtividadeViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = RegraAtividade.objects.all().order_by('curso')
     serializer_class = RegraAtividadeSerializer
+
+class StatusSubmissaoViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = StatusSubmissao.objects.all().order_by('nome_status')
+    serializer_class = StatusSubmissaoSerializer

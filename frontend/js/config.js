@@ -10,7 +10,8 @@ const CONFIG = {
         inscricao: '/inscricao/',
         coordenacaoCurso: '/coordenacaoCurso/',
         tipoAtividade: '/tipoAtividade/',
-        regraAtividade: '/regraAtividade/'
+        regraAtividade: '/regraAtividade/',
+        statusSubmissao: '/statusSubmissao/',
     }
 };
 
@@ -653,4 +654,107 @@ Saída (GET):
 Regra de negócio:
 - unicidade baseada em (curso + tipo_atividade)
 - id é apenas identificador técnico
+*/
+
+/*
+========================
+STATUS DE SUBMISSÃO
+========================
+
+Endpoint:
+GET /statusSubmissao/
+GET /statusSubmissao/{id}/
+POST /statusSubmissao/
+PATCH /statusSubmissao/{id}/
+DELETE /statusSubmissao/{id}/
+
+Descrição:
+Representa os possíveis status de uma submissão de atividade complementar.
+Ex: Pendente, Aprovado, Rejeitado.
+
+========================
+GET /statusSubmissao/
+========================
+Retorna lista de status disponíveis.
+
+Resposta:
+[
+  {
+    "id": 1,
+    "nome_status": "Pendente"
+  },
+  {
+    "id": 2,
+    "nome_status": "Aprovado"
+  },
+  {
+    "id": 3,
+    "nome_status": "Rejeitado"
+  }
+]
+
+========================
+GET /statusSubmissao/{id}/
+========================
+Retorna um status específico.
+
+Resposta:
+{
+  "id": 1,
+  "nome_status": "Pendente"
+}
+
+========================
+POST /statusSubmissao/
+========================
+Cria um novo status.
+
+Body:
+{
+  "nome_status": "Em análise"
+}
+
+Observações:
+- nome_status deve ser único (recomendado)
+- geralmente essa tabela é pré-populada e pouco alterada
+
+Possíveis erros:
+- nome duplicado
+
+========================
+PATCH /statusSubmissao/{id}/
+========================
+Atualiza o nome do status.
+
+Body:
+{
+  "nome_status": "Em revisão"
+}
+
+Observações:
+- mudanças podem impactar o entendimento do sistema
+- deve ser usado com cautela
+
+========================
+DELETE /statusSubmissao/{id}/
+========================
+Remove um status.
+
+Observações:
+- permitido, mas NÃO recomendado se já estiver em uso
+- pode causar inconsistência em submissões existentes
+
+========================
+Resumo
+========================
+Entrada (POST/PATCH):
+- recebe nome_status
+
+Saída (GET):
+- retorna id e nome do status
+
+Observação importante:
+- essa tabela é usada como referência para o fluxo de submissão
+- normalmente contém valores fixos (Pendente, Aprovado, Rejeitado)
+- não possui regras complexas de negócio
 */
