@@ -8,7 +8,9 @@ const CONFIG = {
         superadmin: '/superadmin/',
         login: '/login/',
         inscricao: '/inscricao/',
-        coordenacaoCurso: '/coordenacaoCurso/'
+        coordenacaoCurso: '/coordenacaoCurso/',
+        tipoAtividade: '/tipoAtividade/',
+        regraAtividade: '/regraAtividade/'
     }
 };
 
@@ -443,4 +445,212 @@ Saída (GET):
 - status é calculado automaticamente:
   - "ativo" → data_fim = null
   - "encerrado" → data_fim preenchida
+*/
+
+/*
+========================
+TIPO DE ATIVIDADE
+========================
+
+Endpoint:
+GET /tipo-atividade/
+GET /tipo-atividade/{id}/
+POST /tipo-atividade/
+PATCH /tipo-atividade/{id}/
+DELETE /tipo-atividade/{id}/
+
+Descrição:
+Representa os tipos de atividades complementares aceitas no sistema.
+Ex: Curso, Palestra, Evento, Monitoria, etc.
+
+========================
+GET /tipo-atividade/
+========================
+Retorna lista de tipos de atividade.
+
+Resposta:
+[
+  {
+    "id": 1,
+    "nome": "Curso"
+  },
+  {
+    "id": 2,
+    "nome": "Palestra"
+  }
+]
+
+========================
+GET /tipo-atividade/{id}/
+========================
+Retorna um tipo de atividade específico.
+
+Resposta:
+{
+  "id": 1,
+  "nome": "Curso"
+}
+
+========================
+POST /tipo-atividade/
+========================
+Cria um novo tipo de atividade.
+
+Body:
+{
+  "nome": "Workshop"
+}
+
+Observações:
+- nome deve ser único
+- não permite duplicidade de nomes
+
+Possíveis erros:
+- nome já existente
+
+========================
+PATCH /tipo-atividade/{id}/
+========================
+Atualiza o nome do tipo de atividade.
+
+Body:
+{
+  "nome": "Evento Acadêmico"
+}
+
+Observações:
+- nome continua sendo único
+- não permite duplicidade
+
+========================
+DELETE /tipo-atividade/{id}/
+========================
+Remove o tipo de atividade.
+
+Observações:
+- permitido, mas deve-se garantir que não esteja sendo utilizado em regras
+
+========================
+Resumo
+========================
+Entrada (POST/PATCH):
+- recebe apenas o campo nome
+
+Saída (GET):
+- retorna id e nome do tipo de atividade
+*/
+
+/*========================
+REGRA DE ATIVIDADE (VÍNCULO CURSO-TIPO DE ATIVIDADE)
+========================
+
+Endpoint:
+GET /regraAtividade/
+GET /regraAtividade/{id}/
+POST /regraAtividade/
+PATCH /regraAtividade/{id}/
+DELETE /regraAtividade/{id}/
+
+Descrição:
+Define as regras de atividades complementares para cada curso.
+Relaciona um curso a um tipo de atividade, definindo limites e exigências.
+
+Regra principal:
+- NÃO permite duplicidade de (curso + tipo_atividade)
+- cada combinação curso + tipo de atividade deve ser única
+
+========================
+GET /regraAtividade/
+========================
+Retorna lista de regras.
+
+Resposta:
+[
+  {
+    "id": 1,
+    "tipo_atividade": 2,
+    "tipo_atividade_nome": "Palestra",
+    "curso": 1,
+    "curso_nome": "ADS",
+    "limite_horas": 40,
+    "exige_comprovante": true
+  }
+]
+
+========================
+GET /regraAtividade/{id}/
+========================
+Retorna uma regra específica.
+
+Resposta:
+{
+  "id": 1,
+  "tipo_atividade": 2,
+  "tipo_atividade_nome": "Palestra",
+  "curso": 1,
+  "curso_nome": "ADS",
+  "limite_horas": 40,
+  "exige_comprovante": true
+}
+
+========================
+POST /regraAtividade/
+========================
+Cria uma nova regra de atividade para um curso.
+
+Body:
+{
+  "tipo_atividade": 2,
+  "curso": 1,
+  "limite_horas": 40,
+  "exige_comprovante": true
+}
+
+Observações:
+- tipo_atividade e curso devem ser IDs existentes
+- não permite criar regra duplicada para o mesmo curso e tipo de atividade
+
+Possíveis erros:
+- tipo_atividade ou curso inexistente
+- já existe regra para essa combinação (curso + tipo_atividade)
+
+========================
+PATCH /regraAtividade/{id}/
+========================
+Atualiza uma regra existente.
+
+Body:
+{
+  "limite_horas": 60,
+  "exige_comprovante": false
+}
+
+Observações:
+- pode alterar qualquer campo
+- não permite gerar duplicidade de (curso + tipo_atividade)
+
+========================
+DELETE /regraAtividade/{id}/
+========================
+Remove a regra de atividade.
+
+Observações:
+- permitido
+- deve-se garantir que não existam dependências futuras (ex: submissões)
+
+========================
+Resumo
+========================
+Entrada (POST/PATCH):
+- usa IDs (tipo_atividade, curso)
+- define limite_horas e exige_comprovante
+
+Saída (GET):
+- retorna dados enriquecidos:
+  - nome do tipo de atividade
+  - nome do curso
+
+Regra de negócio:
+- unicidade baseada em (curso + tipo_atividade)
+- id é apenas identificador técnico
 */

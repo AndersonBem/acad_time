@@ -232,5 +232,19 @@ CREATE UNIQUE INDEX uq_coordenador_curso_ativo
 ON public."CoordenacaoCurso" ("Curso_idCurso", "Coordenador_idUsuario")
 WHERE "dataFim" IS NULL;
 
+ALTER TABLE "TipoAtividade"
+ADD CONSTRAINT uq_tipo_atividade_nome UNIQUE (nome);
+
+ALTER TABLE "RegraAtividade"
+DROP CONSTRAINT "RegraAtividade_pkey";
+
+ALTER TABLE "RegraAtividade"
+ADD COLUMN id SERIAL;
+
+ALTER TABLE "RegraAtividade"
+ADD PRIMARY KEY (id)
+
+ALTER TABLE "RegraAtividade"
+ADD CONSTRAINT uq_regra UNIQUE ("TipoAtividade_idTipoAtividade", "Curso_idCurso");
 
 END;
