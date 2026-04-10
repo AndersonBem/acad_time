@@ -55,4 +55,4 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
         alert('Não foi possível conectar ao servidor.');
     }
 });
-/*
+
