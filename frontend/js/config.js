@@ -12,6 +12,7 @@ const CONFIG = {
         tipoAtividade: '/tipoAtividade/',
         regraAtividade: '/regraAtividade/',
         statusSubmissao: '/statusSubmissao/',
+        atividadeComplementar: '/atividadeComplementar/'
     }
 };
 
@@ -757,4 +758,128 @@ Observação importante:
 - essa tabela é usada como referência para o fluxo de submissão
 - normalmente contém valores fixos (Pendente, Aprovado, Rejeitado)
 - não possui regras complexas de negócio
+*/
+
+/*
+========================
+ATIVIDADE COMPLEMENTAR
+========================
+
+Endpoint:
+GET /atividadeComplementar/
+GET /atividadeComplementar/{id}/
+POST /atividadeComplementar/
+PATCH /atividadeComplementar/{id}/
+DELETE /atividadeComplementar/{id}/
+
+Descrição:
+Representa a atividade complementar em si, ou seja, o material/registro acadêmico que poderá ser enviado posteriormente em uma submissão.
+
+Essa entidade NÃO representa o envio para análise.
+Ela representa apenas o conteúdo da atividade complementar cadastrada pelo aluno.
+
+Exemplos:
+- participação em palestra
+- curso realizado
+- evento acadêmico
+- atividade de extensão
+
+Fluxo no sistema:
+- primeiro a atividade complementar é cadastrada
+- depois ela pode ser enviada por meio da Submissão
+- a análise, aprovação, status, certificado e feedback do coordenador pertencem ao fluxo de Submissão, não à AtividadeComplementar
+
+========================
+GET /atividadeComplementar/
+========================
+Retorna lista de atividades complementares.
+
+Resposta:
+[
+  {
+    "id_atividade_complementar": 1,
+    "descricao": "Participação em palestra sobre segurança digital",
+    "carga_horaria_solicitada": 10,
+    "tipo_atividade": 2,
+    "tipo_atividade_nome": "Palestra"
+  }
+]
+
+========================
+GET /atividadeComplementar/{id}/
+========================
+Retorna uma atividade complementar específica.
+
+Resposta:
+{
+  "id_atividade_complementar": 1,
+  "descricao": "Participação em palestra sobre segurança digital",
+  "carga_horaria_solicitada": 10,
+  "tipo_atividade": 2,
+  "tipo_atividade_nome": "Palestra"
+}
+
+========================
+POST /atividadeComplementar/
+========================
+Cria uma nova atividade complementar.
+
+Body:
+{
+  "descricao": "Participação em palestra sobre segurança digital",
+  "carga_horaria_solicitada": 10,
+  "tipo_atividade": 2
+}
+
+Observações:
+- tipo_atividade deve ser um ID existente
+- essa entidade representa apenas a atividade em si, não o envio para análise
+
+Possíveis erros:
+- tipo_atividade inexistente
+- dados obrigatórios ausentes
+
+========================
+PATCH /atividadeComplementar/{id}/
+========================
+Atualiza uma atividade complementar existente.
+
+Body:
+{
+  "descricao": "Participação em palestra sobre LGPD",
+  "carga_horaria_solicitada": 12
+}
+
+Observações:
+- permite editar livremente os dados da atividade
+- não envolve status, aprovação ou análise
+
+========================
+DELETE /atividadeComplementar/{id}/
+========================
+Remove uma atividade complementar.
+
+Observações:
+- permitido no estado atual do sistema
+- futuramente, caso exista submissão vinculada, pode ser necessário revisar essa regra
+
+========================
+Resumo
+========================
+Entrada (POST/PATCH):
+- usa tipo_atividade por ID
+- recebe descrição e carga_horaria_solicitada
+
+Saída (GET):
+- retorna:
+  - id_atividade_complementar
+  - descricao
+  - carga_horaria_solicitada
+  - tipo_atividade
+  - tipo_atividade_nome
+
+Regra de negócio:
+- AtividadeComplementar representa o item acadêmico entregue pelo aluno
+- o envio dessa atividade para análise acontece em Submissão
+- status, aprovação, certificado e feedback não pertencem a esta entidade
 */

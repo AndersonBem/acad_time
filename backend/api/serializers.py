@@ -2,7 +2,8 @@ from rest_framework import serializers
 from datetime import date
 from api.models import (Usuario, Coordenador, Aluno, 
                         SuperAdmin, CoordenacaoCurso, Inscricao,
-                        TipoAtividade, RegraAtividade,StatusSubmissao,)
+                        TipoAtividade, RegraAtividade,StatusSubmissao,
+                        AtividadeComplementar,)
 
 """Serializer geral para get"""
 class UsuarioSerializer(serializers.ModelSerializer):
@@ -243,3 +244,16 @@ class StatusSubmissaoSerializer(serializers.ModelSerializer):
     class Meta:
         model = StatusSubmissao
         fields = '__all__'
+
+class AtividadeComplementarSerializer(serializers.ModelSerializer):
+    tipo_atividade_nome = serializers.ReadOnlyField(source ='tipo_atividade.nome')
+    
+    class Meta:
+        model = AtividadeComplementar
+        fields = [
+            'id_atividade_complementar',
+            'descricao',
+            'carga_horaria_solicitada',
+            'tipo_atividade',
+            'tipo_atividade_nome'
+        ]
