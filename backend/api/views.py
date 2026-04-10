@@ -5,14 +5,18 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.db import connection, IntegrityError, DatabaseError
 from django.contrib.auth.hashers import make_password, check_password
 from api.models import (Usuario, Coordenador, Aluno,
-                        SuperAdmin, Inscricao, CoordenacaoCurso)
+                        SuperAdmin, Inscricao, CoordenacaoCurso,
+                        TipoAtividade,RegraAtividade, StatusSubmissao,
+                        AtividadeComplementar,)
 from api.serializers import (
     UsuarioSerializer, 
     CoordenadorSerializer, CoordenadorCreateSerializer, CoordenadorUpdateSerializer, 
     AlunoSerializer, AlunoCreateSerializer,AlunoUpdateSerializer,
     SuperAdminSerializer, LoginSerializer, InscricaoReadSerializer,
     InscricaoCreateSerializer, InscricaoUpdateSerializer, CoordenacaoCursoCreateSerializer,
-    CoordenacaoCursoUpdateSerializer,CoordenacaoCursoReadSerializer)
+    CoordenacaoCursoUpdateSerializer,CoordenacaoCursoReadSerializer,
+    TipoAtividadeSerializer,RegraAtividadeSerializer,StatusSubmissaoSerializer,
+    AtividadeComplementarSerializer,)
 from api.jwt_utils import gerar_access_token
 
 class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
@@ -209,7 +213,7 @@ class InscricaoViewSet(viewsets.ModelViewSet):
 
 class AlunoViewSet(viewsets.ModelViewSet):
     """repete coordenadorviewset, com modificações pertinentes"""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     queryset = Aluno.objects.select_related('usuario').prefetch_related(
         'inscricoes__curso',
         'inscricoes__status_matricula'
@@ -407,3 +411,23 @@ class LoginAPIView(APIView):
             return 'superadmin'
 
         return 'usuario'
+
+class TipoAtividadeViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = TipoAtividade.objects.all().order_by('nome')
+    serializer_class = TipoAtividadeSerializer
+
+class RegraAtividadeViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = RegraAtividade.objects.all().order_by('curso')
+    serializer_class = RegraAtividadeSerializer
+
+class StatusSubmissaoViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = StatusSubmissao.objects.all().order_by('nome_status')
+    serializer_class = StatusSubmissaoSerializer
+
+class AtividadeComplementarViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = AtividadeComplementar.objects.all().order_by('id_atividade_complementar')
+    serializer_class = AtividadeComplementarSerializer
