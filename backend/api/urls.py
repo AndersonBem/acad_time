@@ -3,7 +3,8 @@ from rest_framework import routers
 from api.views import (
     UsuarioViewSet, CoordenadorViewSet, AlunoViewSet,
     SuperAdminViewSet, LoginAPIView, InscricaoViewSet,
-    CoordenadorCursoViewSet,CursoViewSet)
+    CoordenadorCursoViewSet, TipoAtividadeViewSet, RegraAtividadeViewSet,
+    StatusSubmissaoViewSet,AtividadeComplementarViewSet, CursoViewSet)
 
 router = routers.DefaultRouter()
 router.register('usuarios', UsuarioViewSet, basename='usuarios')
@@ -12,6 +13,10 @@ router.register('aluno', AlunoViewSet, basename='aluno')
 router.register('superadmin', SuperAdminViewSet, basename='superadmin' )
 router.register('inscricao', InscricaoViewSet, basename='inscricao')
 router.register('coordenacaoCurso', CoordenadorCursoViewSet, basename= 'coordenaaoCurso')
+router.register('tipoAtividade', TipoAtividadeViewSet, basename='tipoAtividade')
+router.register('regraAtividade', RegraAtividadeViewSet, basename= 'regraAtividade')
+router.register('statusSubmissao', StatusSubmissaoViewSet, basename='statusSubmissao' )
+router.register('atividadeComplementar', AtividadeComplementarViewSet, basename= 'AtividadeComplementar')
 router.register('curso', CursoViewSet, basename= 'curso')
 
 urlpatterns = [
