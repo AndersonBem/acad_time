@@ -19,7 +19,6 @@ router.register('statusSubmissao', StatusSubmissaoViewSet, basename='statusSubmi
 router.register('atividadeComplementar', AtividadeComplementarViewSet, basename= 'AtividadeComplementar')
 router.register('submissao',SubmissaoViewSet, basename= 'submissao')
 router.register('curso', CursoViewSet, basename= 'curso')
-
 urlpatterns = [
     path('login/', LoginAPIView.as_view(), name='login'),
     path('', include(router.urls)),
