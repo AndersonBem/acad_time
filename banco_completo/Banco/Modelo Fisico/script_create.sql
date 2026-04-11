@@ -267,4 +267,34 @@ ADD COLUMN "cursoOcr" varchar(250),
 ADD COLUMN "instituicaoOcr" varchar(250),
 ADD COLUMN "dataUpload" date;
 
+
+CREATE TABLE IF NOT EXISTS public."TipoAcao"
+(
+    "idTipoAcao" integer NOT NULL GENERATED ALWAYS AS IDENTITY,
+    acao character varying(20) NOT NULL,
+    PRIMARY KEY ("idTipoAcao"),
+    UNIQUE (acao)
+);
+
+CREATE TABLE IF NOT EXISTS public."LogAuditoria"
+(
+    "idLogAuditoria" integer NOT NULL GENERATED ALWAYS AS IDENTITY,
+    "dataHora" timestamp NOT NULL,
+    "idEntidadeAfetada" integer NOT NULL,
+    descricao text NOT NULL,
+    "ipOrigem" character varying(50),
+    "idUsuario" integer,
+    "idTipoAcao" integer NOT NULL,
+    PRIMARY KEY ("idLogAuditoria")
+);
+
+ALTER TABLE public."LogAuditoria"
+ADD CONSTRAINT fk_logauditoria_usuario
+FOREIGN KEY ("idUsuario") REFERENCES "Usuario"("idUsuario")
+ON DELETE SET NULL;
+
+ALTER TABLE public."LogAuditoria"
+ADD CONSTRAINT fk_logauditoria_tipoacao
+FOREIGN KEY ("idTipoAcao") REFERENCES "TipoAcao"("idTipoAcao");
+
 END;

@@ -13,7 +13,8 @@ const CONFIG = {
         regraAtividade: '/regraAtividade/',
         statusSubmissao: '/statusSubmissao/',
         atividadeComplementar: '/atividadeComplementar/',
-        curso: '/curso/'
+        curso: '/curso/',
+        submissap: '/submissao/'
     }
 };
 
@@ -50,7 +51,11 @@ LOGIN
 Rota: /login/
 Método: POST
 Autenticação: NÃO precisa token
-
+emails para testes:
+teste@acadtime.com
+testealuno@acadtime.com
+testecoordeandor@acadtime.com
+testesuperadmin@acadtime.com
 Body:
 {
     "email": "teste@acadtime.com",
@@ -997,4 +1002,220 @@ Saída (GET):
 Vínculos:
 - aluno ↔ curso → /inscricao/
 - coordenador ↔ curso → /coordenacaoCurso/
+*/
+
+/*
+========================================
+ENDPOINT: /submissao/
+========================================
+
+Observação importante:
+Este endpoint faz parte de um fluxo de processo, não de um CRUD totalmente livre.
+A submissão representa um envio acadêmico que passa por avaliação, então nem todos os perfis
+podem executar todas as ações.
+
+Fluxo definido:
+Aluno cria submissão -> Coordenador avalia -> Status da submissão é alterado
+A submissão NÃO deve ser excluída fisicamente, para preservar histórico e auditoria.
+
+--------------------------------------------------
+REGRAS GERAIS DE NEGÓCIO
+--------------------------------------------------
+
+1) CREATE (POST)
+- Apenas ALUNO autenticado pode criar submissão.
+- O aluno NÃO envia seu próprio id no body.
+- O backend usa o usuário autenticado (request.user) para vincular a submissão ao aluno correto.
+- O coordenador e o superadmin NÃO podem criar submissões.
+
+Validações já aplicadas:
+- usuário autenticado precisa ser aluno
+- aluno precisa ter inscrição ativa no curso
+- precisa existir regra da atividade para o curso
+- limite de horas é validado no banco
+- certificado é opcional
+
+Campos esperados no create:
+{
+    "curso": <id>,
+    "atividade_complementar": <id>,
+    "certificado": null
+}
+
+Exemplo:
+POST /submissao/
+
+Body:
+{
+    "curso": 1,
+    "atividade_complementar": 2,
+    "certificado": null
+}
+
+Resposta esperada:
+201 Created
+
+Exemplo de retorno:
+{
+    "id_submissao": 9,
+    "data_envio": "2026-04-11",
+    "observacao_coordenador": null,
+    "aluno": 22,
+    "aluno_nome": "TesteAluno",
+    "curso": 1,
+    "curso_nome": "ADS",
+    "atividade_complementar": 2,
+    "status_submissao": 1,
+    "status_submissao_nome": "PENDENTE",
+    "certificado": null,
+    "coordenador": null
+}
+
+--------------------------------------------------
+2) UPDATE / PATCH
+--------------------------------------------------
+
+Objetivo do PATCH:
+Permitir que a submissão seja avaliada.
+
+Quem pode atualizar:
+- ALUNO: NÃO pode atualizar
+- COORDENADOR: pode atualizar apenas submissões de cursos com vínculo ativo
+- SUPERADMIN: pode atualizar
+
+Campos liberados no update:
+{
+    "status_submissao": <id>,
+    "observacao_coordenador": "texto"
+}
+
+Exemplo:
+PATCH /submissao/{id}/
+
+Body:
+{
+    "status_submissao": 2,
+    "observacao_coordenador": "Submissão avaliada pelo coordenador."
+}
+
+Regras do update:
+- aluno não pode alterar submissão
+- coordenador só pode avaliar submissão do curso que coordena
+- superadmin pode atualizar
+- o coordenador que avaliou pode ser gravado automaticamente pelo backend
+- o backend e o banco podem impedir alterações conforme regras de negócio
+- submissões finalizadas podem ser bloqueadas por trigger no banco
+
+Exemplo de erro esperado:
+403 Forbidden
+quando:
+- aluno tenta atualizar
+- coordenador tenta atualizar submissão sem vínculo com o curso
+
+400 Bad Request
+quando:
+- a regra de negócio do banco impedir a operação
+Exemplo:
+"Submissão já finalizada e não pode ter o status alterado."
+
+--------------------------------------------------
+3) DELETE
+--------------------------------------------------
+
+DELETE NÃO é permitido.
+
+Motivo:
+A submissão representa um histórico de envio e avaliação acadêmica.
+Mesmo rejeitada ou inválida, deve continuar registrada.
+
+Decisão adotada:
+- NÃO haverá exclusão física da submissão
+- mudanças de situação devem ocorrer por ALTERAÇÃO DE STATUS
+- isso preserva histórico, auditoria e consistência do processo
+
+Resposta esperada:
+403 Forbidden
+
+Mensagem sugerida:
+"Exclusão de submissão não é permitida. Utilize a alteração de status."
+
+--------------------------------------------------
+4) LEITURA / CONSULTA
+--------------------------------------------------
+
+Uso esperado:
+- aluno consultar sua própria submissão e seu status
+- coordenador consultar submissões para avaliar
+- superadmin consultar submissões para administração
+
+Campos importantes no retorno:
+- id_submissao
+- data_envio
+- observacao_coordenador
+- aluno
+- aluno_nome
+- curso
+- curso_nome
+- atividade_complementar
+- status_submissao
+- status_submissao_nome
+- certificado
+- coordenador
+
+Observação:
+O serializer de leitura pode retornar campos enriquecidos com nomes para facilitar o front,
+como:
+- aluno_nome
+- curso_nome
+- status_submissao_nome
+
+--------------------------------------------------
+5) COMPORTAMENTO ESPERADO POR PERFIL
+--------------------------------------------------
+
+ALUNO
+- pode criar submissão
+- pode consultar submissão
+- não pode atualizar status
+- não pode excluir
+
+COORDENADOR
+- não pode criar submissão
+- pode consultar submissões do(s) curso(s) que coordena
+- pode atualizar status e observação da submissão
+- não pode excluir
+
+SUPERADMIN
+- não pode criar submissão
+- pode consultar
+- pode atualizar
+- não pode excluir
+
+--------------------------------------------------
+6) OBSERVAÇÕES PARA FRONT-END
+--------------------------------------------------
+
+- O front não deve tentar enviar "aluno" no create.
+- O front não deve exibir botão de edição para aluno.
+- O front não deve exibir botão de exclusão.
+- A tela do coordenador deve focar em avaliação:
+  - alterar status
+  - preencher observação_coordenador
+- O front deve tratar respostas 403 e 400 com mensagens claras para o usuário.
+- Quando houver erro vindo do banco por regra de negócio, a API deve retornar mensagem tratada,
+  e o front deve exibir essa mensagem sem quebrar a interface.
+
+--------------------------------------------------
+7) OBSERVAÇÕES PARA BACK-END / EVOLUÇÃO FUTURA
+--------------------------------------------------
+
+- Este endpoint já segue uma lógica de fluxo, não apenas CRUD.
+- O ideal é manter serializers separados:
+  - SubmissaoReadSerializer
+  - SubmissaoCreateSerializer
+  - SubmissaoUpdateSerializer
+- O endpoint deve continuar respeitando as triggers e funções do banco.
+- A auditoria da submissão já existe no banco e pode ser evoluída depois
+  para registrar usuário autenticado real, IP e outros metadados.
+- No futuro, este comentário pode ser migrado para documentação formal da API.
 */

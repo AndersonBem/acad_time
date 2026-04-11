@@ -2,8 +2,11 @@ from rest_framework import status,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from django.db import connection, IntegrityError, DatabaseError
+from rest_framework.exceptions import PermissionDenied, ValidationError
+from django.db import (connection, IntegrityError, DatabaseError,
+                        InternalError, transaction)
 from django.contrib.auth.hashers import make_password, check_password
+from django.utils import timezone
 from api.models import (Usuario, Coordenador, Aluno,
                         SuperAdmin, Inscricao, CoordenacaoCurso,
                         TipoAtividade,RegraAtividade, StatusSubmissao,
@@ -16,7 +19,8 @@ from api.serializers import (
     InscricaoCreateSerializer, InscricaoUpdateSerializer, CoordenacaoCursoCreateSerializer,
     CoordenacaoCursoUpdateSerializer,CoordenacaoCursoReadSerializer,
     TipoAtividadeSerializer,RegraAtividadeSerializer,StatusSubmissaoSerializer,
-    AtividadeComplementarSerializer, SubmissaoReadSerializer, CursoSerializer)
+    AtividadeComplementarSerializer, SubmissaoReadSerializer, CursoSerializer,
+    SubmissaoCreateSerializer, SubmissaoUpdateSerializer)
 from api.jwt_utils import gerar_access_token
 
 class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
@@ -441,6 +445,87 @@ class CursoViewSet(viewsets.ModelViewSet):
 class SubmissaoViewSet(viewsets.ModelViewSet):
     """permission_classes = [IsAuthenticated]"""
     queryset = Submissao.objects.all()
+    serializer_class = SubmissaoReadSerializer
+    
     def get_serializer_class(self):
-
+        if self.action == 'create':
+            return SubmissaoCreateSerializer
+        if self.action in ['update', 'partial_update']:
+            return SubmissaoUpdateSerializer
         return SubmissaoReadSerializer
+    
+    def perform_create(self, serializer):
+        usuario = self.request.user
+
+
+        eh_aluno = hasattr(usuario, 'aluno')
+
+        if not eh_aluno:
+            raise PermissionDenied('Apenas alunos podem criar submissões.')
+
+        
+        aluno = usuario.aluno
+        curso = serializer.validated_data.get('curso')
+
+        possui_inscricao_ativa = Inscricao.objects.filter(
+            aluno = aluno,
+            curso = curso,
+            status_matricula_id =1
+        ).exists()
+
+        if not possui_inscricao_ativa:
+            raise ValidationError('O aluno não possui inscrição ativa nesse curso.')
+
+        status_pendente = StatusSubmissao.objects.get(nome_status = 'PENDENTE')    
+
+        serializer.save(
+            aluno=aluno,
+            data_envio=timezone.now().date(),
+            status_submissao=status_pendente,
+            observacao_coordenador=None,
+            coordenador=None
+        )
+
+    def perform_update(self, serializer):
+        usuario = self.request.user
+        submissao = self.get_object()
+
+        eh_aluno = hasattr(usuario, 'aluno')
+        eh_coordenador = hasattr(usuario, 'coordenador')
+        eh_superadmin = hasattr(usuario, 'superadmin')
+
+        if eh_aluno:
+            raise PermissionDenied('Aluno não pode alterar submissões.')
+        if eh_coordenador:
+            vinculo_ativo = CoordenacaoCurso.objects.filter(
+                coordenador=usuario.coordenador,
+                curso=submissao.curso,
+                data_fim__isnull=True
+            ).exists()
+
+            if not vinculo_ativo:
+                raise PermissionDenied("Você não pode avaliar submissões deste curso.")
+            
+            try:
+                with transaction.atomic():
+                    serializer.save(coordenador=usuario.coordenador)
+            except InternalError as e:
+                raise ValidationError({'detail': str(e)})
+            return
+        
+        if eh_superadmin:
+            try:
+                with transaction.atomic():
+                    serializer.save()
+            except InternalError as e:
+                raise ValidationError({'detail': str(e)})
+            return
+        
+        raise PermissionDenied("Usuário sem permissão para atualizer submissão.")
+
+        return super().perform_update(serializer)
+    
+    def destroy(self, request, *args, **kwargs):
+        raise PermissionDenied('Exclusão de submissão não é permitida. Utilize a alteração de status.')
+    
+

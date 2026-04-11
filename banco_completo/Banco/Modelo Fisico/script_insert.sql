@@ -183,3 +183,10 @@ INSERT INTO "LogAuditoria"
 ('2024-01-01',1,'Criou','127.0.0.1',1,1),
 ('2024-01-01',2,'Editou','127.0.0.1',2,2),
 ('2024-01-01',3,'Removeu','127.0.0.1',3,3);
+
+INSERT INTO public."TipoAcao" (acao)
+VALUES
+('CREATE'),
+('UPDATE'),
+('DELETE')
+ON CONFLICT (acao) DO NOTHING;

@@ -287,6 +287,35 @@ class SubmissaoReadSerializer(serializers.ModelSerializer):
             'coordenador_nome'
         ]
 
+class SubmissaoCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Submissao
+        fields = ['curso', 'atividade_complementar', 'certificado']
+
+    def validate(self, attrs):
+        curso = attrs.get('curso')
+        atividade = attrs.get('atividade_complementar')
+
+        if Submissao.objects.filter(atividade_complementar = atividade).exists():
+            raise serializers.ValidationError(
+                'Essa atividade complementar já foi submetida.'
+            )
+        existe_regra = RegraAtividade.objects.filter(
+            curso = curso,
+            tipo_atividade = atividade.tipo_atividade
+        ).exists()
+
+        if not existe_regra:
+            raise serializers.ValidationError(
+                'Não existe regra de atividade para esse curso e tipo de atividade.'
+            )
+
+        return attrs
+
+class SubmissaoUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Submissao
+        fields =['observacao_coordenador', 'status_submissao',]
 
 class CursoSerializer(serializers.ModelSerializer):
     class Meta:

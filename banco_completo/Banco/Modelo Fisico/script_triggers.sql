@@ -230,6 +230,101 @@ EXECUTE FUNCTION trg_validar_coordenacao_ativa();
 
 
 
+CREATE OR REPLACE FUNCTION public.trg_validar_limite_horas_submissao()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_tipo integer;
+    v_curso integer;
+    v_carga integer;
+    v_limite_restante numeric;
+BEGIN
+    -- Busca tipo e carga da atividade
+    SELECT ac."tipoAtividade", ac."cargaHorariaSolicitada"
+    INTO v_tipo, v_carga
+    FROM "AtividadeComplementar" ac
+    WHERE ac."idAtividadeComplementar" = NEW."atividadeComplementa";
 
+    IF v_tipo IS NULL THEN
+        RAISE EXCEPTION 'Atividade complementar % não encontrada', NEW."atividadeComplementa";
+    END IF;
 
+    -- Usa o curso informado na própria submissão
+    v_curso := NEW."idCurso";
 
+    IF v_curso IS NULL THEN
+        RAISE EXCEPTION 'Submissão sem curso informado.';
+    END IF;
+
+    -- Verifica o limite restante para o tipo de atividade
+    v_limite_restante := fn_limite_disponivel_tipo(
+        NEW."idAluno",
+        v_curso,
+        v_tipo
+    );
+
+    IF v_carga > v_limite_restante THEN
+        RAISE EXCEPTION
+            'Horas excedem o limite permitido para este tipo. Restante: %, solicitado: %',
+            v_limite_restante, v_carga;
+    END IF;
+
+    RETURN NEW;
+END;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.trg_validar_matricula_ativa_submissao()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $function$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM "Inscricao" i
+        WHERE i."Aluno_idUsuario" = NEW."idAluno"
+          AND i."Curso_idCurso" = NEW."idCurso"
+          AND i."idStatusMatricula" = 1
+    ) THEN
+        RAISE EXCEPTION
+            'Aluno % não possui inscrição ativa no curso %.',
+            NEW."idAluno",
+            NEW."idCurso";
+    END IF;
+
+    RETURN NEW;
+END;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.trg_log_auditoria_submissao()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_tipo integer;
+BEGIN
+    SELECT "idTipoAcao"
+    INTO v_tipo
+    FROM "TipoAcao"
+    WHERE acao =
+        CASE
+            WHEN TG_OP = 'INSERT' THEN 'CREATE'
+            WHEN TG_OP = 'UPDATE' THEN 'UPDATE'
+            ELSE 'DELETE'
+        END
+    LIMIT 1;
+
+    INSERT INTO "LogAuditoria"
+    ("dataHora", "idEntidadeAfetada", descricao, "ipOrigem", "idUsuario", "idTipoAcao")
+    VALUES (
+        CURRENT_TIMESTAMP,
+        COALESCE(NEW."idSubmissao", OLD."idSubmissao"),
+        TG_OP,
+        '127.0.0.1',
+        COALESCE(NEW."idAluno", OLD."idAluno"),
+        v_tipo
+    );
+
+    RETURN COALESCE(NEW, OLD);
+END;
+$function$;
