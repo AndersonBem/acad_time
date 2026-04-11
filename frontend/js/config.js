@@ -12,7 +12,8 @@ const CONFIG = {
         tipoAtividade: '/tipoAtividade/',
         regraAtividade: '/regraAtividade/',
         statusSubmissao: '/statusSubmissao/',
-        atividadeComplementar: '/atividadeComplementar/'
+        atividadeComplementar: '/atividadeComplementar/',
+        curso: '/curso/'
     }
 };
 
@@ -882,4 +883,118 @@ Regra de negócio:
 - AtividadeComplementar representa o item acadêmico entregue pelo aluno
 - o envio dessa atividade para análise acontece em Submissão
 - status, aprovação, certificado e feedback não pertencem a esta entidade
+*/
+
+/*
+========================
+CURSO
+========================
+
+⚠️ Observação importante:
+- O endpoint de curso NÃO gerencia vínculos.
+- Para vincular:
+  - aluno ↔ curso → usar /inscricao/
+  - coordenador ↔ curso → usar /coordenacaoCurso/
+- Este endpoint é apenas para dados do curso.
+
+Endpoint:
+GET /curso/
+GET /curso/{id}/
+POST /curso/
+PATCH /curso/{id}/
+DELETE /curso/{id}/
+
+Descrição:
+Representa os dados base de um curso.
+Não inclui diretamente alunos ou coordenadores vinculados.
+
+========================
+GET /curso/
+========================
+Retorna lista de cursos.
+
+Resposta:
+[
+  {
+    "idCurso": 1,
+    "nome": "ADS",
+    "codigo": "ADS001",
+    "status": true,
+    "cargaHoraria": 200,
+    "descricao": "Curso de Análise e Desenvolvimento de Sistemas"
+  }
+]
+
+========================
+GET /curso/{id}/
+========================
+Retorna um curso específico.
+
+Resposta:
+{
+  "idCurso": 1,
+  "nome": "ADS",
+  "codigo": "ADS001",
+  "status": true,
+  "cargaHoraria": 200,
+  "descricao": "Curso de Análise e Desenvolvimento de Sistemas"
+}
+
+========================
+POST /curso/
+========================
+Cria um novo curso.
+
+Body:
+{
+  "nome": "ADS",
+  "codigo": "ADS001",
+  "status": true,
+  "cargaHoraria": 200,
+  "descricao": "Curso de Análise e Desenvolvimento de Sistemas"
+}
+
+Observações:
+- Todos os campos seguem o model diretamente
+- Não realiza vínculo com alunos ou coordenadores
+
+Possíveis erros:
+- campos obrigatórios não informados
+- violação de regra de unicidade (se existir no banco)
+
+========================
+PATCH /curso/{id}/
+========================
+Atualiza dados do curso.
+
+Body (exemplo):
+{
+  "nome": "ADS Atualizado",
+  "status": false
+}
+
+Observações:
+- Permite atualizar qualquer campo do curso
+- Não altera vínculos existentes
+
+========================
+DELETE /curso/{id}/
+========================
+Remove um curso.
+
+Observações:
+- Pode afetar registros relacionados dependendo do comportamento do banco (CASCADE)
+
+========================
+Resumo
+========================
+Entrada (POST/PATCH):
+- usa dados diretos do curso
+
+Saída (GET):
+- retorna dados simples do curso
+
+Vínculos:
+- aluno ↔ curso → /inscricao/
+- coordenador ↔ curso → /coordenacaoCurso/
 */

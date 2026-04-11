@@ -7,7 +7,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from api.models import (Usuario, Coordenador, Aluno,
                         SuperAdmin, Inscricao, CoordenacaoCurso,
                         TipoAtividade,RegraAtividade, StatusSubmissao,
-                        AtividadeComplementar, Submissao)
+                        AtividadeComplementar,  Submissao, Curso)
 from api.serializers import (
     UsuarioSerializer, 
     CoordenadorSerializer, CoordenadorCreateSerializer, CoordenadorUpdateSerializer, 
@@ -16,7 +16,7 @@ from api.serializers import (
     InscricaoCreateSerializer, InscricaoUpdateSerializer, CoordenacaoCursoCreateSerializer,
     CoordenacaoCursoUpdateSerializer,CoordenacaoCursoReadSerializer,
     TipoAtividadeSerializer,RegraAtividadeSerializer,StatusSubmissaoSerializer,
-    AtividadeComplementarSerializer,SubmissaoReadSerializer)
+    AtividadeComplementarSerializer, SubmissaoReadSerializer, CursoSerializer)
 from api.jwt_utils import gerar_access_token
 
 class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
@@ -431,6 +431,11 @@ class AtividadeComplementarViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = AtividadeComplementar.objects.all().order_by('id_atividade_complementar')
     serializer_class = AtividadeComplementarSerializer
+
+class CursoViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = Curso.objects.all()
+    serializer_class= CursoSerializer
 
 
 class SubmissaoViewSet(viewsets.ModelViewSet):

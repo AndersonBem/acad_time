@@ -3,7 +3,7 @@ from datetime import date
 from api.models import (Usuario, Coordenador, Aluno, 
                         SuperAdmin, CoordenacaoCurso, Inscricao,
                         TipoAtividade, RegraAtividade,StatusSubmissao,
-                        AtividadeComplementar,Submissao)
+                        AtividadeComplementar,Submissao, Curso)
 
 """Serializer geral para get"""
 class UsuarioSerializer(serializers.ModelSerializer):
@@ -202,6 +202,11 @@ class SuperAdminSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     senha = serializers.CharField(write_only = True)
+
+class CursoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Curso
+        fields = '__all__'
 
 class TipoAtividadeSerializer(serializers.ModelSerializer):
     class Meta:
