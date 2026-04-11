@@ -251,6 +251,12 @@ class Submissao(models.Model):
     data_envio = models.DateField(db_column='dataEnvio')
     observacao_coordenador = models.TextField(db_column='observacaoCoordenador', blank=True, null=True)
     aluno = models.ForeignKey(Aluno, models.DO_NOTHING, db_column='idAluno')
+    curso = models.ForeignKey(
+        Curso,
+        models.DO_NOTHING,
+        db_column='idCurso'
+    )
+    
     atividade_complementar = models.OneToOneField(
         AtividadeComplementar,
         models.DO_NOTHING,
@@ -261,7 +267,10 @@ class Submissao(models.Model):
         models.DO_NOTHING,
         db_column='statusSubmissao'
     )
-    certificado = models.OneToOneField(Certificado, models.DO_NOTHING, db_column='certificado')
+    certificado = models.OneToOneField(Certificado, models.DO_NOTHING, db_column='certificado',
+        blank=True,
+        null=True  # ⚠️ Temporário
+        )
     coordenador = models.ForeignKey(
         Coordenador,
         models.DO_NOTHING,

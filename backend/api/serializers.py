@@ -3,7 +3,7 @@ from datetime import date
 from api.models import (Usuario, Coordenador, Aluno, 
                         SuperAdmin, CoordenacaoCurso, Inscricao,
                         TipoAtividade, RegraAtividade,StatusSubmissao,
-                        AtividadeComplementar, Curso)
+                        AtividadeComplementar,Submissao, Curso)
 
 """Serializer geral para get"""
 class UsuarioSerializer(serializers.ModelSerializer):
@@ -203,6 +203,11 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     senha = serializers.CharField(write_only = True)
 
+class CursoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Curso
+        fields = '__all__'
+
 class TipoAtividadeSerializer(serializers.ModelSerializer):
     class Meta:
         model = TipoAtividade
@@ -258,6 +263,59 @@ class AtividadeComplementarSerializer(serializers.ModelSerializer):
             'tipo_atividade_nome'
         ]
 
+class SubmissaoReadSerializer(serializers.ModelSerializer):
+    aluno_nome = serializers.ReadOnlyField(source = 'aluno.usuario.nome')
+    curso_nome = serializers.ReadOnlyField(source = 'curso.nome')
+    coordenador_nome = serializers.ReadOnlyField(source = 'coordenador.usuario.nome')
+    status_submissao_nome = serializers.ReadOnlyField(source = 'status_submissao.nome_status')
+    
+    class Meta:
+        model = Submissao
+        fields = [
+            'id_submissao',
+            'data_envio',
+            'observacao_coordenador',
+            'aluno',
+            'aluno_nome',
+            'curso',
+            'curso_nome',
+            'atividade_complementar',
+            'status_submissao',
+            'status_submissao_nome',
+            'certificado',
+            'coordenador',
+            'coordenador_nome'
+        ]
+
+class SubmissaoCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Submissao
+        fields = ['curso', 'atividade_complementar', 'certificado']
+
+    def validate(self, attrs):
+        curso = attrs.get('curso')
+        atividade = attrs.get('atividade_complementar')
+
+        if Submissao.objects.filter(atividade_complementar = atividade).exists():
+            raise serializers.ValidationError(
+                'Essa atividade complementar já foi submetida.'
+            )
+        existe_regra = RegraAtividade.objects.filter(
+            curso = curso,
+            tipo_atividade = atividade.tipo_atividade
+        ).exists()
+
+        if not existe_regra:
+            raise serializers.ValidationError(
+                'Não existe regra de atividade para esse curso e tipo de atividade.'
+            )
+
+        return attrs
+
+class SubmissaoUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Submissao
+        fields =['observacao_coordenador', 'status_submissao',]
 
 class CursoSerializer(serializers.ModelSerializer):
     class Meta:

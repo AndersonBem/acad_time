@@ -247,4 +247,54 @@ ADD PRIMARY KEY (id)
 ALTER TABLE "RegraAtividade"
 ADD CONSTRAINT uq_regra UNIQUE ("TipoAtividade_idTipoAtividade", "Curso_idCurso");
 
+ALTER TABLE "Submissao"
+ADD COLUMN "idCurso" integer;
+
+
+ALTER TABLE "Submissao"
+ADD CONSTRAINT fk_submissao_curso
+FOREIGN KEY ("idCurso") REFERENCES "Curso"("idCurso");
+
+ALTER TABLE "Submissao"
+ALTER COLUMN "idCurso" SET NOT NULL;
+
+
+ALTER TABLE "Certificado"
+ADD COLUMN "textoExtraidoOcr" varchar(250),
+ADD COLUMN "cargaHorariaOcr" varchar(250),
+ADD COLUMN "dataCertificadoOcr" varchar(250),
+ADD COLUMN "cursoOcr" varchar(250),
+ADD COLUMN "instituicaoOcr" varchar(250),
+ADD COLUMN "dataUpload" date;
+
+
+CREATE TABLE IF NOT EXISTS public."TipoAcao"
+(
+    "idTipoAcao" integer NOT NULL GENERATED ALWAYS AS IDENTITY,
+    acao character varying(20) NOT NULL,
+    PRIMARY KEY ("idTipoAcao"),
+    UNIQUE (acao)
+);
+
+CREATE TABLE IF NOT EXISTS public."LogAuditoria"
+(
+    "idLogAuditoria" integer NOT NULL GENERATED ALWAYS AS IDENTITY,
+    "dataHora" timestamp NOT NULL,
+    "idEntidadeAfetada" integer NOT NULL,
+    descricao text NOT NULL,
+    "ipOrigem" character varying(50),
+    "idUsuario" integer,
+    "idTipoAcao" integer NOT NULL,
+    PRIMARY KEY ("idLogAuditoria")
+);
+
+ALTER TABLE public."LogAuditoria"
+ADD CONSTRAINT fk_logauditoria_usuario
+FOREIGN KEY ("idUsuario") REFERENCES "Usuario"("idUsuario")
+ON DELETE SET NULL;
+
+ALTER TABLE public."LogAuditoria"
+ADD CONSTRAINT fk_logauditoria_tipoacao
+FOREIGN KEY ("idTipoAcao") REFERENCES "TipoAcao"("idTipoAcao");
+
 END;
