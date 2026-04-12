@@ -4,7 +4,7 @@ from api.views import (
     UsuarioViewSet, CoordenadorViewSet, AlunoViewSet,
     SuperAdminViewSet, LoginAPIView, InscricaoViewSet,
     CoordenadorCursoViewSet, TipoAtividadeViewSet, RegraAtividadeViewSet,
-    StatusSubmissaoViewSet,AtividadeComplementarViewSet,SubmissaoViewSet, CursoViewSet)
+    StatusSubmissaoViewSet,AtividadeComplementarViewSet,SubmissaoViewSet, CursoViewSet,LoginAPIView)
 
 router = routers.DefaultRouter()
 router.register('usuarios', UsuarioViewSet, basename='usuarios')

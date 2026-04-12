@@ -5,6 +5,9 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from django.db import (connection, IntegrityError, DatabaseError,
                         InternalError, transaction)
+import os
+from django.core.files.storage import default_storage
+import uuid 
 from django.contrib.auth.hashers import make_password, check_password
 from django.utils import timezone
 from api.models import (Usuario, Coordenador, Aluno,
@@ -685,6 +688,7 @@ class SubmissaoViewSet(viewsets.ModelViewSet):
         
         aluno = usuario.aluno
         curso = serializer.validated_data.get('curso')
+        arquivo = serializer.validated_data.get('certificado_arquivo')
 
         possui_inscricao_ativa = Inscricao.objects.filter(
             aluno = aluno,
@@ -694,15 +698,36 @@ class SubmissaoViewSet(viewsets.ModelViewSet):
 
         if not possui_inscricao_ativa:
             raise ValidationError('O aluno não possui inscrição ativa nesse curso.')
+        
+        if not arquivo:
+            raise ValidationError('O arquivo de certificado é obrigatório.')
+        
+        extensao = os.path.splitext(arquivo.name)[1].lower()
+        extensoes_permitidas = ['.pdf', '.jpg', '.jpeg', '.png']
+        nome_unico = f"{uuid.uuid4()}{extensao}"
 
-        status_pendente = StatusSubmissao.objects.get(nome_status = 'PENDENTE')    
+        if extensao not in extensoes_permitidas:
+            raise ValidationError({
+            'certificado_arquivo': 'Formato inválido. Envie PDF, JPG, JPEG ou PNG.'
+        })
+        caminho_arquivo = default_storage.save(f'certificados/{nome_unico}', arquivo)
+
+
+        status_pendente = StatusSubmissao.objects.get(nome_status = 'PENDENTE')   
+
+        certificado = Certificado.objects.create(
+             nome_arquivo=nome_unico,
+             url_arquivo=caminho_arquivo,
+             data_upload=timezone.now().date()
+        ) 
 
         serializer.save(
             aluno=aluno,
             data_envio=timezone.now().date(),
             status_submissao=status_pendente,
             observacao_coordenador=None,
-            coordenador=None
+            coordenador=None,
+            certificado=certificado
         )
 
     def perform_update(self, serializer):
