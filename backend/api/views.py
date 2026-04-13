@@ -190,62 +190,7 @@ class CoordenadorViewSet(viewsets.ModelViewSet):
     
     def partial_update(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
-    def update(self, request, *args, **kwargs):
-        coordenador = self.get_object()
 
-        serializer = self.get_serializer(data = request.data)
-        serializer.is_valid(raise_exception = True)
-
-        nome = serializer.validated_data.get('nome')
-        email = serializer.validated_data.get('email')
-        status_coordenador = serializer.validated_data.get('status')
-
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    'CALL sp_atualizar_coordenador_com_usuario(%s, %s, %s, %s)',
-                    [
-                        coordenador.usuario.id_usuario,
-                        nome,
-                        email,
-                        status_coordenador
-                    ]
-                )
-        except IntegrityError as e:
-            erro = str(e)
-            if 'Usuario_email_key' in erro:
-                return Response(
-                    {"erro": "Email já está em uso"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            return Response(
-                {"erro": "Erro ao cadastrar aluno"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        except DatabaseError as e:
-            erro = str(e)
-
-            if 'Já existe outro usuário com este email' in erro:
-                return Response(
-                    {"erro": "Email já está em uso"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
-            return Response(
-                {"erro": "Erro ao atualizar aluno"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        coordenador_atualizado = Coordenador.objects.get(
-            usuario__id_usuario = coordenador.usuario.id_usuario
-        )
-
-        response_serializer = CoordenadorSerializer(coordenador_atualizado)
-
-        return Response(response_serializer.data, status =status.HTTP_200_OK)
-    
-    def partial_update(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
 
 class CoordenadorCursoViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -272,55 +217,55 @@ class CoordenadorCursoViewSet(viewsets.ModelViewSet):
 
         if not hasattr(usuario, 'superadmin'):
             raise PermissionDenied('Apenas superadmin pode realizar esta ação.')
-        def create(self, request, *args, **kwargs):
-            self._validar_superadmin(request)
+    def create(self, request, *args, **kwargs):
+        self._validar_superadmin(request)
 
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            nome = serializer.validated_data['nome']
-            email = serializer.validated_data['email']
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        nome = serializer.validated_data['nome']
+        email = serializer.validated_data['email']
 
-            senha = serializer.validated_data['senha']
-            senha_hash = make_password(senha)
+        senha = serializer.validated_data['senha']
+        senha_hash = make_password(senha)
 
-            telefone = serializer.validated_data.get('telefone')
+        telefone = serializer.validated_data.get('telefone')
 
-            try:
-                with connection.cursor() as cursor:
-                    cursor.execute(
-                        'CALL sp_cadastrar_coordenador_com_usuario(%s, %s, %s, %s)',
-                        [nome, email, senha_hash, telefone]
-                    )
-            except IntegrityError as e:
-                erro = str(e)
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    'CALL sp_cadastrar_coordenador_com_usuario(%s, %s, %s, %s)',
+                    [nome, email, senha_hash, telefone]
+                )
+        except IntegrityError as e:
+            erro = str(e)
 
-                if 'Usuario_email_key' in erro:
-                    return Response(
-                        {"erro": "Email já está em uso"},
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
+            if 'Usuario_email_key' in erro:
                 return Response(
-                    {"erro": "Erro ao cadastrar coordenador"},
+                    {"erro": "Email já está em uso"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            except DatabaseError as e:
-                erro = str(e)
+            return Response(
+                {"erro": "Erro ao cadastrar coordenador"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except DatabaseError as e:
+            erro = str(e)
 
-                if 'Já existe outro usuário com este email' in erro:
-                    return Response(
-                        {"erro": "Email já está em uso"},
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-
+            if 'Já existe outro usuário com este email' in erro:
                 return Response(
-                    {"erro": "Erro ao atualizar coordenador"},
+                    {"erro": "Email já está em uso"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            coordenador = Coordenador.objects.get(usuario__email=email)
-            response_serializer = CoordenadorSerializer(coordenador)
+            return Response(
+                {"erro": "Erro ao atualizar coordenador"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+        coordenador = Coordenador.objects.get(usuario__email=email)
+        response_serializer = CoordenadorSerializer(coordenador)
+
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
     def update(self, request, *args, **kwargs):
         self._validar_superadmin(request)
 
