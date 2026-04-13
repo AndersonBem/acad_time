@@ -10,7 +10,8 @@ from django.utils import timezone
 from api.models import (Usuario, Coordenador, Aluno,
                         SuperAdmin, Inscricao, CoordenacaoCurso,
                         TipoAtividade,RegraAtividade, StatusSubmissao,
-                        AtividadeComplementar,  Submissao, Curso)
+                        AtividadeComplementar,  Submissao, Curso,
+                        LogAuditoria)
 from api.serializers import (
     UsuarioSerializer, 
     CoordenadorSerializer, CoordenadorCreateSerializer, CoordenadorUpdateSerializer, 
@@ -20,8 +21,9 @@ from api.serializers import (
     CoordenacaoCursoUpdateSerializer,CoordenacaoCursoReadSerializer,
     TipoAtividadeSerializer,RegraAtividadeSerializer,StatusSubmissaoSerializer,
     AtividadeComplementarSerializer, SubmissaoReadSerializer, CursoSerializer,
-    SubmissaoCreateSerializer, SubmissaoUpdateSerializer)
+    SubmissaoCreateSerializer, SubmissaoUpdateSerializer,LogAuditoriaReadSerializer)
 from api.jwt_utils import gerar_access_token
+from .mixins import AuditContextMixin
 
 class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
     """Listando usuários, sem permitir criação, deleteção e etc, esses metodos
@@ -29,7 +31,7 @@ class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
 
-class CoordenadorViewSet(viewsets.ModelViewSet):
+class CoordenadorViewSet(AuditContextMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     """Tabela especifica que herda de usuario, aqui vai permitir os metodos
@@ -41,11 +43,6 @@ class CoordenadorViewSet(viewsets.ModelViewSet):
 
     def _validar_superadmin(self, request):
         usuario = request.user
-
-        print('USUARIO LOGADO:', usuario.email)
-        print('EH SUPERADMIN?', hasattr(usuario, 'superadmin'))
-        print('EH COORDENADOR?', hasattr(usuario, 'coordenador'))
-        print('EH ALUNO?', hasattr(usuario, 'aluno'))
 
         if not hasattr(usuario, 'superadmin'):
             raise PermissionDenied('Apenas superadmin pode realizar esta ação.')
@@ -192,7 +189,7 @@ class CoordenadorViewSet(viewsets.ModelViewSet):
         return self.update(request, *args, **kwargs)
 
 
-class CoordenadorCursoViewSet(viewsets.ModelViewSet):
+class CoordenadorCursoViewSet(AuditContextMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = CoordenacaoCurso.objects.select_related(
         'coordenador',
@@ -206,124 +203,31 @@ class CoordenadorCursoViewSet(viewsets.ModelViewSet):
         if self.action in ['update', 'partial_update']:
             return CoordenacaoCursoUpdateSerializer
         return CoordenacaoCursoReadSerializer
-    
-    def destroy(self, request, *args, **kwargs):
-        return Response(
-            {'erro': 'Exclusão de vinculo não é permitida.'},
-            status= status.HTTP_405_METHOD_NOT_ALLOWED
-        )
+
     def _validar_superadmin(self, request):
         usuario = request.user
-
         if not hasattr(usuario, 'superadmin'):
             raise PermissionDenied('Apenas superadmin pode realizar esta ação.')
+
     def create(self, request, *args, **kwargs):
         self._validar_superadmin(request)
+        return super().create(request, *args, **kwargs)
 
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        nome = serializer.validated_data['nome']
-        email = serializer.validated_data['email']
-
-        senha = serializer.validated_data['senha']
-        senha_hash = make_password(senha)
-
-        telefone = serializer.validated_data.get('telefone')
-
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    'CALL sp_cadastrar_coordenador_com_usuario(%s, %s, %s, %s)',
-                    [nome, email, senha_hash, telefone]
-                )
-        except IntegrityError as e:
-            erro = str(e)
-
-            if 'Usuario_email_key' in erro:
-                return Response(
-                    {"erro": "Email já está em uso"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            return Response(
-                {"erro": "Erro ao cadastrar coordenador"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        except DatabaseError as e:
-            erro = str(e)
-
-            if 'Já existe outro usuário com este email' in erro:
-                return Response(
-                    {"erro": "Email já está em uso"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
-            return Response(
-                {"erro": "Erro ao atualizar coordenador"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        coordenador = Coordenador.objects.get(usuario__email=email)
-        response_serializer = CoordenadorSerializer(coordenador)
-
-        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
     def update(self, request, *args, **kwargs):
         self._validar_superadmin(request)
+        return super().update(request, *args, **kwargs)
 
-        coordenador = self.get_object()
+    def partial_update(self, request, *args, **kwargs):
+        self._validar_superadmin(request)
+        return super().partial_update(request, *args, **kwargs)
 
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        nome = serializer.validated_data.get('nome')
-        email = serializer.validated_data.get('email')
-        status_coordenador = serializer.validated_data.get('status')
-
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    'CALL sp_atualizar_coordenador_com_usuario(%s, %s, %s, %s)',
-                    [
-                        coordenador.usuario.id_usuario,
-                        nome,
-                        email,
-                        status_coordenador
-                    ]
-                )
-        except IntegrityError as e:
-            erro = str(e)
-            if 'Usuario_email_key' in erro:
-                return Response(
-                    {"erro": "Email já está em uso"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            return Response(
-                {"erro": "Erro ao cadastrar aluno"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        except DatabaseError as e:
-            erro = str(e)
-
-            if 'Já existe outro usuário com este email' in erro:
-                return Response(
-                    {"erro": "Email já está em uso"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
-            return Response(
-                {"erro": "Erro ao atualizar aluno"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        coordenador_atualizado = Coordenador.objects.get(
-            usuario__id_usuario=coordenador.usuario.id_usuario
+    def destroy(self, request, *args, **kwargs):
+        return Response(
+            {'erro': 'Exclusão de vínculo não é permitida.'},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED
         )
 
-        response_serializer = CoordenadorSerializer(coordenador_atualizado)
-
-        return Response(response_serializer.data, status=status.HTTP_200_OK)
-
-
-class InscricaoViewSet(viewsets.ModelViewSet):
+class InscricaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     queryset = Inscricao.objects.select_related(
         'aluno',
@@ -364,7 +268,7 @@ class InscricaoViewSet(viewsets.ModelViewSet):
         self._validar_coordenador_ou_superadmin(request)
         return super().partial_update(request, *args, **kwargs)
 
-class AlunoViewSet(viewsets.ModelViewSet):
+class AlunoViewSet(AuditContextMixin, viewsets.ModelViewSet):
     """repete coordenadorviewset, com modificações pertinentes"""
     permission_classes = [AllowAny]
     queryset = Aluno.objects.select_related('usuario').prefetch_related(
@@ -565,33 +469,33 @@ class LoginAPIView(APIView):
 
         return 'usuario'
 
-class TipoAtividadeViewSet(viewsets.ModelViewSet):
+class TipoAtividadeViewSet(AuditContextMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = TipoAtividade.objects.all().order_by('nome')
     serializer_class = TipoAtividadeSerializer
 
-class RegraAtividadeViewSet(viewsets.ModelViewSet):
+class RegraAtividadeViewSet(AuditContextMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = RegraAtividade.objects.all().order_by('curso')
     serializer_class = RegraAtividadeSerializer
 
-class StatusSubmissaoViewSet(viewsets.ModelViewSet):
+class StatusSubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = StatusSubmissao.objects.all().order_by('nome_status')
     serializer_class = StatusSubmissaoSerializer
 
-class AtividadeComplementarViewSet(viewsets.ModelViewSet):
+class AtividadeComplementarViewSet(AuditContextMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = AtividadeComplementar.objects.all().order_by('id_atividade_complementar')
     serializer_class = AtividadeComplementarSerializer
 
-class CursoViewSet(viewsets.ModelViewSet):
+class CursoViewSet(AuditContextMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Curso.objects.all()
     serializer_class= CursoSerializer
 
 
-class SubmissaoViewSet(viewsets.ModelViewSet):
+class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
     """permission_classes = [IsAuthenticated]"""
     def get_queryset(self):
         usuario = self.request.user
@@ -711,4 +615,20 @@ class SubmissaoViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         raise PermissionDenied('Exclusão de submissão não é permitida. Utilize a alteração de status.')
     
+class LogAuditoriaViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = LogAuditoriaReadSerializer
+    
+    def _validar_superadmin(self, request):
+        usuario = request.user
+        
+        if not hasattr(usuario, 'superadmin'):
+            raise PermissionDenied('Apenas superadmin pode realizar esta ação.')
+    def get_queryset(self):
+        self._validar_superadmin(self.request)
+
+        return LogAuditoria.objects.select_related(
+            'usuario',
+            'tipo_acao'
+        ).order_by('-data_hora')
 

@@ -3,7 +3,8 @@ from datetime import date
 from api.models import (Usuario, Coordenador, Aluno, 
                         SuperAdmin, CoordenacaoCurso, Inscricao,
                         TipoAtividade, RegraAtividade,StatusSubmissao,
-                        AtividadeComplementar,Submissao, Curso)
+                        AtividadeComplementar,Submissao, Curso,
+                        LogAuditoria)
 
 """Serializer geral para get"""
 class UsuarioSerializer(serializers.ModelSerializer):
@@ -328,3 +329,26 @@ class CursoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Curso
         fields = '__all__'
+
+class LogAuditoriaReadSerializer(serializers.ModelSerializer):
+    usuario_nome = serializers.ReadOnlyField(source ='usuario.nome')
+    tipo_acao_nome = serializers.ReadOnlyField(source = 'tipo_acao.acao')
+    usuario_email = serializers.ReadOnlyField(source='usuario.email')
+    
+    class Meta:
+        model = LogAuditoria
+        fields = [
+            'id_log_auditoria',
+            'data_hora',
+            'nome_entidade',
+            'id_entidade_afetada',
+            'descricao',
+            'ip_origem',
+            'usuario',
+            'usuario_nome',
+            'usuario_email',
+            'tipo_acao',
+            'tipo_acao_nome',
+            'valor_anterior',
+            'valor_novo'
+        ]

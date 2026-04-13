@@ -373,9 +373,30 @@ END;
 $function$;
 
 
+DROP TRIGGER IF EXISTS trg_log_auditoria_submissao ON "Submissao";
+
+CREATE TRIGGER trg_log_auditoria_submissao
+AFTER INSERT OR UPDATE OR DELETE
+ON "Submissao"
+FOR EACH ROW
+EXECUTE FUNCTION fn_log_auditoria_submissao();
+
 DROP TRIGGER IF EXISTS tg_validar_aprovacao_submissao ON "Submissao";
 
 CREATE TRIGGER tg_validar_aprovacao_submissao
 BEFORE UPDATE ON "Submissao"
 FOR EACH ROW
 EXECUTE FUNCTION trg_validar_aprovacao_submissao();
+
+
+DROP TRIGGER IF EXISTS tg_log_auditoria_submissao ON "Submissao";
+DROP TRIGGER IF EXISTS trg_log_auditoria_submissao ON "Submissao";
+
+DROP FUNCTION IF EXISTS trg_log_auditoria_submissao();
+DROP FUNCTION IF EXISTS fn_log_auditoria_submissao();
+
+CREATE TRIGGER trg_log_auditoria_submissao
+AFTER INSERT OR UPDATE OR DELETE
+ON "Submissao"
+FOR EACH ROW
+EXECUTE FUNCTION fn_log_auditoria_submissao();

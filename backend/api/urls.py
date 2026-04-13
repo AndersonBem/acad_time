@@ -4,7 +4,8 @@ from api.views import (
     UsuarioViewSet, CoordenadorViewSet, AlunoViewSet,
     SuperAdminViewSet, LoginAPIView, InscricaoViewSet,
     CoordenadorCursoViewSet, TipoAtividadeViewSet, RegraAtividadeViewSet,
-    StatusSubmissaoViewSet,AtividadeComplementarViewSet,SubmissaoViewSet, CursoViewSet)
+    StatusSubmissaoViewSet,AtividadeComplementarViewSet,SubmissaoViewSet, CursoViewSet,
+    LogAuditoriaViewSet)
 
 router = routers.DefaultRouter()
 router.register('usuarios', UsuarioViewSet, basename='usuarios')
@@ -19,6 +20,7 @@ router.register('statusSubmissao', StatusSubmissaoViewSet, basename='statusSubmi
 router.register('atividadeComplementar', AtividadeComplementarViewSet, basename= 'AtividadeComplementar')
 router.register('submissao',SubmissaoViewSet, basename= 'submissao')
 router.register('curso', CursoViewSet, basename= 'curso')
+router.register('auditoria', LogAuditoriaViewSet, basename='auditoria')
 urlpatterns = [
     path('login/', LoginAPIView.as_view(), name='login'),
     path('', include(router.urls)),
