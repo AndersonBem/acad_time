@@ -279,6 +279,12 @@ class Submissao(models.Model):
         null=True
     )
 
+    carga_horaria_aprovada = models.IntegerField(
+        db_column='cargaHorariaAprovada',
+        blank=True,
+        null=True
+    )
+
     class Meta:
         managed = False
         db_table = 'Submissao'

@@ -1,8 +1,9 @@
 -- Aprova uma submissão válida, registrando o coordenador responsável e a observação.
-CREATE PROCEDURE sp_aprovar_submissao(
+CREATE OR REPLACE PROCEDURE sp_aprovar_submissao(
     p_id_submissao integer,
     p_id_coordenador integer,
-    p_obs text
+    p_obs text,
+    p_carga_horaria_aprovada integer
 )
 LANGUAGE plpgsql
 AS
@@ -10,26 +11,25 @@ $$
 DECLARE
     v_curso integer;
 BEGIN
-    SELECT m."Curso_idCurso"
+    SELECT s."idCurso"
     INTO v_curso
     FROM "Submissao" s
-    JOIN "Matricula" m
-      ON m."Aluno_idUsuario" = s."idAluno"
     WHERE s."idSubmissao" = p_id_submissao;
 
     IF NOT fn_usuario_coordena_curso(p_id_coordenador, v_curso) THEN
         RAISE EXCEPTION 'Coordenador não pertence ao curso';
     END IF;
 
-    IF NOT fn_submissao_pode_ser_aprovada(p_id_submissao) THEN
-        RAISE EXCEPTION 'Submissao invalida';
-    END IF;
-
     UPDATE "Submissao"
     SET "statusSubmissao" = 2,
         "observacaoCoordenador" = p_obs,
-        "idCoordenador" = p_id_coordenador
+        "idCoordenador" = p_id_coordenador,
+        "cargaHorariaAprovada" = p_carga_horaria_aprovada
     WHERE "idSubmissao" = p_id_submissao;
+
+    IF NOT fn_submissao_pode_ser_aprovada(p_id_submissao) THEN
+        RAISE EXCEPTION 'Submissao invalida';
+    END IF;
 END;
 $$;
 

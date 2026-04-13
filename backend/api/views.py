@@ -592,7 +592,7 @@ class CursoViewSet(viewsets.ModelViewSet):
 
 
 class SubmissaoViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    """permission_classes = [IsAuthenticated]"""
     def get_queryset(self):
         usuario = self.request.user
 
@@ -652,6 +652,14 @@ class SubmissaoViewSet(viewsets.ModelViewSet):
         if not possui_inscricao_ativa:
             raise ValidationError('O aluno não possui inscrição ativa nesse curso.')
 
+        coordenacao_ativa = CoordenacaoCurso.objects.filter(
+            curso=curso,
+            data_fim__isnull=True
+        ).first()
+
+        if not coordenacao_ativa:
+            raise ValidationError('O curso informado não possui coordenador ativo.')
+
         status_pendente = StatusSubmissao.objects.get(nome_status = 'PENDENTE')    
 
         serializer.save(
@@ -659,7 +667,7 @@ class SubmissaoViewSet(viewsets.ModelViewSet):
             data_envio=timezone.now().date(),
             status_submissao=status_pendente,
             observacao_coordenador=None,
-            coordenador=None
+            coordenador=coordenacao_ativa.coordenador
         )
 
     def perform_update(self, serializer):

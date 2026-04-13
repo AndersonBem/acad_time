@@ -26,7 +26,7 @@ $$;
 
 
 -- Calcula o total de horas aprovadas de atividades complementares de um aluno.
-CREATE FUNCTION fn_total_horas_aprovadas_aluno(p_id_aluno integer)
+CREATE OR REPLACE FUNCTION fn_total_horas_aprovadas_aluno(p_id_aluno integer)
 RETURNS numeric
 LANGUAGE plpgsql
 AS
@@ -34,11 +34,9 @@ $$
 DECLARE
     total numeric;
 BEGIN
-    SELECT COALESCE(SUM(ac."cargaHorariaSolicitada"), 0)
+    SELECT COALESCE(SUM(s."cargaHorariaAprovada"), 0)
     INTO total
     FROM "Submissao" s
-    JOIN "AtividadeComplementar" ac
-      ON ac."idAtividadeComplementar" = s."atividadeComplementa"
     WHERE s."idAluno" = p_id_aluno
       AND s."statusSubmissao" = 2;
 
@@ -73,7 +71,7 @@ $$;
 
 
 -- Retorna quantas horas ainda podem ser aproveitadas para um tipo de atividade no curso.
-CREATE FUNCTION fn_limite_disponivel_tipo(
+CREATE OR REPLACE FUNCTION fn_limite_disponivel_tipo(
     p_id_aluno integer,
     p_id_curso integer,
     p_id_tipo integer
@@ -92,7 +90,7 @@ BEGIN
     WHERE "Curso_idCurso" = p_id_curso
       AND "TipoAtividade_idTipoAtividade" = p_id_tipo;
 
-    SELECT COALESCE(SUM(ac."cargaHorariaSolicitada"), 0)
+    SELECT COALESCE(SUM(s."cargaHorariaAprovada"), 0)
     INTO v_usado
     FROM "Submissao" s
     JOIN "AtividadeComplementar" ac
@@ -107,7 +105,7 @@ $$;
 
 
 -- Verifica se uma submissão pode ser aprovada com base no limite de horas do tipo de atividade.
-CREATE FUNCTION fn_submissao_pode_ser_aprovada(p_id_submissao integer)
+CREATE OR REPLACE FUNCTION fn_submissao_pode_ser_aprovada(p_id_submissao integer)
 RETURNS boolean
 LANGUAGE plpgsql
 AS
@@ -121,17 +119,19 @@ DECLARE
 BEGIN
     SELECT
         ac."tipoAtividade",
-        m."Curso_idCurso",
+        s."idCurso",
         s."idAluno",
-        ac."cargaHorariaSolicitada"
+        s."cargaHorariaAprovada"
     INTO v_tipo, v_curso, v_aluno, v_carga
     FROM "Submissao" s
     JOIN "AtividadeComplementar" ac
       ON ac."idAtividadeComplementar" = s."atividadeComplementa"
-    JOIN "Matricula" m
-      ON m."Aluno_idUsuario" = s."idAluno"
     WHERE s."idSubmissao" = p_id_submissao
     LIMIT 1;
+
+    IF v_carga IS NULL THEN
+        RETURN false;
+    END IF;
 
     v_restante := fn_limite_disponivel_tipo(v_aluno, v_curso, v_tipo);
 

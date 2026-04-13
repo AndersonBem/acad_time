@@ -328,3 +328,54 @@ BEGIN
     RETURN COALESCE(NEW, OLD);
 END;
 $function$;
+
+
+CREATE OR REPLACE FUNCTION public.trg_validar_aprovacao_submissao()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_tipo integer;
+    v_limite_restante numeric;
+BEGIN
+    -- só valida quando estiver aprovando
+    IF NEW."statusSubmissao" = 2 THEN
+
+        IF NEW."cargaHorariaAprovada" IS NULL THEN
+            RAISE EXCEPTION 'Carga horária aprovada deve ser informada para aprovar a submissão.';
+        END IF;
+
+        SELECT ac."tipoAtividade"
+        INTO v_tipo
+        FROM "AtividadeComplementar" ac
+        WHERE ac."idAtividadeComplementar" = NEW."atividadeComplementa";
+
+        IF v_tipo IS NULL THEN
+            RAISE EXCEPTION 'Atividade complementar % não encontrada.', NEW."atividadeComplementa";
+        END IF;
+
+        v_limite_restante := fn_limite_disponivel_tipo(
+            NEW."idAluno",
+            NEW."idCurso",
+            v_tipo
+        );
+
+        IF NEW."cargaHorariaAprovada" > v_limite_restante THEN
+            RAISE EXCEPTION
+                'Carga horária aprovada excede o limite permitido para este tipo. Restante: %, aprovada: %',
+                v_limite_restante,
+                NEW."cargaHorariaAprovada";
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$function$;
+
+
+DROP TRIGGER IF EXISTS tg_validar_aprovacao_submissao ON "Submissao";
+
+CREATE TRIGGER tg_validar_aprovacao_submissao
+BEFORE UPDATE ON "Submissao"
+FOR EACH ROW
+EXECUTE FUNCTION trg_validar_aprovacao_submissao();
