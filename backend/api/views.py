@@ -11,7 +11,7 @@ from api.models import (Usuario, Coordenador, Aluno,
                         SuperAdmin, Inscricao, CoordenacaoCurso,
                         TipoAtividade,RegraAtividade, StatusSubmissao,
                         AtividadeComplementar,  Submissao, Curso,
-                        LogAuditoria)
+                        LogAuditoria, NotificacaoEmail)
 from api.serializers import (
     UsuarioSerializer, 
     CoordenadorSerializer, CoordenadorCreateSerializer, CoordenadorUpdateSerializer, 
@@ -21,9 +21,11 @@ from api.serializers import (
     CoordenacaoCursoUpdateSerializer,CoordenacaoCursoReadSerializer,
     TipoAtividadeSerializer,RegraAtividadeSerializer,StatusSubmissaoSerializer,
     AtividadeComplementarSerializer, SubmissaoReadSerializer, CursoSerializer,
-    SubmissaoCreateSerializer, SubmissaoUpdateSerializer,LogAuditoriaReadSerializer)
+    SubmissaoCreateSerializer, SubmissaoUpdateSerializer,LogAuditoriaReadSerializer,
+    NotificacaoEmailReadSerializer)
 from api.jwt_utils import gerar_access_token
 from .mixins import AuditContextMixin
+from api.notificacao_service import NotificacaoService
 
 class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
     """Listando usuários, sem permitir criação, deleteção e etc, esses metodos
@@ -566,7 +568,7 @@ class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
         status_pendente = StatusSubmissao.objects.get(nome_status = 'PENDENTE')    
 
-        serializer.save(
+        submissao = serializer.save(
             aluno=aluno,
             data_envio=timezone.now().date(),
             status_submissao=status_pendente,
@@ -574,9 +576,15 @@ class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
             coordenador=coordenacao_ativa.coordenador
         )
 
+        try:
+            NotificacaoService.notificar_submissao_criada(submissao)
+        except Exception as e:
+            print(f'Erro ao enviar notificação de submissão criada: {e}')
+
     def perform_update(self, serializer):
         usuario = self.request.user
         submissao = self.get_object()
+        status_anterior = submissao.status_submissao.nome_status
 
         eh_aluno = hasattr(usuario, 'aluno')
         eh_coordenador = hasattr(usuario, 'coordenador')
@@ -597,6 +605,18 @@ class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
             try:
                 with transaction.atomic():
                     serializer.save(coordenador=usuario.coordenador)
+                submissao.refresh_from_db()
+                status_novo = submissao.status_submissao.nome_status
+
+                if status_anterior != status_novo:
+                    try:
+                        if status_novo == 'APROVADA':
+                            NotificacaoService.notificar_submissao_aprovada(submissao)
+                        elif status_novo == 'REPROVADA':
+                            NotificacaoService.notificar_submissao_reprovada(submissao)
+                    except Exception as e:
+                        print(f'Erro ao enviar notificação de atualização da submissão: {e}')
+                
             except InternalError as e:
                 raise ValidationError({'detail': str(e)})
             return
@@ -605,6 +625,17 @@ class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
             try:
                 with transaction.atomic():
                     serializer.save()
+                submissao.refresh_from_db()
+                status_novo = submissao.status_submissao.nome_status
+
+                if status_anterior != status_novo:
+                    try:
+                        if status_novo == 'APROVADA':
+                            NotificacaoService.notificar_submissao_aprovada(submissao)
+                        elif status_novo == 'REPROVADA':
+                            NotificacaoService.notificar_submissao_reprovada(submissao)
+                    except Exception as e:
+                        print(f'Erro ao enviar notificação de atualização da submissão: {e}')
             except InternalError as e:
                 raise ValidationError({'detail': str(e)})
             return
@@ -632,3 +663,16 @@ class LogAuditoriaViewSet(viewsets.ReadOnlyModelViewSet):
             'tipo_acao'
         ).order_by('-data_hora')
 
+class NotificacaoEmailViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = NotificacaoEmailReadSerializer
+
+    def _validar_superadmin(self, request):
+        usuario = request.user
+        if not hasattr(usuario, 'superadmin'):
+            raise PermissionDenied('Apenas superadmin pode realizar esta ação.')
+
+    def get_queryset(self):
+        self._validar_superadmin(self.request)
+
+        return NotificacaoEmail.objects.order_by('-data', '-id_notificacao_email')
+    

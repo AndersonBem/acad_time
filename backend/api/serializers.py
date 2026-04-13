@@ -4,7 +4,7 @@ from api.models import (Usuario, Coordenador, Aluno,
                         SuperAdmin, CoordenacaoCurso, Inscricao,
                         TipoAtividade, RegraAtividade,StatusSubmissao,
                         AtividadeComplementar,Submissao, Curso,
-                        LogAuditoria)
+                        LogAuditoria, NotificacaoEmail)
 
 """Serializer geral para get"""
 class UsuarioSerializer(serializers.ModelSerializer):
@@ -351,4 +351,21 @@ class LogAuditoriaReadSerializer(serializers.ModelSerializer):
             'tipo_acao_nome',
             'valor_anterior',
             'valor_novo'
+        ]
+
+class NotificacaoEmailReadSerializer(serializers.ModelSerializer):
+    submissao_id = serializers.IntegerField(source='submissao.id_submissao', read_only=True)
+
+    class Meta:
+        model = NotificacaoEmail
+        fields = [
+            'id_notificacao_email',
+            'assunto',
+            'corpo',
+            'data',
+            'destinatario',
+            'status_envio',
+            'tipo_evento',
+            'mensagem_erro',
+            'submissao_id'
         ]

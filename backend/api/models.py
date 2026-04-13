@@ -298,6 +298,10 @@ class NotificacaoEmail(models.Model):
     assunto = models.CharField(max_length=250)
     corpo = models.TextField()
     data = models.DateField()
+    destinatario = models.EmailField(max_length=150, null=True, blank=True)
+    status_envio = models.CharField(db_column='statusEnvio', max_length=20, null=True, blank=True)
+    tipo_evento = models.CharField(db_column='tipoEvento', max_length=50, null=True, blank=True)
+    mensagem_erro = models.TextField(db_column='mensagemErro', null=True, blank=True)
     submissao = models.ForeignKey(Submissao, models.DO_NOTHING, db_column='idSubmissao')
 
     class Meta:

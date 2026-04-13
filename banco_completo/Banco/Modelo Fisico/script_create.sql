@@ -322,4 +322,11 @@ ALTER TABLE "LogAuditoria"
 ALTER TABLE "LogAuditoria"
     ADD COLUMN "valorNovo" jsonb;
 
+ALTER TABLE "NotificacaoEmail"
+ADD COLUMN "destinatario" varchar(150),
+ADD COLUMN "statusEnvio" varchar(20),
+ADD COLUMN "tipoEvento" varchar(50),
+ADD COLUMN "mensagemErro" text;
+
+
 END;
