@@ -329,4 +329,16 @@ ADD COLUMN "tipoEvento" varchar(50),
 ADD COLUMN "mensagemErro" text;
 
 
+CREATE TABLE "RecuperacaoSenha" (
+    "idRecuperacaoSenha" SERIAL PRIMARY KEY,
+    "idUsuario" INTEGER NOT NULL,
+    "token" TEXT NOT NULL,
+    "expiraEm" TIMESTAMP NOT NULL,
+    "usado" BOOLEAN NOT NULL DEFAULT FALSE,
+    "dataCriacao" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "fk_recuperacao_usuario"
+        FOREIGN KEY ("idUsuario")
+        REFERENCES "Usuario" ("idUsuario")
+);
+
 END;
