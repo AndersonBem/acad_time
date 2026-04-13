@@ -1253,3 +1253,66 @@ SUPERADMIN
  * - Logs são gerados automaticamente via trigger no banco de dados
  * - O campo valor_anterior e valor_novo representam o estado antes e depois da operação
  */
+
+/*
+========================================
+ENDPOINT: notificacaoEmail
+URL: /notificacaoEmail/
+TIPO: READ ONLY
+ACESSO: Apenas superadmin
+OBJETIVO:
+Listar o histórico técnico de notificações de e-mail enviadas pelo sistema,
+incluindo assunto, corpo, destinatário, status do envio, tipo do evento,
+mensagem de erro (quando existir) e a submissão relacionada.
+
+REGRAS:
+- Não permite criação manual.
+- Não permite edição.
+- Não permite exclusão.
+- Deve ser usado apenas para consulta administrativa/técnica.
+- Retorna as notificações da mais recente para a mais antiga.
+
+GET /notificacaoEmail/
+Lista todas as notificações de e-mail registradas no sistema.
+
+Exemplo de resposta:
+[
+  {
+    "id_notificacao_email": 15,
+    "assunto": "Nova submissão pendente - ADS",
+    "corpo": "Olá, Gabriel Dias...\n\n...",
+    "data": "2026-04-13",
+    "destinatario": "gabriel@email.com",
+    "status_envio": "SUCESSO",
+    "tipo_evento": "SUBMISSAO_CRIADA",
+    "mensagem_erro": null,
+    "submissao_id": 43
+  }
+]
+
+GET /notificacaoEmail/{id}/
+Retorna os detalhes de uma notificação específica.
+
+Campos retornados:
+- id_notificacao_email: identificador da notificação
+- assunto: assunto do e-mail
+- corpo: conteúdo enviado
+- data: data do registro
+- destinatario: e-mail que recebeu a notificação
+- status_envio: resultado do envio
+  Valores esperados:
+  - "SUCESSO"
+  - "FALHA"
+- tipo_evento: evento que gerou a notificação
+  Valores atuais:
+  - "SUBMISSAO_CRIADA"
+  - "SUBMISSAO_APROVADA"
+  - "SUBMISSAO_REPROVADA"
+- mensagem_erro: descrição do erro, quando houver falha
+- submissao_id: id da submissão relacionada à notificação
+
+Observação:
+Esse endpoint é administrativo e serve para auditoria e rastreio técnico
+das notificações de e-mail do sistema.
+========================================
+*/
