@@ -297,4 +297,8 @@ ALTER TABLE public."LogAuditoria"
 ADD CONSTRAINT fk_logauditoria_tipoacao
 FOREIGN KEY ("idTipoAcao") REFERENCES "TipoAcao"("idTipoAcao");
 
+ALTER TABLE "Submissao"
+ADD COLUMN "cargaHorariaAprovada" integer;
+
+
 END;

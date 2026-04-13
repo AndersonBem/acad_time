@@ -268,7 +268,7 @@ class SubmissaoReadSerializer(serializers.ModelSerializer):
     curso_nome = serializers.ReadOnlyField(source = 'curso.nome')
     coordenador_nome = serializers.ReadOnlyField(source = 'coordenador.usuario.nome')
     status_submissao_nome = serializers.ReadOnlyField(source = 'status_submissao.nome_status')
-    
+    carga_horaria_solicitada = serializers.ReadOnlyField(source = 'atividade_complementar.carga_horaria_solicitada')
     class Meta:
         model = Submissao
         fields = [
@@ -284,7 +284,9 @@ class SubmissaoReadSerializer(serializers.ModelSerializer):
             'status_submissao_nome',
             'certificado',
             'coordenador',
-            'coordenador_nome'
+            'coordenador_nome',
+            'carga_horaria_aprovada',
+            'carga_horaria_solicitada'
         ]
 
 class SubmissaoCreateSerializer(serializers.ModelSerializer):
@@ -310,12 +312,17 @@ class SubmissaoCreateSerializer(serializers.ModelSerializer):
                 'Não existe regra de atividade para esse curso e tipo de atividade.'
             )
 
+        if 'aluno' in self.initial_data:
+            raise serializers.ValidationError({
+                'aluno': 'Este campo não pode ser enviado.'
+            })
+
         return attrs
 
 class SubmissaoUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Submissao
-        fields =['observacao_coordenador', 'status_submissao',]
+        fields =['observacao_coordenador', 'status_submissao','carga_horaria_aprovada']
 
 class CursoSerializer(serializers.ModelSerializer):
     class Meta:
