@@ -596,19 +596,31 @@ class SubmissaoViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         usuario = self.request.user
 
+        queryset = Submissao.objects.select_related(
+            'aluno',
+            'aluno__usuario',
+            'curso',
+            'atividade_complementar',
+            'status_submissao',
+            'certificado',
+            'coordenador',
+            'coordenador__usuario'
+        )
+
         if hasattr(usuario, 'aluno'):
-            return Submissao.objects.filter(aluno=usuario.aluno)
+            return queryset.filter(aluno=usuario.aluno)
 
         if hasattr(usuario, 'coordenador'):
-            return Submissao.objects.filter(
+            return queryset.filter(
                 curso__coordenacaocurso__coordenador=usuario.coordenador,
                 curso__coordenacaocurso__data_fim__isnull=True
-            )
+            ).distinct()
 
         if hasattr(usuario, 'superadmin'):
-            return Submissao.objects.all()
+            return queryset
 
-        return Submissao.objects.none()
+        return queryset.none()
+    
     serializer_class = SubmissaoReadSerializer
     
     def get_serializer_class(self):
