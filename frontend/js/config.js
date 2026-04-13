@@ -1219,3 +1219,37 @@ SUPERADMIN
   para registrar usuário autenticado real, IP e outros metadados.
 - No futuro, este comentário pode ser migrado para documentação formal da API.
 */
+/**
+ * LOG DE AUDITORIA (APENAS LEITURA - SUPERADMIN)
+ *
+ * Endpoint responsável por visualizar o histórico de ações realizadas no sistema.
+ * Registra operações como criação, atualização, aprovação, rejeição e exclusão.
+ *
+ * 🔐 Permissão:
+ * - Apenas usuários com perfil de superadmin podem acessar.
+ *
+ * 📥 GET /logauditoria/
+ * - Lista todos os logs de auditoria (ordenados do mais recente para o mais antigo)
+ *
+ * 📥 GET /logauditoria/{id}/
+ * - Retorna os detalhes de um log específico
+ *
+ * 📊 Campos retornados:
+ * - id_log_auditoria
+ * - data_hora
+ * - nome_entidade (ex: "Submissao")
+ * - id_entidade_afetada
+ * - descricao (ex: "Submissão criada", "Submissão aprovada")
+ * - ip_origem
+ * - usuario (id)
+ * - usuario_nome
+ * - tipo_acao (id)
+ * - tipo_acao_nome (CREATE, UPDATE, APPROVE, etc)
+ * - valor_anterior (JSON)
+ * - valor_novo (JSON)
+ *
+ * ⚠️ Observações:
+ * - Este endpoint é somente leitura (não permite POST, PUT, PATCH ou DELETE)
+ * - Logs são gerados automaticamente via trigger no banco de dados
+ * - O campo valor_anterior e valor_novo representam o estado antes e depois da operação
+ */
