@@ -300,5 +300,26 @@ FOREIGN KEY ("idTipoAcao") REFERENCES "TipoAcao"("idTipoAcao");
 ALTER TABLE "Submissao"
 ADD COLUMN "cargaHorariaAprovada" integer;
 
+ALTER TABLE "LogAuditoria"
+    ALTER COLUMN "dataHora" TYPE timestamp
+    USING "dataHora"::timestamp;
+
+ALTER TABLE "LogAuditoria"
+    ADD COLUMN "nomeEntidade" varchar(100);
+
+ALTER TABLE "LogAuditoria"
+    ALTER COLUMN "idUsuario" DROP NOT NULL;
+
+ALTER TABLE "LogAuditoria"
+    ALTER COLUMN "ipOrigem" DROP NOT NULL;
+
+ALTER TABLE "LogAuditoria"
+    ALTER COLUMN "descricao" TYPE text;
+
+ALTER TABLE "LogAuditoria"
+    ADD COLUMN "valorAnterior" jsonb;
+
+ALTER TABLE "LogAuditoria"
+    ADD COLUMN "valorNovo" jsonb;
 
 END;

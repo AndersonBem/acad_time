@@ -323,7 +323,7 @@ class Telefone(models.Model):
 
 class TipoAcao(models.Model):
     id_tipo_acao = models.AutoField(db_column='idTipoAcao', primary_key=True)
-    acao = models.CharField(max_length=150)
+    acao = models.CharField(max_length=20)
 
     class Meta:
         managed = False
@@ -334,13 +334,26 @@ class TipoAcao(models.Model):
 
 
 class LogAuditoria(models.Model):
-    id_log_auditoria = models.AutoField(db_column='idLogauditoria', primary_key=True)
-    data_hora = models.DateField(db_column='dataHora')
+    id_log_auditoria = models.AutoField(db_column='idLogAuditoria', primary_key=True)
+    data_hora = models.DateTimeField(db_column='dataHora')
+    nome_entidade = models.CharField(db_column='nomeEntidade', max_length=100)
     id_entidade_afetada = models.IntegerField(db_column='idEntidadeAfetada')
-    descricao = models.CharField(max_length=200, blank=True, null=True)
-    ip_origem = models.CharField(db_column='ipOrigem', max_length=45)
-    usuario = models.ForeignKey(Usuario, models.DO_NOTHING, db_column='idUsuario')
-    tipo_acao = models.ForeignKey(TipoAcao, models.DO_NOTHING, db_column='idTipoAcao')
+    descricao = models.TextField(blank=True, null=True)
+    ip_origem = models.CharField(db_column='ipOrigem', max_length=45, blank=True, null=True)
+    usuario = models.ForeignKey(
+        Usuario,
+        models.DO_NOTHING,
+        db_column='idUsuario',
+        blank=True,
+        null=True
+    )
+    tipo_acao = models.ForeignKey(
+        TipoAcao,
+        models.DO_NOTHING,
+        db_column='idTipoAcao'
+    )
+    valor_anterior = models.JSONField(db_column='valorAnterior', blank=True, null=True)
+    valor_novo = models.JSONField(db_column='valorNovo', blank=True, null=True)
 
     class Meta:
         managed = False
