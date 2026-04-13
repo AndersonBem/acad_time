@@ -372,3 +372,7 @@ class NotificacaoEmailReadSerializer(serializers.ModelSerializer):
 
 class RecuperarSenhaSerializer(serializers.Serializer):
     email = serializers.EmailField()
+
+class RedefinirSenhaSerializer(serializers.Serializer):
+    token = serializers.CharField()
+    nova_senha = serializers.CharField(min_length=6)

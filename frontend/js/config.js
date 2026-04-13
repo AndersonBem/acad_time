@@ -19,6 +19,7 @@ const CONFIG = {
         auditoria: '/audirotia/',
         notificacaoEmail: '/notificacaoEmail/',
         recuperarsenha: '/recuperar-senha/',
+        redefinirsenha: '/redefinir-senha/'
     }
 };
 
@@ -1355,5 +1356,56 @@ Observações:
 - Esse endpoint apenas inicia o processo.
 - A redefinição da senha ocorre em outro endpoint (redefinir-senha).
 - O front deve direcionar o usuário para a tela de redefinição ao acessar o link enviado por e-mail.
+========================================
+*/
+
+/*
+========================================
+ENDPOINT: redefinirsenha
+URL: /redefinir-senha/
+TIPO: POST
+ACESSO: Público (não requer autenticação)
+OBJETIVO:
+Permitir que o usuário redefina sua senha utilizando um token temporário
+recebido por e-mail no processo de recuperação de senha.
+
+REGRAS:
+- Recebe token e nova senha.
+- O token deve existir, não pode estar expirado e não pode ter sido utilizado.
+- Após uso, o token é invalidado (usado = true).
+- A senha é armazenada de forma segura (hash).
+- Não permite reutilização do token.
+
+POST /redefinir-senha/
+Redefine a senha do usuário.
+
+Body esperado:
+{
+  "token": "token_recebido_por_email",
+  "nova_senha": "novaSenha123"
+}
+
+Resposta de sucesso:
+{
+  "mensagem": "Senha redefinida com sucesso."
+}
+
+Possíveis erros:
+{
+  "erro": "Token inválido."
+}
+
+{
+  "erro": "Token expirado."
+}
+
+{
+  "erro": "Token já utilizado."
+}
+
+Observações:
+- Esse endpoint é a segunda etapa do fluxo de recuperação de senha.
+- O token é gerado no endpoint /recuperar-senha/.
+- O front deve capturar o token da URL (ex: ?token=...) e enviar neste endpoint.
 ========================================
 */

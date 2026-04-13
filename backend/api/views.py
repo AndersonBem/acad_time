@@ -7,11 +7,13 @@ from django.db import (connection, IntegrityError, DatabaseError,
                         InternalError, transaction)
 from django.contrib.auth.hashers import make_password, check_password
 from django.utils import timezone
+
 from api.models import (Usuario, Coordenador, Aluno,
                         SuperAdmin, Inscricao, CoordenacaoCurso,
                         TipoAtividade,RegraAtividade, StatusSubmissao,
                         AtividadeComplementar,  Submissao, Curso,
                         LogAuditoria, NotificacaoEmail)
+
 from api.serializers import (
     UsuarioSerializer, 
     CoordenadorSerializer, CoordenadorCreateSerializer, CoordenadorUpdateSerializer, 
@@ -22,11 +24,13 @@ from api.serializers import (
     TipoAtividadeSerializer,RegraAtividadeSerializer,StatusSubmissaoSerializer,
     AtividadeComplementarSerializer, SubmissaoReadSerializer, CursoSerializer,
     SubmissaoCreateSerializer, SubmissaoUpdateSerializer,LogAuditoriaReadSerializer,
-    NotificacaoEmailReadSerializer, RecuperarSenhaSerializer)
+    NotificacaoEmailReadSerializer, RecuperarSenhaSerializer, RedefinirSenhaSerializer)
+
 from api.jwt_utils import gerar_access_token
 from .mixins import AuditContextMixin
 from api.notificacao_service import NotificacaoService
 from api.recuperar_service import RecuperacaoSenhaService
+from api.redefinir_service import RedefinirSenhaService
 
 class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
     """Listando usuários, sem permitir criação, deleteção e etc, esses metodos
@@ -693,5 +697,28 @@ class RecuperarSenhaAPIView(APIView):
 
         return Response(
             {'mensagem': 'Se o e-mail existir, o link de recuperação foi enviado.'},
+            status=status.HTTP_200_OK
+        )
+    
+class RedefinirSenhaAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = RedefinirSenhaSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        token = serializer.validated_data['token']
+        nova_senha = serializer.validated_data['nova_senha']
+
+        sucesso, mensagem = RedefinirSenhaService.redefinir_senha(token, nova_senha)
+
+        if not sucesso:
+            return Response(
+                {'erro': mensagem},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return Response(
+            {'mensagem': mensagem},
             status=status.HTTP_200_OK
         )
