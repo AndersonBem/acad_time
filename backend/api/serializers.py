@@ -369,3 +369,6 @@ class NotificacaoEmailReadSerializer(serializers.ModelSerializer):
             'mensagem_erro',
             'submissao_id'
         ]
+
+class RecuperarSenhaSerializer(serializers.Serializer):
+    email = serializers.EmailField()

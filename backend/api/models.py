@@ -365,3 +365,16 @@ class LogAuditoria(models.Model):
 
     def __str__(self):
         return f'Log {self.id_log_auditoria}'
+
+
+class RecuperacaoSenha(models.Model):
+    id_recuperacao_senha = models.AutoField(db_column='idRecuperacaoSenha', primary_key=True)
+    usuario = models.ForeignKey('Usuario', models.DO_NOTHING, db_column='idUsuario')
+    token = models.TextField()
+    expira_em = models.DateTimeField(db_column='expiraEm')
+    usado = models.BooleanField(default=False)
+    data_criacao = models.DateTimeField(db_column='dataCriacao')
+
+    class Meta:
+        managed = False
+        db_table = 'RecuperacaoSenha'

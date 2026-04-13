@@ -22,10 +22,11 @@ from api.serializers import (
     TipoAtividadeSerializer,RegraAtividadeSerializer,StatusSubmissaoSerializer,
     AtividadeComplementarSerializer, SubmissaoReadSerializer, CursoSerializer,
     SubmissaoCreateSerializer, SubmissaoUpdateSerializer,LogAuditoriaReadSerializer,
-    NotificacaoEmailReadSerializer)
+    NotificacaoEmailReadSerializer, RecuperarSenhaSerializer)
 from api.jwt_utils import gerar_access_token
 from .mixins import AuditContextMixin
 from api.notificacao_service import NotificacaoService
+from api.recuperar_service import RecuperacaoSenhaService
 
 class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
     """Listando usuários, sem permitir criação, deleteção e etc, esses metodos
@@ -676,3 +677,21 @@ class NotificacaoEmailViewSet(viewsets.ReadOnlyModelViewSet):
 
         return NotificacaoEmail.objects.order_by('-data', '-id_notificacao_email')
     
+class RecuperarSenhaAPIView(APIView):
+    permission_classes = []
+
+    def post(self, request):
+        serializer = RecuperarSenhaSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        email = serializer.validated_data['email']
+
+        try:
+            RecuperacaoSenhaService.solicitar_recuperacao(email)
+        except Exception as e:
+            print(f'Erro ao solicitar recuperação de senha: {e}')
+
+        return Response(
+            {'mensagem': 'Se o e-mail existir, o link de recuperação foi enviado.'},
+            status=status.HTTP_200_OK
+        )

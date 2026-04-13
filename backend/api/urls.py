@@ -5,7 +5,7 @@ from api.views import (
     SuperAdminViewSet, LoginAPIView, InscricaoViewSet,
     CoordenadorCursoViewSet, TipoAtividadeViewSet, RegraAtividadeViewSet,
     StatusSubmissaoViewSet,AtividadeComplementarViewSet,SubmissaoViewSet, CursoViewSet,
-    LogAuditoriaViewSet,NotificacaoEmailViewSet)
+    LogAuditoriaViewSet,NotificacaoEmailViewSet, RecuperarSenhaAPIView)
 
 router = routers.DefaultRouter()
 router.register('usuarios', UsuarioViewSet, basename='usuarios')
@@ -24,5 +24,6 @@ router.register('auditoria', LogAuditoriaViewSet, basename='auditoria')
 router.register('notificacaoEmail', NotificacaoEmailViewSet, basename='notificacaoEmail')
 urlpatterns = [
     path('login/', LoginAPIView.as_view(), name='login'),
+    path('recuperar-senha/', RecuperarSenhaAPIView.as_view(), name='recuperar-senha'),
     path('', include(router.urls)),
 ]

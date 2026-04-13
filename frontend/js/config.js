@@ -14,7 +14,11 @@ const CONFIG = {
         statusSubmissao: '/statusSubmissao/',
         atividadeComplementar: '/atividadeComplementar/',
         curso: '/curso/',
-        submissap: '/submissao/'
+        submissao: '/submissao/',
+        recuperarsenha: '/recuperar-senha/',
+        auditoria: '/audirotia/',
+        notificacaoEmail: '/notificacaoEmail/',
+        recuperarsenha: '/recuperar-senha/',
     }
 };
 
@@ -1314,5 +1318,42 @@ Campos retornados:
 Observação:
 Esse endpoint é administrativo e serve para auditoria e rastreio técnico
 das notificações de e-mail do sistema.
+========================================
+*/
+
+/*
+========================================
+ENDPOINT: recuperarsenha
+URL: /recuperar-senha/
+TIPO: POST
+ACESSO: Público (não requer autenticação)
+OBJETIVO:
+Permitir que o usuário solicite a recuperação de senha informando seu e-mail.
+O sistema gera um token temporário e envia um link de redefinição por e-mail.
+
+REGRAS:
+- Recebe apenas e-mail.
+- Não informa se o e-mail existe ou não no sistema (segurança).
+- Sempre retorna mensagem genérica de sucesso.
+- Gera token com validade (ex: 1 hora).
+- O link enviado contém o token para redefinição de senha.
+
+POST /recuperar-senha/
+Solicita recuperação de senha.
+
+Body esperado:
+{
+  "email": "usuario@email.com"
+}
+
+Resposta (sempre 200):
+{
+  "mensagem": "Se o e-mail existir, o link de recuperação foi enviado."
+}
+
+Observações:
+- Esse endpoint apenas inicia o processo.
+- A redefinição da senha ocorre em outro endpoint (redefinir-senha).
+- O front deve direcionar o usuário para a tela de redefinição ao acessar o link enviado por e-mail.
 ========================================
 */
