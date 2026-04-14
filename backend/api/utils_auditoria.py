@@ -14,7 +14,7 @@ def set_audit_context(request):
     ip = get_client_ip(request)
 
     with connection.cursor() as cursor:
-        if usuario_id:
-            cursor.execute("SET app.usuario_id = %s;", [str(usuario_id)])
+        if usuario_id is not None:
+            cursor.execute("SET LOCAL app.usuario_id = %s;", [str(usuario_id)])
         if ip:
-            cursor.execute("SET app.ip_origem = %s;", [ip])
+            cursor.execute("SET LOCAL app.ip_origem = %s;", [ip])

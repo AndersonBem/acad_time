@@ -31,6 +31,7 @@ from .mixins import AuditContextMixin
 from api.notificacao_service import NotificacaoService
 from api.recuperar_service import RecuperacaoSenhaService
 from api.redefinir_service import RedefinirSenhaService
+from api.utils_auditoria import set_audit_context
 
 class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
     """Listando usuários, sem permitir criação, deleteção e etc, esses metodos
@@ -70,7 +71,9 @@ class CoordenadorViewSet(AuditContextMixin, viewsets.ModelViewSet):
     """Quando apagar o coordenador, precisa apagar o usuario, se não ele vai manter o usuario sem ter relação com as
     tabelas filhas. Para facilitar, vou mandar ele deletar o usuario relacionado a coordenador e o banco vai apagar o 
     coordenador pelo cascade"""
+    @transaction.atomic
     def destroy(self, request, *args, **kwargs):
+        set_audit_context(request)
         self._validar_superadmin(request)
 
         """pega o objeto coordenador"""
@@ -82,8 +85,9 @@ class CoordenadorViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
+        set_audit_context(request)
         self._validar_superadmin(request)
 
         """Pegando o serializer que foi definido antes e as informações que
@@ -141,7 +145,9 @@ class CoordenadorViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
+    @transaction.atomic
     def update(self, request, *args, **kwargs):
+        set_audit_context(request)
         self._validar_superadmin(request)
 
         coordenador = self.get_object()
@@ -197,6 +203,7 @@ class CoordenadorViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
         return Response(response_serializer.data, status=status.HTTP_200_OK)
     
+    @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
 
@@ -221,18 +228,22 @@ class CoordenadorCursoViewSet(AuditContextMixin, viewsets.ModelViewSet):
         if not hasattr(usuario, 'superadmin'):
             raise PermissionDenied('Apenas superadmin pode realizar esta ação.')
 
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         self._validar_superadmin(request)
         return super().create(request, *args, **kwargs)
 
+    @transaction.atomic
     def update(self, request, *args, **kwargs):
         self._validar_superadmin(request)
         return super().update(request, *args, **kwargs)
 
+    @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
         self._validar_superadmin(request)
         return super().partial_update(request, *args, **kwargs)
 
+    @transaction.atomic
     def destroy(self, request, *args, **kwargs):
         return Response(
             {'erro': 'Exclusão de vínculo não é permitida.'},
@@ -271,6 +282,7 @@ class InscricaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
             return InscricaoUpdateSerializer
         return InscricaoReadSerializer
     
+    
     def destroy(self, request, *args, **kwargs):
         return Response(
             {'erro': 'Exclusão de inscrição não é permitida.'},
@@ -284,11 +296,13 @@ class InscricaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
         if not (eh_coordenador or eh_superadmin):
             raise PermissionDenied('Apenas coordenador ou superadmin pode realizar esta ação.')
-
+    
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         self._validar_coordenador_ou_superadmin(request)
         return super().create(request, *args, **kwargs)
 
+    @transaction.atomic
     def perform_create(self, serializer):
         usuario = self.request.user
         
@@ -316,11 +330,13 @@ class InscricaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
         raise PermissionDenied('Sem permissão.')
 
+    @transaction.atomic
     def update(self, request, *args, **kwargs):
         self.get_object()
         self._validar_coordenador_ou_superadmin(request)
         return super().update(request, *args, **kwargs)
 
+    @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
         self.get_object()
         self._validar_coordenador_ou_superadmin(request)
@@ -368,7 +384,9 @@ class AlunoViewSet(AuditContextMixin, viewsets.ModelViewSet):
         if not hasattr(request.user, 'superadmin'):
             raise PermissionDenied('Apenas superadmin pode realizer esta ação.')
 
+    @transaction.atomic
     def destroy(self, request, *args, **kwargs):
+        set_audit_context(request)
         self._validar_apenas_superadmin(request)
         aluno = self.get_object()
 
@@ -377,7 +395,9 @@ class AlunoViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
         return Response(status= status.HTTP_204_NO_CONTENT)
     
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
+        set_audit_context(request)
         self._validar_apenas_superadmin(request)
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid(raise_exception = True)
@@ -431,7 +451,9 @@ class AlunoViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
         return Response(response_serializer.data, status= status.HTTP_201_CREATED)
     
+    @transaction.atomic
     def update(self, request, *args, **kwargs):
+        set_audit_context(request)
         self._validar_apenas_superadmin(request)
         aluno = self.get_object()
         serializer = self.get_serializer(data = request.data)
@@ -492,6 +514,7 @@ class AlunoViewSet(AuditContextMixin, viewsets.ModelViewSet):
         response_serializer = AlunoSerializer(aluno_atualizado)
         return Response(response_serializer.data, status= status.HTTP_200_OK)
     
+    @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
 
@@ -630,6 +653,7 @@ class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
             return SubmissaoUpdateSerializer
         return SubmissaoReadSerializer
     
+    @transaction.atomic
     def perform_create(self, serializer):
         usuario = self.request.user
 
@@ -675,6 +699,7 @@ class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
         except Exception as e:
             print(f'Erro ao enviar notificação de submissão criada: {e}')
 
+    @transaction.atomic
     def perform_update(self, serializer):
         usuario = self.request.user
         submissao = self.get_object()
@@ -736,8 +761,9 @@ class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
         
         raise PermissionDenied("Usuário sem permissão para atualizar submissão.")
 
-    
+    @transaction.atomic
     def destroy(self, request, *args, **kwargs):
+        set_audit_context(request)
         raise PermissionDenied('Exclusão de submissão não é permitida. Utilize a alteração de status.')
     
 class LogAuditoriaViewSet(viewsets.ReadOnlyModelViewSet):
