@@ -35,8 +35,13 @@ from api.redefinir_service import RedefinirSenhaService
 class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
     """Listando usuários, sem permitir criação, deleteção e etc, esses metodos
     vão ser usadas nas tabelas detalhadas de usuario(coordenador, aluno e SuperAdmin)"""
-    queryset = Usuario.objects.all()
+    permission_classes = [IsAuthenticated]
     serializer_class = UsuarioSerializer
+    def get_queryset(self):
+        usuario = self.request.user
+        if hasattr(usuario, 'superadmin'):
+            return Usuario.objects.all()
+        raise PermissionDenied('Apenas superadmin pode acessar usuários.')
 
 class CoordenadorViewSet(AuditContextMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -235,13 +240,29 @@ class CoordenadorCursoViewSet(AuditContextMixin, viewsets.ModelViewSet):
         )
 
 class InscricaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
-    permission_classes = [AllowAny]
-    queryset = Inscricao.objects.select_related(
-        'aluno',
-        'curso',
-        'aluno__usuario',
-        'status_matricula'
-    )
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        usuario = self.request.user
+
+        # Super admin
+
+        if hasattr(usuario, 'superadmin'):
+            return Inscricao.objects.all()
+        
+        # Coordenador 
+
+        if hasattr(usuario, 'coordenador'):
+            return Inscricao.objects.filter(
+                curso__coordenacaocurso__coordenador = usuario.coordenador,
+                curso__coordenacaocurso__data_fim__isnull = True
+            )
+        
+        # Aluno
+
+        if hasattr(usuario, 'aluno'):
+            return Inscricao.objects.filter(aluno = usuario.aluno)
+        
+        return Inscricao.objects.none()
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -263,25 +284,79 @@ class InscricaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
         if not (eh_coordenador or eh_superadmin):
             raise PermissionDenied('Apenas coordenador ou superadmin pode realizar esta ação.')
+
     def create(self, request, *args, **kwargs):
         self._validar_coordenador_ou_superadmin(request)
         return super().create(request, *args, **kwargs)
 
+    def perform_create(self, serializer):
+        usuario = self.request.user
+        
+        #Coordenador
+        
+        if hasattr(usuario, 'coordenador'):
+            curso = serializer.validated_data.get('curso')
+
+            vinculo = curso.coordenacaocurso_set.filter(
+                coordenador= usuario.coordenador,
+                data_fim__isnull=True
+            ).exists()
+
+            if not vinculo:
+                raise PermissionDenied('Você não pode criar inscrição para este curso.')
+            
+            serializer.save()
+            return
+        
+        # SuperAdmin
+
+        if hasattr(usuario, 'superadmin'):
+            serializer.save()
+            return
+
+        raise PermissionDenied('Sem permissão.')
+
     def update(self, request, *args, **kwargs):
+        self.get_object()
         self._validar_coordenador_ou_superadmin(request)
         return super().update(request, *args, **kwargs)
 
     def partial_update(self, request, *args, **kwargs):
+        self.get_object()
         self._validar_coordenador_ou_superadmin(request)
         return super().partial_update(request, *args, **kwargs)
 
 class AlunoViewSet(AuditContextMixin, viewsets.ModelViewSet):
     """repete coordenadorviewset, com modificações pertinentes"""
-    permission_classes = [AllowAny]
-    queryset = Aluno.objects.select_related('usuario').prefetch_related(
-        'inscricoes__curso',
-        'inscricoes__status_matricula'
-    )
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        usuario = self.request.user
+
+        base_qs = Aluno.objects.select_related('usuario').prefetch_related(
+            'inscricoes__curso',
+            'inscricoes__status_matricula'
+        )
+
+        # superadmin
+
+        if hasattr(usuario, 'superadmin'):
+            return base_qs
+        
+        # coordenador
+
+        if hasattr(usuario, 'coordenador'):
+            return base_qs.filter(
+                inscricoes__curso__coordenacaocurso__coordenador=usuario.coordenador,
+                inscricoes__curso__coordenacaocurso__data_fim__isnull=True
+            ).distinct()
+
+        # aluno
+
+        if hasattr(usuario, 'aluno'):
+            return base_qs.filter(pk= usuario.aluno.pk)
+
+        return Aluno.objects.none()
+    
     def get_serializer_class(self):
         if self.action == 'create':
             return AlunoCreateSerializer
@@ -289,7 +364,12 @@ class AlunoViewSet(AuditContextMixin, viewsets.ModelViewSet):
             return AlunoUpdateSerializer
         return AlunoSerializer
     
+    def _validar_apenas_superadmin(self, request):
+        if not hasattr(request.user, 'superadmin'):
+            raise PermissionDenied('Apenas superadmin pode realizer esta ação.')
+
     def destroy(self, request, *args, **kwargs):
+        self._validar_apenas_superadmin(request)
         aluno = self.get_object()
 
         usuario = aluno.usuario
@@ -298,6 +378,7 @@ class AlunoViewSet(AuditContextMixin, viewsets.ModelViewSet):
         return Response(status= status.HTTP_204_NO_CONTENT)
     
     def create(self, request, *args, **kwargs):
+        self._validar_apenas_superadmin(request)
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid(raise_exception = True)
         nome = serializer.validated_data['nome']
@@ -351,6 +432,7 @@ class AlunoViewSet(AuditContextMixin, viewsets.ModelViewSet):
         return Response(response_serializer.data, status= status.HTTP_201_CREATED)
     
     def update(self, request, *args, **kwargs):
+        self._validar_apenas_superadmin(request)
         aluno = self.get_object()
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid(raise_exception = True)
@@ -417,8 +499,15 @@ class AlunoViewSet(AuditContextMixin, viewsets.ModelViewSet):
    não vamos permitir criação via api"""
 class SuperAdminViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
-    queryset = SuperAdmin.objects.all()
     serializer_class = SuperAdminSerializer
+
+    def get_queryset(self):
+        usuario = self.request.user
+
+        if hasattr(usuario, 'superadmin'):
+            return SuperAdmin.objects.all()
+
+        raise PermissionDenied('Apenas superadmin pode acessar este endpoint.')
 
 class LoginAPIView(APIView):
     permission_classes = [AllowAny]
