@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang='pt-br'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Cursos</title>
+
+    <link rel="stylesheet" href="../css/global.css">    
+    <link rel="stylesheet" href="../css/cadastrarCurso.css"> 
+    <link rel="stylesheet" href="../css/listarCertificados.css"> 
+
+</head>
+
+<body>
+  <div class="layout">
+    <div class="menu-lateral">
+        <div class ="logo-box">
+            <a href = "dashboard.html"><img src = "../assets/Logo.png" alt="Logo AcadTime" class="Logo"></a>  
+    </div>
+
+
+    <aside class="sidebar">
+      <ul>
+         <li>Dashboard</li>
+        <li><a href="cursos.html">Cursos</a></li>
+        <li><a href="coordenadores.html">Coordenadores</a></li>
+        <li><a href="alunos.html">Alunos</a></li>
+        <li><a href="horasComplementares.html">Horas Complementares</a></li>
+        <li><a href="listarCertificados.html">Análise de Certificados</a></li>
+      </ul>
+    </aside>
+</div>
+
+
+    <main class="content">
+      <div class="topo-usuario">
+      </div>
+
+      <div class="card card-analise-lista">
+        <div class="cabecalho-pagina">
+          <h1>Análise de Certificados</h1>
+          <p>Gerencie as solicitações enviadas pelos alunos</p>
+        </div>
+
+        <div class="card filtros-card">
+          <div class="filtro">
+            <label for="buscarAluno">Buscar aluno</label>
+            <input type="text" id="buscarAluno" placeholder="Nome ou e-mail do aluno">
+          </div>
+
+          <div class="filtro">
+            <label for="filtroCurso">Curso</label>
+            <select id="filtroCurso">
+              <option>Todos os cursos</option>
+              <option>Análise e Desenvolvimento de Sistemas</option>
+              <option>Psicologia</option>
+              <option>Engenharia Civil</option>
+              <option>Ciência da Computação</option>
+            </select>
+          </div>
+
+          <div class="filtro">
+            <label for="filtroStatus">Status</label>
+            <select id="filtroStatus">
+              <option>Todos os status</option>
+              <option>Em análise</option>
+              <option>Enviado</option>
+              <option>Aprovado</option>
+              <option>Reprovado</option>
+              <option>Correção solicitada</option>
+            </select>
+          </div>
+
+          <div class="filtro">
+            <label for="filtroCategoria">Categoria</label>
+            <select id="filtroCategoria">
+              <option>Todas as categorias</option>
+              <option>Ensino Acadêmico</option>
+              <option>Extensão</option>
+              <option>Pesquisa</option>
+              <option>Evento</option>
+              <option>Curso Livre</option>
+            </select>
+          </div>
+
+          <div class="filtro limpar-filtros">
+            <button type="button" class="btn-limpar-filtros">Limpar filtros</button>
+          </div>
+        </div>
+
+        <div class="card tabela-card">
+          <table class="tabela-analise">
+            <thead>
+              <tr>
+                <th>Aluno</th>
+                <th>Curso</th>
+                <th>Categoria</th>
+                <th>Carga Horária</th>
+                <th>Data da atividade</th>
+                <th>Data do envio</th>
+                <th>Status</th>
+                <th>Ação</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <strong>Careca bem</strong><br>
+                  <span>careca.bem@teste.com</span>
+                </td>
+                <td>Análise e Desenvolvimento de Sistemas</td>
+                <td>Ensino Acadêmico</td>
+                <td>20h</td>
+                <td>12/12/2025</td>
+                <td>12/12/2025 14:32</td>
+                <td><span class="status-badge em-analise">Em análise</span></td>
+                <td><a href="analiseCertificados.html" class="btn-acao analisar">Analisar</a></td>
+              </tr>
+
+              <tr>
+                <td>
+                  <strong>Maria Souza</strong><br>
+                  <span>maria.souza@teste.com</span>
+                </td>
+                <td>Psicologia</td>
+                <td>Extensão</td>
+                <td>15h</td>
+                <td>10/12/2025</td>
+                <td>11/12/2025 09:15</td>
+                <td><span class="status-badge enviado">Enviado</span></td>
+                <td><a href="analiseCertificados.html" class="btn-acao analisar">Analisar</a></td>
+              </tr>
+
+              <tr>
+                <td>
+                  <strong>João Silva</strong><br>
+                  <span>joao.silva@teste.com</span>
+                </td>
+                <td>Engenharia Civil</td>
+                <td>Pesquisa</td>
+                <td>30h</td>
+                <td>05/12/2025</td>
+                <td>06/12/2025 16:45</td>
+                <td><span class="status-badge aprovado">Aprovado</span></td>
+                <td><a href="analiseCertificados.html" class="btn-acao ver">Ver análise</a></td>
+              </tr>
+
+              <tr>
+                <td>
+                  <strong>Ana Martins</strong><br>
+                  <span>ana.martins@teste.com</span>
+                </td>
+                <td>Ciência da Computação</td>
+                <td>Evento</td>
+                <td>10h</td>
+                <td>01/12/2025</td>
+                <td>02/12/2025 11:20</td>
+                <td><span class="status-badge reprovado">Reprovado</span></td>
+                <td><a href="analiseCertificados.html" class="btn-acao ver">Ver análise</a></td>
+              </tr>
+
+              <tr>
+                <td>
+                  <strong>Lucas Oliveira</strong><br>
+                  <span>lucas.oliveira@teste.com</span>
+                </td>
+                <td>Análise e Desenvolvimento de Sistemas</td>
+                <td>Curso Livre</td>
+                <td>40h</td>
+                <td>28/11/2025</td>
+                <td>29/11/2025 08:10</td>
+                <td><span class="status-badge correcao">Correção solicitada</span></td>
+                <td><a href="analiseCertificados.html" class="btn-acao analisar">Analisar</a></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="rodape-tabela">
+            <div class="info-tabela">Mostrando 5 de 32 solicitações</div>
+
+            <div class="paginacao">
+              <button type="button">&lt;</button>
+              <button type="button" class="ativo">1</button>
+              <button type="button">2</button>
+              <button type="button">3</button>
+              <button type="button">4</button>
+              <span>...</span>
+              <button type="button">7</button>
+              <button type="button">&gt;</button>
+            </div>
+
+            <div class="itens-pagina">
+              <label for="itensPagina">Itens por página:</label>
+              <select id="itensPagina">
+                <option>5</option>
+                <option>10</option>
+                <option>20</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

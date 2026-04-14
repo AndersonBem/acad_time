@@ -68,7 +68,7 @@ async function listarAlunos() {
 }
 
 function editarAluno(id) {
-    window.location.href = `editarAluno.html?id=${id}`;
+    window.location.href = `cadastrarAluno.html?id=${id}`;
 }
 
 listarAlunos();

@@ -21,11 +21,12 @@
 
     <aside class="sidebar">
       <ul>
-        <li>Dashboard</li>
+         <li>Dashboard</li>
         <li><a href="cursos.html">Cursos</a></li>
         <li><a href="coordenadores.html">Coordenadores</a></li>
         <li><a href="alunos.html">Alunos</a></li>
         <li><a href="horasComplementares.html">Horas Complementares</a></li>
+        <li><a href="listarCertificados.html">Análise de Certificados</a></li>
       </ul>
     </aside>
 </div>
@@ -94,79 +95,9 @@
 
   <script src="../js/config.js"></script>
   <script src="../js/utils.js"></script>
+  <script src="../js/cadastrarCurso.js"></script>
 
-  <script>
-    const form = document.getElementById("form-curso");
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
-
-    if (id) {
-      document.getElementById("titulo-pagina").textContent = "Cadastro/Edição de Curso";
-    }
-
-    if (id) {
-      const cursos = JSON.parse(localStorage.getItem("cursos")) || [];
-      const curso = cursos.find(c => c.id == id);
-
-      if (curso) {
-        document.getElementById("nome").value = curso.nome || "";
-        document.getElementById("codigo").value = curso.codigo || "";
-        document.getElementById("cargaHoraria").value = curso.cargaHoraria || "";
-        document.getElementById("coordenador").value = curso.coordenador || "";
-        document.getElementById("descricao").value = curso.descricao || "";
-
-        if (curso.status === "ativo") {
-          document.getElementById("ativo").checked = true;
-        } else if (curso.status === "inativo") {
-          document.getElementById("inativo").checked = true;
-        }
-      }
-    }
-
-    form.addEventListener("submit", function (event) {
-      event.preventDefault();
-
-      const nome = document.getElementById("nome").value;
-      const codigo = document.getElementById("codigo").value;
-      const cargaHoraria = document.getElementById("cargaHoraria").value;
-      const coordenador = document.getElementById("coordenador").value;
-      const descricao = document.getElementById("descricao").value;
-      const status = document.querySelector('input[name="status"]:checked')?.value;
-
-      let cursos = JSON.parse(localStorage.getItem("cursos")) || [];
-
-      if (id) {
-        cursos = cursos.map(curso =>
-          curso.id == id
-            ? {
-                ...curso,
-                nome,
-                codigo,
-                cargaHoraria,
-                coordenador,
-                descricao,
-                status
-              }
-            : curso
-        );
-      } else {
-        const novoCurso = {
-          id: Date.now(),
-          nome,
-          codigo,
-          cargaHoraria,
-          coordenador,
-          descricao,
-          status
-        };
-
-        cursos.push(novoCurso);
-      }
-
-      localStorage.setItem("cursos", JSON.stringify(cursos));
-      window.location.href = "cursos.html";
-    });
-  </script>
+  
   <script>
       function toggleMenu() {
         const sidebar = document.querySelector('.sidebar');
