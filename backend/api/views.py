@@ -593,10 +593,54 @@ class TipoAtividadeViewSet(AuditContextMixin, viewsets.ModelViewSet):
     queryset = TipoAtividade.objects.all().order_by('nome')
     serializer_class = TipoAtividadeSerializer
 
+    def _validar_apenas_superadmin(self, request):
+        if not hasattr(request.user, 'superadmin'):
+            raise PermissionDenied('Apenas superadmin pode realizar esta ação.')
+
+    def create(self, request, *args, **kwargs):
+        self._validar_apenas_superadmin(request)
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        self._validar_apenas_superadmin(request)
+        return super().update(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        self._validar_apenas_superadmin(request)
+        return super().partial_update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        return Response(
+            {'erro': 'Exclusão de tipo de atividade não é permitida.'},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )
+
 class RegraAtividadeViewSet(AuditContextMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = RegraAtividade.objects.all().order_by('curso')
     serializer_class = RegraAtividadeSerializer
+
+    def _validar_apenas_superadmin(self, request):
+        if not hasattr(request.user, 'superadmin'):
+            raise PermissionDenied('Apenas superadmin pode realizar esta ação.')
+
+    def create(self, request, *args, **kwargs):
+        self._validar_apenas_superadmin(request)
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        self._validar_apenas_superadmin(request)
+        return super().update(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        self._validar_apenas_superadmin(request)
+        return super().partial_update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        return Response(
+            {'erro': 'Exclusão de regra de atividade não é permitida.'},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )
 
 class StatusSubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -605,13 +649,68 @@ class StatusSubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
 class AtividadeComplementarViewSet(AuditContextMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
-    queryset = AtividadeComplementar.objects.all().order_by('id_atividade_complementar')
     serializer_class = AtividadeComplementarSerializer
+
+    def get_queryset(self):
+        usuario = self.request.user
+        queryset = AtividadeComplementar.objects.all().order_by('id_atividade_complementar')
+
+        if hasattr(usuario, 'superadmin'):
+            return queryset
+
+        if hasattr(usuario, 'coordenador'):
+            return queryset.filter(
+                submissao__curso__coordenacaocurso__coordenador=usuario.coordenador,
+                submissao__curso__coordenacaocurso__data_fim__isnull=True
+            ).distinct()
+
+        if hasattr(usuario, 'aluno'):
+            return queryset.filter(
+                submissao__aluno=usuario.aluno
+            ).distinct()
+
+        return queryset.none()
+
+    def create(self, request, *args, **kwargs):
+        if not hasattr(request.user, 'aluno'):
+            raise PermissionDenied('Apenas aluno pode criar atividade complementar.')
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        raise PermissionDenied('Edição de atividade complementar não é permitida.')
+
+    def partial_update(self, request, *args, **kwargs):
+        raise PermissionDenied('Edição de atividade complementar não é permitida.')
+
+    def destroy(self, request, *args, **kwargs):
+        raise PermissionDenied('Exclusão de atividade complementar não é permitida.')
 
 class CursoViewSet(AuditContextMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Curso.objects.all()
-    serializer_class= CursoSerializer
+    serializer_class = CursoSerializer
+
+    def _validar_apenas_superadmin(self, request):
+        if not hasattr(request.user, 'superadmin'):
+            raise PermissionDenied('Apenas superadmin pode realizar esta ação.')
+
+    def create(self, request, *args, **kwargs):
+        self._validar_apenas_superadmin(request)
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        self._validar_apenas_superadmin(request)
+        return super().update(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        self._validar_apenas_superadmin(request)
+        return super().partial_update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        return Response(
+            {'erro': 'Exclusão de curso não é permitida.'},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )
 
 
 class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
