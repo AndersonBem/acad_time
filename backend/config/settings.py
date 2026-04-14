@@ -85,7 +85,9 @@ CORS_ALLOW_CREDENTIALS = True
 
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://acad-time-api.onrender.com"
+    "https://acadtime.netlify.app",
+    "https://acad-time-api.onrender.com",
+    "https://acad-time.onrender.com"
 ]
 
 REST_FRAMEWORK = {
