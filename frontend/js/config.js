@@ -15,7 +15,6 @@ const CONFIG = {
         atividadeComplementar: '/atividadeComplementar/',
         curso: '/curso/',
         submissao: '/submissao/',
-        recuperarsenha: '/recuperar-senha/',
         auditoria: '/audirotia/',
         notificacaoEmail: '/notificacaoEmail/',
         recuperarsenha: '/recuperar-senha/',
