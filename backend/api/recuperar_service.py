@@ -1,5 +1,6 @@
 import secrets
 from datetime import timedelta
+from django.conf import settings
 
 from django.core.mail import send_mail
 from django.utils import timezone
@@ -15,6 +16,11 @@ class RecuperacaoSenhaService:
         except Usuario.DoesNotExist:
             return
 
+        RecuperacaoSenha.objects.filter(
+            usuario=usuario,
+            usado=False
+        ).update(usado=True)
+
         token = secrets.token_urlsafe(32)
         expira_em = timezone.now() + timedelta(hours=1)
 
@@ -26,7 +32,7 @@ class RecuperacaoSenhaService:
             data_criacao=timezone.now()
         )
 
-        link = f'http://127.0.0.1:5500/frontend/pages/redefinirsenha.html?token={token}'
+        link = f'{settings.FRONTEND_URL}/pages/redefinirsenha.html?token={token}'
 
         assunto = 'AcadTime - Recuperação de senha'
         corpo = (
@@ -41,7 +47,7 @@ class RecuperacaoSenhaService:
         send_mail(
             subject=assunto,
             message=corpo,
-            from_email=None,
+            from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[usuario.email],
             fail_silently=False
         )
