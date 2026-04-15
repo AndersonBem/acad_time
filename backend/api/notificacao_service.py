@@ -2,6 +2,7 @@ from django.core.mail import send_mail
 from django.utils import timezone
 
 from api.models import NotificacaoEmail
+from api.email_service import enviar_email_resend
 
 
 class NotificacaoService:
@@ -28,12 +29,13 @@ class NotificacaoService:
     @staticmethod
     def _enviar_email(submissao, assunto, corpo, destinatario, tipo_evento):
         try:
-            send_mail(
-                subject=assunto,
-                message=corpo,
-                from_email=None,
-                recipient_list=[destinatario],
-                fail_silently=False,
+            html = corpo.replace('\n', '<br>')
+
+            enviar_email_resend(
+                destinatario=destinatario,
+                assunto=assunto,
+                html=html,
+                texto=corpo
             )
 
             NotificacaoService._registrar_notificacao(

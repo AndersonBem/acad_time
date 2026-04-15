@@ -936,3 +936,4 @@ class RedefinirSenhaAPIView(APIView):
             {'mensagem': mensagem},
             status=status.HTTP_200_OK
         )
+

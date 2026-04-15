@@ -1,5 +1,4 @@
 import secrets
-import threading
 from datetime import timedelta
 from django.conf import settings
 
@@ -7,19 +6,7 @@ from django.core.mail import send_mail
 from django.utils import timezone
 
 from api.models import Usuario, RecuperacaoSenha
-
-def enviar_email_recuperacao_async(assunto, corpo, destinatario):
-    try:
-        send_mail(
-            subject=assunto,
-            message=corpo,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[destinatario],
-            fail_silently=False
-        )
-        print(f'E-mail de recuperação enviado para {destinatario}')
-    except Exception as e:
-        print(f'Erro ao enviar e-mail de recuperação: {e}')
+from api.email_service import enviar_email_resend
 
 class RecuperacaoSenhaService:
     @staticmethod
@@ -48,7 +35,20 @@ class RecuperacaoSenhaService:
         link = f'{settings.FRONTEND_URL}/pages/redefinirsenha.html?token={token}'
 
         assunto = 'AcadTime - Recuperação de senha'
-        corpo = (
+
+        html = f"""
+        <h2>Recuperação de senha</h2>
+        <p>Olá, {usuario.nome}.</p>
+        <p>Recebemos uma solicitação para redefinir sua senha.</p>
+        <p>
+            Clique no link abaixo para continuar:<br>
+            <a href="{link}">{link}</a>
+        </p>
+        <p>Esse link expira em 1 hora.</p>
+        <p>Se você não solicitou isso, ignore este e-mail.</p>
+        """
+
+        texto = (
             f'Olá, {usuario.nome}.\n\n'
             f'Recebemos uma solicitação para redefinir sua senha.\n\n'
             f'Acesse o link abaixo para continuar:\n'
@@ -57,8 +57,9 @@ class RecuperacaoSenhaService:
             f'Se você não solicitou isso, ignore este e-mail.'
         )
 
-        threading.Thread(
-            target=enviar_email_recuperacao_async,
-            args=(assunto, corpo, usuario.email),
-            daemon=True
-        ).start()
+        enviar_email_resend(
+            destinatario=usuario.email,
+            assunto=assunto,
+            html=html,
+            texto=texto
+        )

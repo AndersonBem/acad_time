@@ -116,3 +116,10 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 FRONTEND_URL = config('FRONTEND_URL')
+
+
+RESEND_API_KEY = config('RESEND_API_KEY', default='')
+RESEND_FROM_EMAIL = config(
+    'RESEND_FROM_EMAIL',
+    default='AcadTime <onboarding@resend.dev>'
+)
