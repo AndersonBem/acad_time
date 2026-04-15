@@ -35,8 +35,10 @@ class RedefinirSenhaService:
                 usuario.senha_hash = nova_senha_hash
                 usuario.save(update_fields=['senha_hash'])
 
-                recuperacao.usado = True
-                recuperacao.save(update_fields=['usado'])
+                RecuperacaoSenha.objects.filter(
+                    usuario=usuario,
+                    usado=False
+                ).update(usado=True)
         except Exception:
             return False, 'Erro ao redefinir senha.'
 
