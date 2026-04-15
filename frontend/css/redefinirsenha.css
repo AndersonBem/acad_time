@@ -1,0 +1,150 @@
+/* Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Travar tela */
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Body */
+body {
+    background: linear-gradient(90deg, #15487D 4.26%, #F4F2F2 47.58%);
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Container geral (AGORA LADO A LADO) */
+.redefinir-container {
+    display: flex;
+    flex-direction: row; /* 🔥 lado a lado */
+    align-items: center;
+    justify-content: center;
+    gap: 60px; /* espaço entre logo e form */
+    width: 100%;
+    max-width: 1100px;
+}
+
+/* Logo (ESQUERDA) */
+.logo {
+    width: clamp(150px, 25vw, 350px);
+    height: auto;
+}
+
+/* Container do form */
+.redefinir-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Form */
+.form-side {
+    width: 100%;
+    max-width: 420px;
+}
+
+/* Caixa */
+.login-box {
+    width: 100%;
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid #000409;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+}
+
+/* Título */
+h2 {
+    text-align: center;
+    color: #003366;
+    margin-bottom: 25px;
+}
+
+/* Inputs */
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #003366;
+    font-size: 14px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #eee;
+}
+
+/* Botão */
+.button1 {
+    background-color: #f39200;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 10px;
+    width: 100%;
+    color: #15487D;
+    font-weight: bold;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.button1:hover {
+    opacity: 0.9;
+}
+
+/* ================= RESPONSIVO ================= */
+
+/* Tablet */
+@media (max-width: 768px) {
+    .main-container {
+        flex-direction: column; 
+        gap: 20px;
+        text-align: center;
+    }
+
+    .logo {
+        width: 220px;
+    }
+
+    .login-box {
+        padding: 25px;
+    }
+}
+
+/* Celular */
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    .logo {
+        width: 180px;
+    }
+
+    .login-box {
+        padding: 20px;
+        border-radius: 15px;
+    }
+
+    h2 {
+        font-size: 18px;
+    }
+
+    .button1 {
+        font-size: 14px;
+    }
+}
