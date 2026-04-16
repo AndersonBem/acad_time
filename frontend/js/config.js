@@ -14,7 +14,11 @@ const CONFIG = {
         statusSubmissao: '/statusSubmissao/',
         atividadeComplementar: '/atividadeComplementar/',
         curso: '/curso/',
-        submissap: '/submissao/'
+        submissao: '/submissao/',
+        auditoria: '/audirotia/',
+        notificacaoEmail: '/notificacaoEmail/',
+        recuperarsenha: '/recuperar-senha/',
+        redefinirsenha: '/redefinir-senha/'
     }
 };
 
@@ -1218,4 +1222,189 @@ SUPERADMIN
 - A auditoria da submissão já existe no banco e pode ser evoluída depois
   para registrar usuário autenticado real, IP e outros metadados.
 - No futuro, este comentário pode ser migrado para documentação formal da API.
+*/
+/**
+ * LOG DE AUDITORIA (APENAS LEITURA - SUPERADMIN)
+ *
+ * Endpoint responsável por visualizar o histórico de ações realizadas no sistema.
+ * Registra operações como criação, atualização, aprovação, rejeição e exclusão.
+ *
+ * 🔐 Permissão:
+ * - Apenas usuários com perfil de superadmin podem acessar.
+ *
+ * 📥 GET /logauditoria/
+ * - Lista todos os logs de auditoria (ordenados do mais recente para o mais antigo)
+ *
+ * 📥 GET /logauditoria/{id}/
+ * - Retorna os detalhes de um log específico
+ *
+ * 📊 Campos retornados:
+ * - id_log_auditoria
+ * - data_hora
+ * - nome_entidade (ex: "Submissao")
+ * - id_entidade_afetada
+ * - descricao (ex: "Submissão criada", "Submissão aprovada")
+ * - ip_origem
+ * - usuario (id)
+ * - usuario_nome
+ * - tipo_acao (id)
+ * - tipo_acao_nome (CREATE, UPDATE, APPROVE, etc)
+ * - valor_anterior (JSON)
+ * - valor_novo (JSON)
+ *
+ * ⚠️ Observações:
+ * - Este endpoint é somente leitura (não permite POST, PUT, PATCH ou DELETE)
+ * - Logs são gerados automaticamente via trigger no banco de dados
+ * - O campo valor_anterior e valor_novo representam o estado antes e depois da operação
+ */
+
+/*
+========================================
+ENDPOINT: notificacaoEmail
+URL: /notificacaoEmail/
+TIPO: READ ONLY
+ACESSO: Apenas superadmin
+OBJETIVO:
+Listar o histórico técnico de notificações de e-mail enviadas pelo sistema,
+incluindo assunto, corpo, destinatário, status do envio, tipo do evento,
+mensagem de erro (quando existir) e a submissão relacionada.
+
+REGRAS:
+- Não permite criação manual.
+- Não permite edição.
+- Não permite exclusão.
+- Deve ser usado apenas para consulta administrativa/técnica.
+- Retorna as notificações da mais recente para a mais antiga.
+
+GET /notificacaoEmail/
+Lista todas as notificações de e-mail registradas no sistema.
+
+Exemplo de resposta:
+[
+  {
+    "id_notificacao_email": 15,
+    "assunto": "Nova submissão pendente - ADS",
+    "corpo": "Olá, Gabriel Dias...\n\n...",
+    "data": "2026-04-13",
+    "destinatario": "gabriel@email.com",
+    "status_envio": "SUCESSO",
+    "tipo_evento": "SUBMISSAO_CRIADA",
+    "mensagem_erro": null,
+    "submissao_id": 43
+  }
+]
+
+GET /notificacaoEmail/{id}/
+Retorna os detalhes de uma notificação específica.
+
+Campos retornados:
+- id_notificacao_email: identificador da notificação
+- assunto: assunto do e-mail
+- corpo: conteúdo enviado
+- data: data do registro
+- destinatario: e-mail que recebeu a notificação
+- status_envio: resultado do envio
+  Valores esperados:
+  - "SUCESSO"
+  - "FALHA"
+- tipo_evento: evento que gerou a notificação
+  Valores atuais:
+  - "SUBMISSAO_CRIADA"
+  - "SUBMISSAO_APROVADA"
+  - "SUBMISSAO_REPROVADA"
+- mensagem_erro: descrição do erro, quando houver falha
+- submissao_id: id da submissão relacionada à notificação
+
+Observação:
+Esse endpoint é administrativo e serve para auditoria e rastreio técnico
+das notificações de e-mail do sistema.
+========================================
+*/
+
+/*
+========================================
+ENDPOINT: recuperarsenha
+URL: /recuperar-senha/
+TIPO: POST
+ACESSO: Público (não requer autenticação)
+OBJETIVO:
+Permitir que o usuário solicite a recuperação de senha informando seu e-mail.
+O sistema gera um token temporário e envia um link de redefinição por e-mail.
+
+REGRAS:
+- Recebe apenas e-mail.
+- Não informa se o e-mail existe ou não no sistema (segurança).
+- Sempre retorna mensagem genérica de sucesso.
+- Gera token com validade (ex: 1 hora).
+- O link enviado contém o token para redefinição de senha.
+
+POST /recuperar-senha/
+Solicita recuperação de senha.
+
+Body esperado:
+{
+  "email": "usuario@email.com"
+}
+
+Resposta (sempre 200):
+{
+  "mensagem": "Se o e-mail existir, o link de recuperação foi enviado."
+}
+
+Observações:
+- Esse endpoint apenas inicia o processo.
+- A redefinição da senha ocorre em outro endpoint (redefinir-senha).
+- O front deve direcionar o usuário para a tela de redefinição ao acessar o link enviado por e-mail.
+========================================
+*/
+
+/*
+========================================
+ENDPOINT: redefinirsenha
+URL: /redefinir-senha/
+TIPO: POST
+ACESSO: Público (não requer autenticação)
+OBJETIVO:
+Permitir que o usuário redefina sua senha utilizando um token temporário
+recebido por e-mail no processo de recuperação de senha.
+
+REGRAS:
+- Recebe token e nova senha.
+- O token deve existir, não pode estar expirado e não pode ter sido utilizado.
+- Após uso, o token é invalidado (usado = true).
+- A senha é armazenada de forma segura (hash).
+- Não permite reutilização do token.
+
+POST /redefinir-senha/
+Redefine a senha do usuário.
+
+Body esperado:
+{
+  "token": "token_recebido_por_email",
+  "nova_senha": "novaSenha123"
+}
+
+Resposta de sucesso:
+{
+  "mensagem": "Senha redefinida com sucesso."
+}
+
+Possíveis erros:
+{
+  "erro": "Token inválido."
+}
+
+{
+  "erro": "Token expirado."
+}
+
+{
+  "erro": "Token já utilizado."
+}
+
+Observações:
+- Esse endpoint é a segunda etapa do fluxo de recuperação de senha.
+- O token é gerado no endpoint /recuperar-senha/.
+- O front deve capturar o token da URL (ex: ?token=...) e enviar neste endpoint.
+========================================
 */

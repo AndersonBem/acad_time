@@ -17,13 +17,16 @@
             <a href = "dashboard.html"><img src = "../assets/Logo.png" alt="Logo AcadTime" class="Logo"></a>  
     </div>
 
+
+
     <aside class="sidebar">
       <ul>
-        <li>Dashboard</li>
+         <li>Dashboard</li>
         <li><a href="cursos.html">Cursos</a></li>
         <li><a href="coordenadores.html">Coordenadores</a></li>
         <li><a href="alunos.html">Alunos</a></li>
         <li><a href="horasComplementares.html">Horas Complementares</a></li>
+        <li><a href="listarCertificados.html">Análise de Certificados</a></li>
       </ul>
     </aside>
 </div>
@@ -64,13 +67,14 @@
 
             <div class = "acoes-form">
                 <button class="btn-cancelar" onclick="window.location.href='alunos.html'">Cancelar</button>
-                <button class="btn-salvar" type="submit">Salvar</button>
+                <button class="btn-salvar" type="button" onclick="salvarAluno()">Salvar</button>
             </div>
         </div>
     </main>
 
     <script src="../js/config.js"></script>
     <script src="../js/utils.js"></script>
-    <script src="../js/cadastrarCurso.js"></script>
+    <script src="../js/cadastrarAluno.js"></script>
+
 </body>
 </html>

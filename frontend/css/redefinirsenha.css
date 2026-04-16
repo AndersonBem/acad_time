@@ -1,4 +1,4 @@
-/* Reset remover os estilos padrões do navegador */
+/* Reset */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -6,40 +6,52 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Travar tela */
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
 /* Body */
 body {
     background: linear-gradient(90deg, #15487D 4.26%, #F4F2F2 47.58%);
-    min-height: 100vh;
+    
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/* Container principal*/
-.login-container {
-    width: 100%;
-    max-width: 1000px;
+/* Container geral (AGORA LADO A LADO) */
+.redefinir-container {
     display: flex;
-    justify-content: space-between;
+    flex-direction: row; /* 🔥 lado a lado */
     align-items: center;
-    gap: 40px;
+    justify-content: center;
+    gap: 60px; /* espaço entre logo e form */
+    width: 100%;
+    max-width: 1100px;
 }
 
-/* Logo AcadTime */
+/* Logo (ESQUERDA) */
 .logo {
-    width: 400px;
-    flex-shrink: 0;
+    width: clamp(150px, 25vw, 350px);
+    height: auto;
 }
 
-/* Controlar o tamanho do form*/
+/* Container do form */
+.redefinir-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Form */
 .form-side {
     width: 100%;
     max-width: 420px;
-    display: flex;
-    justify-content: flex-end;
 }
 
-/* Div de Login e borda preta*/
+/* Caixa */
 .login-box {
     width: 100%;
     padding: 30px;
@@ -49,14 +61,14 @@ body {
     backdrop-filter: blur(10px);
 }
 
-/* Titulo*/
+/* Título */
 h2 {
     text-align: center;
     color: #003366;
     margin-bottom: 25px;
 }
 
-/* Input*/
+/* Inputs */
 .input-group {
     margin-bottom: 15px;
 }
@@ -76,49 +88,32 @@ h2 {
     background: #eee;
 }
 
-/* Esqueceu senha */
-.forgot-password {
-    text-align: right;
-    margin-bottom: 20px;
-}
-
-.forgot-password a {
-    font-size: 12px;
-    color: #003366;
-}
-
-/* Botão de login */
-.btn-login {
-    width: 100%;
-    padding: 12px;
+/* Botão */
+.button1 {
     background-color: #f39200;
-    color: #003366;
-    border: none;
     border-radius: 10px;
+    padding: 10px;
+    margin-top: 10px;
+    width: 100%;
+    color: #15487D;
     font-weight: bold;
+    border: none;
+    outline: none;
     cursor: pointer;
-    transition: 0.3s;
 }
 
-.btn-login:hover {
-    background-color: #e68a00;
+.button1:hover {
+    opacity: 0.9;
 }
 
-
- /*Responsividade */
- 
+/* ================= RESPONSIVO ================= */
 
 /* Tablet */
 @media (max-width: 768px) {
-    .login-container {
+    .main-container {
         flex-direction: column; 
-        align-items: center;
+        gap: 20px;
         text-align: center;
-        gap: 30px;
-    }
-
-    .form-side {
-        justify-content: center;
     }
 
     .logo {
@@ -133,17 +128,11 @@ h2 {
 /* Celular */
 @media (max-width: 480px) {
     body {
-        padding: 20px;
-        align-items: flex-start;
-    }
-
-    .login-container {
-        width: 100%;
+        padding: 10px;
     }
 
     .logo {
         width: 180px;
-        margin-bottom: 10px;
     }
 
     .login-box {
@@ -155,24 +144,7 @@ h2 {
         font-size: 18px;
     }
 
-    .btn-login {
+    .button1 {
         font-size: 14px;
-        padding: 10px;
-    }
-}
-
-/* Para telas grandes */
-@media (min-width: 1200px) {
-    .login-container {
-        max-width: 900px;
-        gap: 100px; 
-    }
-
-    .logo {
-        width: 380px; 
-    }
-
-    .login-box {
-        padding: 40px;
     }
 }

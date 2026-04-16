@@ -26,7 +26,7 @@ $$;
 
 
 -- Calcula o total de horas aprovadas de atividades complementares de um aluno.
-CREATE FUNCTION fn_total_horas_aprovadas_aluno(p_id_aluno integer)
+CREATE OR REPLACE FUNCTION fn_total_horas_aprovadas_aluno(p_id_aluno integer)
 RETURNS numeric
 LANGUAGE plpgsql
 AS
@@ -34,11 +34,9 @@ $$
 DECLARE
     total numeric;
 BEGIN
-    SELECT COALESCE(SUM(ac."cargaHorariaSolicitada"), 0)
+    SELECT COALESCE(SUM(s."cargaHorariaAprovada"), 0)
     INTO total
     FROM "Submissao" s
-    JOIN "AtividadeComplementar" ac
-      ON ac."idAtividadeComplementar" = s."atividadeComplementa"
     WHERE s."idAluno" = p_id_aluno
       AND s."statusSubmissao" = 2;
 
@@ -73,7 +71,7 @@ $$;
 
 
 -- Retorna quantas horas ainda podem ser aproveitadas para um tipo de atividade no curso.
-CREATE FUNCTION fn_limite_disponivel_tipo(
+CREATE OR REPLACE FUNCTION fn_limite_disponivel_tipo(
     p_id_aluno integer,
     p_id_curso integer,
     p_id_tipo integer
@@ -92,7 +90,7 @@ BEGIN
     WHERE "Curso_idCurso" = p_id_curso
       AND "TipoAtividade_idTipoAtividade" = p_id_tipo;
 
-    SELECT COALESCE(SUM(ac."cargaHorariaSolicitada"), 0)
+    SELECT COALESCE(SUM(s."cargaHorariaAprovada"), 0)
     INTO v_usado
     FROM "Submissao" s
     JOIN "AtividadeComplementar" ac
@@ -107,7 +105,7 @@ $$;
 
 
 -- Verifica se uma submissão pode ser aprovada com base no limite de horas do tipo de atividade.
-CREATE FUNCTION fn_submissao_pode_ser_aprovada(p_id_submissao integer)
+CREATE OR REPLACE FUNCTION fn_submissao_pode_ser_aprovada(p_id_submissao integer)
 RETURNS boolean
 LANGUAGE plpgsql
 AS
@@ -121,17 +119,19 @@ DECLARE
 BEGIN
     SELECT
         ac."tipoAtividade",
-        m."Curso_idCurso",
+        s."idCurso",
         s."idAluno",
-        ac."cargaHorariaSolicitada"
+        s."cargaHorariaAprovada"
     INTO v_tipo, v_curso, v_aluno, v_carga
     FROM "Submissao" s
     JOIN "AtividadeComplementar" ac
       ON ac."idAtividadeComplementar" = s."atividadeComplementa"
-    JOIN "Matricula" m
-      ON m."Aluno_idUsuario" = s."idAluno"
     WHERE s."idSubmissao" = p_id_submissao
     LIMIT 1;
+
+    IF v_carga IS NULL THEN
+        RETURN false;
+    END IF;
 
     v_restante := fn_limite_disponivel_tipo(v_aluno, v_curso, v_tipo);
 
@@ -164,6 +164,166 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE FUNCTION fn_log_auditoria_submissao()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_usuario_id INTEGER;
+    v_ip_origem VARCHAR(45);
+    v_id_tipo_acao INTEGER;
+    v_descricao TEXT;
+    v_nome_entidade VARCHAR(100) := 'Submissao';
+    v_status_aprovado INTEGER;
+    v_status_rejeitado INTEGER;
+BEGIN
+    -- contexto vindo da aplicação
+    v_usuario_id := NULLIF(current_setting('app.usuario_id', true), '')::INTEGER;
+    v_ip_origem := NULLIF(current_setting('app.ip_origem', true), '');
+
+    -- busca os ids dos status relevantes
+    SELECT "idStatusSubmissao"
+    INTO v_status_aprovado
+    FROM "StatusSubmissao"
+    WHERE "nomeStatus" = 'APROVADO'
+    LIMIT 1;
+
+    SELECT "idStatusSubmissao"
+    INTO v_status_rejeitado
+    FROM "StatusSubmissao"
+    WHERE "nomeStatus" = 'REJEITADO'
+    LIMIT 1;
+
+    IF TG_OP = 'INSERT' THEN
+        SELECT "idTipoAcao"
+        INTO v_id_tipo_acao
+        FROM "TipoAcao"
+        WHERE "acao" = 'CREATE'
+        LIMIT 1;
+
+        v_descricao := 'Submissão criada';
+
+        INSERT INTO "LogAuditoria" (
+            "dataHora",
+            "nomeEntidade",
+            "idEntidadeAfetada",
+            "descricao",
+            "ipOrigem",
+            "idUsuario",
+            "idTipoAcao",
+            "valorAnterior",
+            "valorNovo"
+        )
+        VALUES (
+            CURRENT_TIMESTAMP,
+            v_nome_entidade,
+            NEW."idSubmissao",
+            v_descricao,
+            v_ip_origem,
+            v_usuario_id,
+            v_id_tipo_acao,
+            NULL,
+            row_to_json(NEW)::jsonb
+        );
+
+        RETURN NEW;
+    END IF;
+
+    IF TG_OP = 'UPDATE' THEN
+        IF OLD."statusSubmissao" IS DISTINCT FROM NEW."statusSubmissao"
+           AND NEW."statusSubmissao" = v_status_aprovado THEN
+
+            SELECT "idTipoAcao"
+            INTO v_id_tipo_acao
+            FROM "TipoAcao"
+            WHERE "acao" = 'APPROVE'
+            LIMIT 1;
+
+            v_descricao := 'Submissão aprovada';
+
+        ELSIF OLD."statusSubmissao" IS DISTINCT FROM NEW."statusSubmissao"
+              AND NEW."statusSubmissao" = v_status_rejeitado THEN
+
+            SELECT "idTipoAcao"
+            INTO v_id_tipo_acao
+            FROM "TipoAcao"
+            WHERE "acao" = 'REFUSE'
+            LIMIT 1;
+
+            v_descricao := 'Submissão rejeitada';
+
+        ELSE
+            SELECT "idTipoAcao"
+            INTO v_id_tipo_acao
+            FROM "TipoAcao"
+            WHERE "acao" = 'UPDATE'
+            LIMIT 1;
+
+            v_descricao := 'Submissão atualizada';
+        END IF;
+
+        INSERT INTO "LogAuditoria" (
+            "dataHora",
+            "nomeEntidade",
+            "idEntidadeAfetada",
+            "descricao",
+            "ipOrigem",
+            "idUsuario",
+            "idTipoAcao",
+            "valorAnterior",
+            "valorNovo"
+        )
+        VALUES (
+            CURRENT_TIMESTAMP,
+            v_nome_entidade,
+            NEW."idSubmissao",
+            v_descricao,
+            v_ip_origem,
+            v_usuario_id,
+            v_id_tipo_acao,
+            row_to_json(OLD)::jsonb,
+            row_to_json(NEW)::jsonb
+        );
+
+        RETURN NEW;
+    END IF;
+
+    IF TG_OP = 'DELETE' THEN
+        SELECT "idTipoAcao"
+        INTO v_id_tipo_acao
+        FROM "TipoAcao"
+        WHERE "acao" = 'DELETE'
+        LIMIT 1;
+
+        v_descricao := 'Submissão excluída';
+
+        INSERT INTO "LogAuditoria" (
+            "dataHora",
+            "nomeEntidade",
+            "idEntidadeAfetada",
+            "descricao",
+            "ipOrigem",
+            "idUsuario",
+            "idTipoAcao",
+            "valorAnterior",
+            "valorNovo"
+        )
+        VALUES (
+            CURRENT_TIMESTAMP,
+            v_nome_entidade,
+            OLD."idSubmissao",
+            v_descricao,
+            v_ip_origem,
+            v_usuario_id,
+            v_id_tipo_acao,
+            row_to_json(OLD)::jsonb,
+            NULL
+        );
+
+        RETURN OLD;
+    END IF;
+
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
 
 SELECT fn_obter_papel_usuario(1);
 SELECT fn_total_horas_aprovadas_aluno(3);

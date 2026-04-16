@@ -8,11 +8,12 @@
 
 /* Body */
 body {
-    background: linear-gradient(90deg, #15487D 4.26%, #F4F2F2 47.58%);
+    background: linear-gradient(90deg, #F4F2F2 52.95%, #134381 95.9%);
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
 }
 
 /* Container principal*/
@@ -23,17 +24,21 @@ body {
     justify-content: space-between;
     align-items: center;
     gap: 40px;
+    position: relative;
 }
 
 /* Logo AcadTime */
 .logo {
-    width: 400px;
+    width: 450px;
     flex-shrink: 0;
+    margin-right: 20%;
+    transition: all 0.3s ease;
 }
 
 /* Controlar o tamanho do form*/
 .form-side {
-    width: 100%;
+    margin-left: 28%;
+    width: 200%;
     max-width: 420px;
     display: flex;
     justify-content: flex-end;
@@ -53,97 +58,110 @@ body {
 h2 {
     text-align: center;
     color: #003366;
-    margin-bottom: 25px;
+    margin-bottom: 40px;
 }
 
-/* Input*/
-.input-group {
-    margin-bottom: 15px;
+/* Botão com ícone */
+.btn-icon {
+    padding-top: 1px;
+    width: 15px;    
+    height: 15px;
 }
 
+/* Labels e Inputs */
 .input-group label {
     display: block;
-    margin-bottom: 5px;
     color: #003366;
     font-size: 14px;
 }
-
 .input-group input {
-    width: 100%;
+    width: 100%;  
+    margin-top: 4px;      
     padding: 10px;
     border-radius: 8px;
     border: 1px solid #ccc;
     background: #eee;
 }
-
-/* Esqueceu senha */
-.forgot-password {
-    text-align: right;
-    margin-bottom: 20px;
-}
-
 .forgot-password a {
     font-size: 12px;
     color: #003366;
 }
 
-/* Botão de login */
-.btn-login {
-    width: 100%;
-    padding: 12px;
-    background-color: #f39200;
-    color: #003366;
+/* Botão de Redefinir */
+.btn-redefinir {
+    width: 100%;          
+    padding: 10px;
+    margin: 30px 0 10px 0; 
+    background-color: #F8970A;
+    color: #15487D;
     border: none;
     border-radius: 10px;
     font-weight: bold;
     cursor: pointer;
     transition: 0.3s;
+    display: block;          
 }
 
-.btn-login:hover {
-    background-color: #e68a00;
+/* Botão de Login */
+.btn-login {
+    width: 100%;          
+    padding: 8px;
+    background-color: #15487D;
+    color: #F4F2F2;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    margin: 90px 0 0 0;    
+    display: block; 
 }
 
+/* Setinha */
+.arrow-left {
+    display: inline-block;
+    transform: rotate(180deg); 
+    font-size: 18px;    
+    padding-bottom: 5px;   
+}
 
- /*Responsividade */
- 
+/* Responsividade */
 
-/* Tablet */
+/* Tablet e Celular */
 @media (max-width: 768px) {
     .login-container {
-        flex-direction: column; 
+        flex-direction: column;
         align-items: center;
         text-align: center;
-        gap: 30px;
+        gap: 20px;
+        position: relative;
+    }
+
+    /* Coloca a logo acima do formulário */
+    .logo {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 220px;
+        margin: 0;
+        z-index: 10;
     }
 
     .form-side {
+        margin-left: 0;
+        width: 100%;
+        max-width: 420px;
         justify-content: center;
-    }
-
-    .logo {
-        width: 220px;
-    }
-
-    .login-box {
-        padding: 25px;
+        padding-top: 120px; /* espaço para logo */
     }
 }
 
-/* Celular */
+/* Celular pequeno */
 @media (max-width: 480px) {
-    body {
-        padding: 20px;
-        align-items: flex-start;
-    }
-
-    .login-container {
-        width: 100%;
-    }
-
     .logo {
         width: 180px;
-        margin-bottom: 10px;
+        top: 15px;
     }
 
     .login-box {
@@ -170,9 +188,13 @@ h2 {
 
     .logo {
         width: 380px; 
+        margin-right: 20%;
+        position: static; /* volta ao normal */
+        transform: none;
     }
 
     .login-box {
         padding: 40px;
     }
 }
+--

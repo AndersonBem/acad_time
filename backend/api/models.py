@@ -279,6 +279,12 @@ class Submissao(models.Model):
         null=True
     )
 
+    carga_horaria_aprovada = models.IntegerField(
+        db_column='cargaHorariaAprovada',
+        blank=True,
+        null=True
+    )
+
     class Meta:
         managed = False
         db_table = 'Submissao'
@@ -292,6 +298,10 @@ class NotificacaoEmail(models.Model):
     assunto = models.CharField(max_length=250)
     corpo = models.TextField()
     data = models.DateField()
+    destinatario = models.EmailField(max_length=150, null=True, blank=True)
+    status_envio = models.CharField(db_column='statusEnvio', max_length=20, null=True, blank=True)
+    tipo_evento = models.CharField(db_column='tipoEvento', max_length=50, null=True, blank=True)
+    mensagem_erro = models.TextField(db_column='mensagemErro', null=True, blank=True)
     submissao = models.ForeignKey(Submissao, models.DO_NOTHING, db_column='idSubmissao')
 
     class Meta:
@@ -317,7 +327,7 @@ class Telefone(models.Model):
 
 class TipoAcao(models.Model):
     id_tipo_acao = models.AutoField(db_column='idTipoAcao', primary_key=True)
-    acao = models.CharField(max_length=150)
+    acao = models.CharField(max_length=20)
 
     class Meta:
         managed = False
@@ -328,13 +338,26 @@ class TipoAcao(models.Model):
 
 
 class LogAuditoria(models.Model):
-    id_log_auditoria = models.AutoField(db_column='idLogauditoria', primary_key=True)
-    data_hora = models.DateField(db_column='dataHora')
+    id_log_auditoria = models.AutoField(db_column='idLogAuditoria', primary_key=True)
+    data_hora = models.DateTimeField(db_column='dataHora')
+    nome_entidade = models.CharField(db_column='nomeEntidade', max_length=100)
     id_entidade_afetada = models.IntegerField(db_column='idEntidadeAfetada')
-    descricao = models.CharField(max_length=200, blank=True, null=True)
-    ip_origem = models.CharField(db_column='ipOrigem', max_length=45)
-    usuario = models.ForeignKey(Usuario, models.DO_NOTHING, db_column='idUsuario')
-    tipo_acao = models.ForeignKey(TipoAcao, models.DO_NOTHING, db_column='idTipoAcao')
+    descricao = models.TextField(blank=True, null=True)
+    ip_origem = models.CharField(db_column='ipOrigem', max_length=45, blank=True, null=True)
+    usuario = models.ForeignKey(
+        Usuario,
+        models.DO_NOTHING,
+        db_column='idUsuario',
+        blank=True,
+        null=True
+    )
+    tipo_acao = models.ForeignKey(
+        TipoAcao,
+        models.DO_NOTHING,
+        db_column='idTipoAcao'
+    )
+    valor_anterior = models.JSONField(db_column='valorAnterior', blank=True, null=True)
+    valor_novo = models.JSONField(db_column='valorNovo', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -342,3 +365,16 @@ class LogAuditoria(models.Model):
 
     def __str__(self):
         return f'Log {self.id_log_auditoria}'
+
+
+class RecuperacaoSenha(models.Model):
+    id_recuperacao_senha = models.AutoField(db_column='idRecuperacaoSenha', primary_key=True)
+    usuario = models.ForeignKey('Usuario', models.DO_NOTHING, db_column='idUsuario')
+    token = models.TextField()
+    expira_em = models.DateTimeField(db_column='expiraEm')
+    usado = models.BooleanField(default=False)
+    data_criacao = models.DateTimeField(db_column='dataCriacao')
+
+    class Meta:
+        managed = False
+        db_table = 'RecuperacaoSenha'

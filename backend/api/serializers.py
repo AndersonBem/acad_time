@@ -3,7 +3,8 @@ from datetime import date
 from api.models import (Usuario, Coordenador, Aluno, 
                         SuperAdmin, CoordenacaoCurso, Inscricao,
                         TipoAtividade, RegraAtividade,StatusSubmissao,
-                        AtividadeComplementar,Submissao, Curso)
+                        AtividadeComplementar,Submissao, Curso,
+                        LogAuditoria, NotificacaoEmail)
 
 """Serializer geral para get"""
 class UsuarioSerializer(serializers.ModelSerializer):
@@ -268,7 +269,7 @@ class SubmissaoReadSerializer(serializers.ModelSerializer):
     curso_nome = serializers.ReadOnlyField(source = 'curso.nome')
     coordenador_nome = serializers.ReadOnlyField(source = 'coordenador.usuario.nome')
     status_submissao_nome = serializers.ReadOnlyField(source = 'status_submissao.nome_status')
-    
+    carga_horaria_solicitada = serializers.ReadOnlyField(source = 'atividade_complementar.carga_horaria_solicitada')
     class Meta:
         model = Submissao
         fields = [
@@ -284,7 +285,9 @@ class SubmissaoReadSerializer(serializers.ModelSerializer):
             'status_submissao_nome',
             'certificado',
             'coordenador',
-            'coordenador_nome'
+            'coordenador_nome',
+            'carga_horaria_aprovada',
+            'carga_horaria_solicitada'
         ]
 
 class SubmissaoCreateSerializer(serializers.ModelSerializer):
@@ -311,14 +314,66 @@ class SubmissaoCreateSerializer(serializers.ModelSerializer):
                 'Não existe regra de atividade para esse curso e tipo de atividade.'
             )
 
+        if 'aluno' in self.initial_data:
+            raise serializers.ValidationError({
+                'aluno': 'Este campo não pode ser enviado.'
+            })
+
         return attrs
 
 class SubmissaoUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Submissao
-        fields =['observacao_coordenador', 'status_submissao',]
+        fields =['observacao_coordenador', 'status_submissao','carga_horaria_aprovada']
 
 class CursoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Curso
         fields = '__all__'
+
+class LogAuditoriaReadSerializer(serializers.ModelSerializer):
+    usuario_nome = serializers.ReadOnlyField(source ='usuario.nome')
+    tipo_acao_nome = serializers.ReadOnlyField(source = 'tipo_acao.acao')
+    usuario_email = serializers.ReadOnlyField(source='usuario.email')
+    
+    class Meta:
+        model = LogAuditoria
+        fields = [
+            'id_log_auditoria',
+            'data_hora',
+            'nome_entidade',
+            'id_entidade_afetada',
+            'descricao',
+            'ip_origem',
+            'usuario',
+            'usuario_nome',
+            'usuario_email',
+            'tipo_acao',
+            'tipo_acao_nome',
+            'valor_anterior',
+            'valor_novo'
+        ]
+
+class NotificacaoEmailReadSerializer(serializers.ModelSerializer):
+    submissao_id = serializers.IntegerField(source='submissao.id_submissao', read_only=True)
+
+    class Meta:
+        model = NotificacaoEmail
+        fields = [
+            'id_notificacao_email',
+            'assunto',
+            'corpo',
+            'data',
+            'destinatario',
+            'status_envio',
+            'tipo_evento',
+            'mensagem_erro',
+            'submissao_id'
+        ]
+
+class RecuperarSenhaSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+class RedefinirSenhaSerializer(serializers.Serializer):
+    token = serializers.CharField()
+    nova_senha = serializers.CharField(min_length=6)
