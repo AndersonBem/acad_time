@@ -5,9 +5,10 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from django.db import (connection, IntegrityError, DatabaseError,
                         InternalError, transaction)
-import os
+
 from django.core.files.storage import default_storage
 import uuid 
+import os
 from django.contrib.auth.hashers import make_password, check_password
 from django.utils import timezone
 from api.models import (Usuario, Coordenador, Aluno,
@@ -717,7 +718,7 @@ class SubmissaoViewSet(viewsets.ModelViewSet):
 
         certificado = Certificado.objects.create(
              nome_arquivo=nome_unico,
-             url_arquivo=caminho_arquivo,
+             url_arquivo=default_storage.url(caminho_arquivo),
              data_upload=timezone.now().date()
         ) 
 
