@@ -291,9 +291,10 @@ class SubmissaoReadSerializer(serializers.ModelSerializer):
         ]
 
 class SubmissaoCreateSerializer(serializers.ModelSerializer):
+    certificado_arquivo = serializers.FileField(write_only=True, required=True)
     class Meta:
         model = Submissao
-        fields = ['curso', 'atividade_complementar', 'certificado']
+        fields = ['curso', 'atividade_complementar', 'certificado_arquivo']
 
     def validate(self, attrs):
         curso = attrs.get('curso')
