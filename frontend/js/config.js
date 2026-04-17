@@ -1026,54 +1026,60 @@ A submissão NÃO deve ser excluída fisicamente, para preservar histórico e au
 REGRAS GERAIS DE NEGÓCIO
 --------------------------------------------------
 
-1) CREATE (POST)
-- Apenas ALUNO autenticado pode criar submissão.
-- O aluno NÃO envia seu próprio id no body.
-- O backend usa o usuário autenticado (request.user) para vincular a submissão ao aluno correto.
-- O coordenador e o superadmin NÃO podem criar submissões.
+---
+
+1. CREATE (POST)
+
+---
+
+* Apenas ALUNO autenticado pode criar submissão.
+* O aluno NÃO envia seu próprio id no body.
+* O backend usa o usuário autenticado (request.user) para vincular a submissão ao aluno correto.
+* O coordenador e o superadmin NÃO podem criar submissões.
 
 Validações já aplicadas:
-- usuário autenticado precisa ser aluno
-- aluno precisa ter inscrição ativa no curso
-- precisa existir regra da atividade para o curso
-- limite de horas é validado no banco
-- certificado é opcional
+
+* usuário autenticado precisa ser aluno
+* aluno precisa ter inscrição ativa no curso
+* precisa existir regra da atividade para o curso
+* limite de horas é validado no banco
+* o envio de certificado é OBRIGATÓRIO
+* o arquivo deve ser PDF, JPG, JPEG ou PNG
 
 Campos esperados no create:
-{
-    "curso": <id>,
-    "atividade_complementar": <id>,
-    "certificado": null
-}
+(form-data / multipart)
+
+* curso: <id>
+* atividade_complementar: <id>
+* certificado_arquivo: <file>
 
 Exemplo:
 POST /submissao/
 
-Body:
-{
-    "curso": 1,
-    "atividade_complementar": 2,
-    "certificado": null
-}
+Body (form-data):
+curso = 1
+atividade_complementar = 2
+certificado_arquivo = [arquivo PDF/JPG/PNG]
 
 Resposta esperada:
 201 Created
 
 Exemplo de retorno:
 {
-    "id_submissao": 9,
-    "data_envio": "2026-04-11",
-    "observacao_coordenador": null,
-    "aluno": 22,
-    "aluno_nome": "TesteAluno",
-    "curso": 1,
-    "curso_nome": "ADS",
-    "atividade_complementar": 2,
-    "status_submissao": 1,
-    "status_submissao_nome": "PENDENTE",
-    "certificado": null,
-    "coordenador": null
+"id_submissao": 9,
+"data_envio": "2026-04-11",
+"observacao_coordenador": null,
+"aluno": 22,
+"aluno_nome": "TesteAluno",
+"curso": 1,
+"curso_nome": "ADS",
+"atividade_complementar": 2,
+"status_submissao": 1,
+"status_submissao_nome": "PENDENTE",
+"certificado": 5,
+"coordenador": 13
 }
+
 
 --------------------------------------------------
 2) UPDATE / PATCH
