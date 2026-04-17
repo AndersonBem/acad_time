@@ -16,7 +16,7 @@ from api.models import (Usuario, Coordenador, Aluno,
                         SuperAdmin, Inscricao, CoordenacaoCurso,
                         TipoAtividade,RegraAtividade, StatusSubmissao,
                         AtividadeComplementar,  Submissao, Curso,
-                        LogAuditoria, NotificacaoEmail)
+                        LogAuditoria, NotificacaoEmail,Certificado)
 
 from api.serializers import (
     UsuarioSerializer, 
@@ -121,7 +121,7 @@ class CoordenadorViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
             if 'Usuario_email_key' in erro:
                 return Response(
-                    {"erro": "Email já está em uso"},
+                    {"detail": "Email já está em uso"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             return Response(
@@ -133,12 +133,12 @@ class CoordenadorViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
             if 'Já existe outro usuário com este email' in erro:
                 return Response(
-                    {"erro": "Email já está em uso"},
+                    {"detail": "Email já está em uso"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
             return Response(
-                {"erro": "Erro ao atualizar coordenador"},
+                {"detail": "Erro ao atualizar coordenador"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -178,11 +178,11 @@ class CoordenadorViewSet(AuditContextMixin, viewsets.ModelViewSet):
             erro = str(e)
             if 'Usuario_email_key' in erro:
                 return Response(
-                    {"erro": "Email já está em uso"},
+                    {"detail": "Email já está em uso"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             return Response(
-                {"erro": "Erro ao atualizar coordenador"},
+                {"detail": "Erro ao atualizar coordenador"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         except DatabaseError as e:
@@ -190,12 +190,12 @@ class CoordenadorViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
             if 'Já existe outro usuário com este email' in erro:
                 return Response(
-                    {"erro": "Email já está em uso"},
+                    {"detail": "Email já está em uso"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
             return Response(
-                {"erro": "Erro ao atualizar coordenador"},
+                {"detail": "Erro ao atualizar coordenador"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -250,7 +250,7 @@ class CoordenadorCursoViewSet(AuditContextMixin, viewsets.ModelViewSet):
     @transaction.atomic
     def destroy(self, request, *args, **kwargs):
         return Response(
-            {'erro': 'Exclusão de vínculo não é permitida.'},
+            {'detail': 'Exclusão de vínculo não é permitida.'},
             status=status.HTTP_405_METHOD_NOT_ALLOWED
         )
 
@@ -422,13 +422,13 @@ class AlunoViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
             if 'Usuario_email_key' in erro:
                 return Response(
-                    {"erro": "Email já está em uso"},
+                    {"detail": "Email já está em uso"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
             elif 'Aluno_matricula_key' in erro:
                 return Response(
-                    {"erro": "Matrícula já está em uso"},
+                    {"detail": "Matrícula já está em uso"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
@@ -441,12 +441,12 @@ class AlunoViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
             if 'Já existe outro usuário com este email' in erro:
                 return Response(
-                    {"erro": "Email já está em uso"},
+                    {"detail": "Email já está em uso"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
             return Response(
-                {"erro": "Erro ao criar aluno"},
+                {"detail": "Erro ao criar aluno"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -483,18 +483,18 @@ class AlunoViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
             if 'Usuario_email_key' in erro:
                 return Response(
-                    {"erro": "Email já está em uso"},
+                    {"detail": "Email já está em uso"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
             elif 'Aluno_matricula_key' in erro:
                 return Response(
-                    {"erro": "Matrícula já está em uso"},
+                    {"detail": "Matrícula já está em uso"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
             return Response(
-                {"erro": "Erro ao atualizar aluno"},
+                {"detail": "Erro ao atualizar aluno"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         except DatabaseError as e:
@@ -502,12 +502,12 @@ class AlunoViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
             if 'Já existe outro usuário com este email' in erro:
                 return Response(
-                    {"erro": "Email já está em uso"},
+                    {"detail": "Email já está em uso"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
             return Response(
-                {"erro": "Erro ao atualizar aluno"},
+                {"detail": "Erro ao atualizar aluno"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -615,7 +615,7 @@ class TipoAtividadeViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         return Response(
-            {'erro': 'Exclusão de tipo de atividade não é permitida.'},
+            {'detail': 'Exclusão de tipo de atividade não é permitida.'},
             status=status.HTTP_405_METHOD_NOT_ALLOWED
         )
 
@@ -769,7 +769,8 @@ class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
         
         aluno = usuario.aluno
         curso = serializer.validated_data.get('curso')
-        arquivo = serializer.validated_data.get('certificado_arquivo')
+        arquivo =  serializer.validated_data.pop('certificado_arquivo', None)
+       
 
         possui_inscricao_ativa = Inscricao.objects.filter(
             aluno = aluno,
@@ -816,8 +817,7 @@ class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
             data_envio=timezone.now().date(),
             status_submissao=status_pendente,
             observacao_coordenador=None,
-            coordenador=None,
-            certificado=certificado
+            certificado=certificado,
             coordenador=coordenacao_ativa.coordenador
         )
 
@@ -956,7 +956,7 @@ class RedefinirSenhaAPIView(APIView):
 
         if not sucesso:
             return Response(
-                {'erro': mensagem},
+                {'detail': mensagem},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
