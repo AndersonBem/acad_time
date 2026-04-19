@@ -6,7 +6,7 @@
   bottom: 0;
 
   box-sizing: border-box;
-  overflow: hidden;
+  overflow-y: auto;
 }
 .card-horas {
   display: flex;
@@ -74,9 +74,19 @@
 .cabecalho-regras,
 .linha-regra {
   display: grid;
-  grid-template-columns: 2fr 1fr 1.4fr 0.6fr;
-  gap: 16px;
-  align-items: start;
+  grid-template-columns: 2fr 0.9fr 1.3fr 0.9fr 0.9fr;
+  column-gap: 24px;
+}
+
+.cabecalho-regras > div:nth-child(4),
+.cabecalho-regras > div:nth-child(5) {
+  text-align: center;
+}
+
+.linha-regra {
+  border-top: 1px solid #eee;
+  padding-top: 16px;
+  align-items: center;
 }
 
 .cabecalho-regras {
@@ -112,11 +122,14 @@
   resize: none;
 }
 
+.comprovante,
 .status {
   display: flex;
   justify-content: center;
-  padding-top: 12px;
+  align-items: center;
+  padding-top: 0;
 }
+
 
 .acoes-horas {
   display: flex;
