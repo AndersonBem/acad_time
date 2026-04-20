@@ -34,7 +34,7 @@ const url = CONFIG.BASE_URL.replace(/\/$/, '') + CONFIG.ENDPOINTS.alunos;
 Authorization: Bearer TOKEN
 
 3. Token salvo em:
-localStorage.getItem('access_token')
+localStorage.getItem('access_toktestecoordenadorn')
 
 4. Usuário logado:
 localStorage.getItem('usuario_logado')

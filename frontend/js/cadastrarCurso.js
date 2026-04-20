@@ -22,7 +22,7 @@ async function carregarCurso(id) {
 
     document.getElementById("nome").value = curso.nome || "";
     document.getElementById("codigo").value = curso.codigo || "";
-    document.getElementById("cargaHoraria").value = curso.cargaHoraria || curso.carga_horaria || "";
+    document.getElementById("cargaHoraria").value = curso.cargaHoraria || curso.carga_horaria || curso.carga_horaria_minima || "";
     document.getElementById("descricao").value = curso.descricao || "";
 
     if (curso.status === true || curso.status === "Ativo" || curso.status === "ativo") {

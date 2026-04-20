@@ -37,13 +37,13 @@
     <div class="card-form">
     
             <div class="campo">
-                <label for="nome">Nome</label>
+                <label for="nome">Nome do coordenador(a)</label>
                 <input type="text" id="nome">
             </div>
 
             <div class="linha-dupla">
                 <div class="campo">
-                    <label for="email">Email</label>
+                    <label for="email">Digite um email para o coordenador(a)</label>
                     <input type="text" id="email">
                 </div>
 
@@ -60,20 +60,27 @@
             </div>
 
             <div class="campo">
-                <label>Curso Vinculado</label>
-                <input type="text" id="curso">
+                <label for="senha">Digite uma senha para o coordenador(a)</label>
+                <input type="password" id="senha">
+            </div>
+
+            <div class="campo">
+                <label for ="curso">Curso Vinculado</label>
+                <select id="curso">
+                    <option value="">Selecione um curso</option>
+                </select>
             </div>
 
             <div class = "acoes-form">
                 <button class="btn-cancelar" onclick="window.location.href='coordenadores.html'">Cancelar</button>
-                <button class="btn-salvar" type="submit">Salvar</button>
+                <button class="btn-salvar" type="button" onclick="salvarCoordenador()">Salvar</button>
             </div>
     </div>
 </main>
 
     <script src="../js/config.js"></script>
     <script src="../js/utils.js"></script>
-    <script src="../js/cadastrarCurso.js"></script>
+    <script src="../js/cadastrarCoordenador.js"></script>
     
 </body>
 </html>

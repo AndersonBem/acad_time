@@ -39,10 +39,12 @@
         <div class="topo-cursos">
           <input type="text" id="buscar" placeholder="Buscar">
 
-          <select>
+          <select id="filtro-status">
             <option value="">Filtrar por status</option>
-            <option value="ativo">Ativos</option>
-            <option value="inativo">Inativos</option>
+            <option value="ATIVO">Ativo</option>
+            <option value="TRANCADO">Trancado</option>
+            <option value="CANCELADO">Cancelado</option>
+            <option value="CONCLUIDO">Concluído</option>
           </select>
 
           <button onclick="window.location.href='cadastrarAluno.html'">

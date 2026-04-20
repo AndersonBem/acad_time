@@ -7,29 +7,26 @@
 
     <link rel="stylesheet" href="../css/global.css">  
     <link rel="stylesheet" href="../css/cadastrarCurso.css">
-
 </head>
 
 <body class="pagina-cadastro-curso">
   <div class="layout">
     <div class="menu-lateral">
-        <div class ="logo-box">
-            <a href = "dashboard.html"><img src = "../assets/Logo.png" alt="Logo AcadTime" class="Logo"></a>  
+      <div class="logo-box">
+        <a href="dashboard.html"><img src="../assets/Logo.png" alt="Logo AcadTime" class="Logo"></a>
+      </div>
+
+      <aside class="sidebar">
+        <ul>
+          <li>Dashboard</li>
+          <li><a href="cursos.html">Cursos</a></li>
+          <li><a href="coordenadores.html">Coordenadores</a></li>
+          <li><a href="alunos.html">Alunos</a></li>
+          <li><a href="horasComplementares.html">Horas Complementares</a></li>
+          <li><a href="listarCertificados.html">Análise de Certificados</a></li>
+        </ul>
+      </aside>
     </div>
-
-
-
-    <aside class="sidebar">
-      <ul>
-         <li>Dashboard</li>
-        <li><a href="cursos.html">Cursos</a></li>
-        <li><a href="coordenadores.html">Coordenadores</a></li>
-        <li><a href="alunos.html">Alunos</a></li>
-        <li><a href="horasComplementares.html">Horas Complementares</a></li>
-        <li><a href="listarCertificados.html">Análise de Certificados</a></li>
-      </ul>
-    </aside>
-</div>
 
     <main class="container">
       <h1 id="titulo-pagina">Cadastro/Edição de Curso</h1>
@@ -63,17 +60,10 @@
           </div>
 
           <div class="linha-dupla">
-            <div class="campo campo-carga">
-              <label for="cargaHoraria">Carga horária total exigida</label>
-              <div class="input-com-texto">
-                <input type="text" id="cargaHoraria" name="cargaHoraria">
-                <span>Horas</span>
-              </div>
-            </div>
-
-            <div class="campo">
-              <label for="coordenador">Coordenador</label>
-              <input type="text" id="coordenador" name="coordenador">
+            <label for="cargaHoraria">Carga horária total exigida</label>
+            <div class="input-com-texto carga-curta">
+              <input type="text" id="cargaHoraria" name="cargaHoraria">
+              <span>Horas</span>
             </div>
           </div>
 
@@ -83,9 +73,7 @@
           </div>
 
           <div class="acoes-form">
-            <button type="button" class="btn-cancelar" onclick="window.location.href='cursos.html'">
-              Cancelar
-            </button>
+
             <button type="submit" class="btn-salvar">Salvar</button>
           </div>
         </form>
@@ -97,14 +85,11 @@
   <script src="../js/utils.js"></script>
   <script src="../js/cadastrarCurso.js"></script>
 
-  
   <script>
-      function toggleMenu() {
-        const sidebar = document.querySelector('.sidebar');
-        sidebar.classList.toggle('open');}
-    </script>
-
+    function toggleMenu() {
+      const sidebar = document.querySelector('.sidebar');
+      sidebar.classList.toggle('open');
+    }
+  </script>
 </body>
 </html>
-
-            

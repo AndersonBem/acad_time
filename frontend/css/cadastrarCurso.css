@@ -39,6 +39,25 @@
   flex-direction: column;
   margin-bottom: 18px;
 }
+.campo carga{
+  margin-top: 8px;
+}
+
+.carga-curta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.carga-curta input {
+  width: 180px;
+  max-width: 180px;
+}
+
+.carga-curta span {
+  font-weight: 500;
+  color: #1f2f5c;
+}
 
 .linha-dupla {
   display: flex;
@@ -50,6 +69,8 @@
 }
 
 input[type="text"],
+input[type="password"],
+select,
 textarea {
   padding: 10px 12px;
   border: 1px solid #d3d3d3;
