@@ -2,7 +2,7 @@ from rest_framework import status,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError,AuthenticationFailed
 from django.db import (connection, IntegrityError, DatabaseError,
                         InternalError, transaction)
 
@@ -120,27 +120,15 @@ class CoordenadorViewSet(AuditContextMixin, viewsets.ModelViewSet):
             erro = str(e)
 
             if 'Usuario_email_key' in erro:
-                return Response(
-                    {"detail": "Email já está em uso"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            return Response(
-                {"erro": "Erro ao cadastrar coordenador"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+                raise ValidationError("O email já está em uso.")
+            raise ValidationError("Erro ao cadastrar coordenador")
         except DatabaseError as e:
             erro = str(e)
 
             if 'Já existe outro usuário com este email' in erro:
-                return Response(
-                    {"detail": "Email já está em uso"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+               raise ValidationError("Email já está em uso")
 
-            return Response(
-                {"detail": "Erro ao atualizar coordenador"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            raise ValidationError("Erro ao atualizar coordenador")
 
         """Capturando o objeto criado, depois chamando o serializer de coordenador
         pra deixar ele no formado correto e respondendo pro front esse json"""
@@ -177,27 +165,15 @@ class CoordenadorViewSet(AuditContextMixin, viewsets.ModelViewSet):
         except IntegrityError as e:
             erro = str(e)
             if 'Usuario_email_key' in erro:
-                return Response(
-                    {"detail": "Email já está em uso"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            return Response(
-                {"detail": "Erro ao atualizar coordenador"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+                raise ValidationError("O email já está em uso.")
+            raise ValidationError("Erro ao atualizar coordenador.")
         except DatabaseError as e:
             erro = str(e)
 
             if 'Já existe outro usuário com este email' in erro:
-                return Response(
-                    {"detail": "Email já está em uso"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                raise ValidationError("O email já está em uso.")
 
-            return Response(
-                {"detail": "Erro ao atualizar coordenador"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            raise ValidationError("Erro ao atualizar coordenador")
         
         coordenador_atualizado = Coordenador.objects.get(
             usuario__id_usuario=coordenador.usuario.id_usuario
@@ -288,10 +264,7 @@ class InscricaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
     
     
     def destroy(self, request, *args, **kwargs):
-        return Response(
-            {'erro': 'Exclusão de inscrição não é permitida.'},
-            status= status.HTTP_405_METHOD_NOT_ALLOWED
-        )
+        raise ValidationError("Exclusão de inscrição não é permitida.")
     def _validar_coordenador_ou_superadmin(self, request):
         usuario = request.user
 
@@ -421,34 +394,18 @@ class AlunoViewSet(AuditContextMixin, viewsets.ModelViewSet):
             erro = str(e)
 
             if 'Usuario_email_key' in erro:
-                return Response(
-                    {"detail": "Email já está em uso"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                raise ValidationError("Email já está em uso")
 
             elif 'Aluno_matricula_key' in erro:
-                return Response(
-                    {"detail": "Matrícula já está em uso"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
-            return Response(
-                {"erro": "Erro ao cadastrar aluno"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+                raise ValidationError("Matrícula já está em uso")
+            raise ValidationError("Erro ao cadastrar aluno")
         except DatabaseError as e:
             erro = str(e)
 
             if 'Já existe outro usuário com este email' in erro:
-                return Response(
-                    {"detail": "Email já está em uso"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                raise ValidationError("Email já está em uso")
 
-            return Response(
-                {"detail": "Erro ao criar aluno"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            raise ValidationError("Erro ao criar aluno")
         
         aluno = Aluno.objects.get(usuario__email = email)
         response_serializer = AlunoSerializer(aluno)
@@ -482,34 +439,18 @@ class AlunoViewSet(AuditContextMixin, viewsets.ModelViewSet):
             erro = str(e)
 
             if 'Usuario_email_key' in erro:
-                return Response(
-                    {"detail": "Email já está em uso"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                raise ValidationError("Email já está em uso")
 
             elif 'Aluno_matricula_key' in erro:
-                return Response(
-                    {"detail": "Matrícula já está em uso"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
-            return Response(
-                {"detail": "Erro ao atualizar aluno"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+                raise ValidationError("Matrícula já está em uso")
+            raise ValidationError("Erro ao atualizar aluno")
         except DatabaseError as e:
             erro = str(e)
 
             if 'Já existe outro usuário com este email' in erro:
-                return Response(
-                    {"detail": "Email já está em uso"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                raise ValidationError("Email já está em uso")
 
-            return Response(
-                {"detail": "Erro ao atualizar aluno"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            raise ValidationError("Erro ao atualizar aluno")
 
         aluno_atualizado = Aluno.objects.get(
             usuario__id_usuario = aluno.usuario.id_usuario
@@ -553,16 +494,11 @@ class LoginAPIView(APIView):
         try:
             usuario = Usuario.objects.get(email = email)
         except Usuario.DoesNotExist:
-            return Response(
-                {'erro': 'Email ou senha inválidos.'},
-                status= status.HTTP_401_UNAUTHORIZED
-            )
+            raise AuthenticationFailed("Email ou senha inválidos")
         
         if not check_password(senha, usuario.senha_hash):
-            return Response(
-                {'erro': 'Email ou senha inválidos.'},
-                status= status.HTTP_401_UNAUTHORIZED
-            )
+            raise AuthenticationFailed("Email ou senha inválidos")
+            
         tipo_usuario = self.descobrir_tipo_usuario(usuario)
         access_token = gerar_access_token(usuario, tipo_usuario)
 
@@ -614,11 +550,8 @@ class TipoAtividadeViewSet(AuditContextMixin, viewsets.ModelViewSet):
         return super().partial_update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
-        return Response(
-            {'detail': 'Exclusão de tipo de atividade não é permitida.'},
-            status=status.HTTP_405_METHOD_NOT_ALLOWED
-        )
-
+        raise PermissionDenied("Exclusão de tipo de atividade não é permitida.")
+    
 class RegraAtividadeViewSet(AuditContextMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = RegraAtividade.objects.all().order_by('curso')
@@ -641,11 +574,8 @@ class RegraAtividadeViewSet(AuditContextMixin, viewsets.ModelViewSet):
         return super().partial_update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
-        return Response(
-            {'erro': 'Exclusão de regra de atividade não é permitida.'},
-            status=status.HTTP_405_METHOD_NOT_ALLOWED
-        )
-
+        raise PermissionDenied("Exclusão de regra de atividade não é permitida.")
+        
 class StatusSubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = StatusSubmissao.objects.all().order_by('nome_status')
@@ -955,10 +885,7 @@ class RedefinirSenhaAPIView(APIView):
         sucesso, mensagem = RedefinirSenhaService.redefinir_senha(token, nova_senha)
 
         if not sucesso:
-            return Response(
-                {'detail': mensagem},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            raise ValidationError(mensagem)
 
         return Response(
             {'mensagem': mensagem},
