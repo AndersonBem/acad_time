@@ -123,3 +123,153 @@ textarea {
   cursor: pointer;
 }
 
+.linha-curso {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 50px;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.linha-curso select,
+.linha-curso .data-inicio,
+.linha-curso .data-fim {
+  width: 100%;
+  height: 42px;
+  padding: 10px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+  box-sizing: border-box;
+  font-size: 14px;
+  background: white;
+}
+
+.cabecalho-cursos {
+  display: grid;
+  grid-template-columns: 2.2fr 1fr 1fr 56px;
+  gap: 12px;
+  margin-top: 18px;
+  margin-bottom: 10px;
+  align-items: end;
+}
+
+.cabecalho-cursos div {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1d2b53;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.linha-curso {
+  display: grid;
+  grid-template-columns: 2.2fr 1fr 1fr 56px;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.linha-curso select,
+.linha-curso .data-inicio,
+.linha-curso .data-fim {
+  width: 100%;
+  height: 42px;
+  padding: 10px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+  box-sizing: border-box;
+  font-size: 14px;
+  background: #fff;
+  margin: 0;
+}
+
+.btn-add-curso,
+.btn-remover-curso {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 22px;
+  font-weight: bold;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-add-curso {
+  background: #163d8f;
+}
+
+.btn-remover-curso {
+  background: #c94b4b;
+}
+.linha-curso-aluno {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 50px;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.linha-curso-aluno select {
+  width: 100%;
+  height: 42px;
+  padding: 10px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+  box-sizing: border-box;
+  font-size: 14px;
+  background: white;
+  margin: 0;
+}
+
+.btn-add-curso,
+.btn-remover-curso {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 22px;
+  font-weight: bold;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-add-curso {
+  background: #163d8f;
+}
+
+.btn-remover-curso {
+  background: #c94b4b;
+}
+
+
+.linha-curso select {
+  flex: 1;
+}
+
+.btn-add-curso,
+.btn-remover-curso {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.btn-add-curso {
+  background: #0d3b82;
+  color: white;
+}
+
+.btn-remover-curso {
+  background: #d9534f;
+  color: white;
+}
