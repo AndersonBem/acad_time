@@ -52,34 +52,35 @@
           </div>
         </div>
 
-        <div class="linha-dupla">
-          <div class="campo">
-            <label for="senha">Senha</label>
-            <input type="password" id="senha">
-          </div>
-
-          <div class="campo">
-            <label for="curso">Curso Vinculado</label>
-            <select id="curso">
-                <option value="">Selecione um curso</option>
-            </select>
-          </div>
+        <div class="campo">
+          <label for="senha">Senha</label>
+          <input type="password" id="senha">
         </div>
 
         <div class="campo">
-          <label>Status</label>
-          <div class="radio-group">
-            <input type="radio" id="ativo" name="status" value="ATIVO">
-            <label for="ativo">Ativo</label>
+          <label>Cursos Vinculados</label>
 
-            <input type="radio" id="trancado" name="status" value="TRANCADO">
-            <label for="trancado">Trancado</label>
+          <div class="cabecalho-cursos">
+            <div>Curso</div>
+            <div>Status da matrícula</div>
+            <div></div>
+          </div>
 
-            <input type="radio" id="cancelado" name="status" value="CANCELADO">
-            <label for="cancelado">Cancelado</label>
+          <div id="lista-cursos-aluno">
+            <div class="linha-curso-aluno">
+              <select class="curso-select">
+                <option value="">Selecione um curso</option>
+              </select>
 
-            <input type="radio" id="concluido" name="status" value="CONCLUIDO">
-            <label for="concluido">Concluído</label>
+              <select class="status-select">
+                <option value="ATIVO">Ativo</option>
+                <option value="TRANCADO">Trancado</option>
+                <option value="CANCELADO">Cancelado</option>
+                <option value="CONCLUIDO">Concluído</option>
+              </select>
+
+              <button type="button" class="btn-add-curso" onclick="adicionarCampoCursoAluno()">+</button>
+            </div>
           </div>
         </div>
 
