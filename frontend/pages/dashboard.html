@@ -1,32 +1,127 @@
 <!DOCTYPE html>
-<html lang='pt-br'>
+<html lang="pt-br">
 <head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>Cursos</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Dashboard </title>
 
     <link rel="stylesheet" href="../css/global.css">    
-    <link rel="stylesheet" href="../css/cursos.css"> 
-
+    <link rel="stylesheet" href="../css/dashboard.css"> 
 </head>
 
 <body>
-  <div class="layout">
-    <div class="menu-lateral">
-        <div class ="logo-box">
-            <a href = "dashboard.html"><img src = "../assets/Logo.png" alt="Logo AcadTime" class="Logo"></a>  
+    <div class="layout">
+        
+        <div class="menu-lateral">
+            <div class="logo-box">
+                <a href="dashboard.html">
+                    <img src="../assets/Logo.png" alt="Logo AcadTime" class="Logo">
+                </a>  
+            </div>
+         
+            <aside class="sidebar" id="sidebar">
+                <button class="menu-toggle" id="menuToggle">☰</button>
+                <ul>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="cursos.html">Cursos</a></li>
+                    <li><a href="coordenadores.html">Coordenadores</a></li>
+                    <li><a href="alunos.html">Alunos</a></li>
+                    <li><a href="horasComplementares.html">Horas Complementares</a></li>
+                    <li><a href="listarCertificados.html">Análise de Certificados</a></li>
+                </ul>
+            </aside>
+        </div>
+          
+        <main class="content">
+             
+           <header class="header">
+           <h1 >Dashboard</h1>
+           <p >Bem-vindo(a), Super Admin</p>
+           </header>
+              
+ 
+          
+            <div class="container">
+                <div class="box">
+                    <img src="../assets/img/Graduation Cap (1).png" alt="Cursos" class="btn-icon">
+                     <span id="numCursos" class="numero">0</span>
+                    <h5 class="h5">Cursos</h5>
+                    
+                </div>
+                <div class="box">
+                    <img src="../assets/img/People.png" alt="Coordenadores" class="btn-icon">
+                     <span id="numCoordenadores" class="numero">0</span>
+                    <h5 class="h5">Coordenadores</h5>
+                    
+                </div>
+                <div class="box">
+                    <img src="../assets/img/Student Male.png" alt="Alunos" class="btn-icon">
+                   <span id="numAlunos" class="numero">0</span>
+                    <h5 class="h5">Alunos Cadastrados</h5>
+                 
+                </div>
+                <div class="box">
+                    <img src="../assets/img/Task Planning.png" alt="Solicitações" class="btn-icon">
+                    <span id="numSolicitacoes" class="numero">0</span>
+                    <h5 class="h5">Solicitações</h5>
+        
+                </div>
+            </div>
+
+           
+            <div class="container1">
+               <div class="box1">
+
+
+  <div class="div aprovados">
+    <span id="numAprovados" class="numero1">0</span>
+    <span class="label">Aprovados</span>
+  </div>
+
+  <div class="div pendentes">
+    <span id="numPendentes" class="numero1">0</span>
+    <span class="label">Pendentes</span>
+  </div>
+
+  <div class="div reprovados">
+    <span id="numReprovados" class="numero1">0</span>
+    <span class="label">Reprovados</span>
+  </div>
+
+</div>
+          </div>
+
+            <div class="graficos-wrapper">
+                <div class="grafico">
+                    <canvas id="meuGrafico"></canvas>
+                </div>
+                <div class="grafico1">
+                    <canvas id="meuGrafico2"></canvas>
+                </div>
+            </div>
+
+         
+            <div class="container2">
+                <button class="div1">
+                    <img src="../assets/img/Add.png" alt="Adicionar">
+                    <h5 class="hh5">Cadastrar Cursos</h5>
+                </button>
+                <button class="div2">
+                    <img src="../assets/img/People.png" alt="Pessoas">
+                    <h5 class="hh5">Cadastrar Coordenadores</h5>
+                </button>
+                <button class="div3">
+                    <img src="../assets/img/Gear.png" alt="Configurações">
+                    <h5 class="hh5">Configurações e regras</h5>
+                </button>
+            </div>
+        </main>
     </div>
 
+    <button class="btn-abrir" id="btnAbrirMenu">☰ </button>
 
-
-    <aside class="sidebar">
-      <ul>
-        <li>Dashboard</li>
-        <li><a href="cursos.html">Cursos</a></li>
-        <li><a href="coordenadores.html">Coordenadores</a></li>
-        <li><a href="alunos.html">Alunos</a></li>
-        <li><a href="horasComplementares.html">Horas Complementares</a></li>
-        <li><a href="listarCertificados.html">Análise de Certificados</a></li>
-      </ul>
-    </aside>
-</div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>
