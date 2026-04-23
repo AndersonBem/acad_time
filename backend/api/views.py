@@ -1,6 +1,7 @@
 from rest_framework import status,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.exceptions import PermissionDenied, ValidationError,AuthenticationFailed
 from django.db import (connection, IntegrityError, DatabaseError,
@@ -666,7 +667,8 @@ class CursoViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
 
 class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
-    """permission_classes = [IsAuthenticated]"""
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
     def get_queryset(self):
         usuario = self.request.user
 
@@ -704,6 +706,48 @@ class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
             return SubmissaoUpdateSerializer
         return SubmissaoReadSerializer
     
+    @swagger_auto_schema(
+        operation_summary="Criar submissão",
+        operation_description="""
+Cria uma nova submissão de atividade complementar.
+
+Este endpoint recebe os dados em multipart/form-data e exige o envio
+do arquivo do certificado no campo `certificado_arquivo`.
+        """,
+        manual_parameters=[
+            openapi.Parameter(
+                'curso',
+                openapi.IN_FORM,
+                description='ID do curso da submissão.',
+                type=openapi.TYPE_INTEGER,
+                required=True
+            ),
+            openapi.Parameter(
+                'atividade_complementar',
+                openapi.IN_FORM,
+                description='ID da atividade complementar.',
+                type=openapi.TYPE_INTEGER,
+                required=True
+            ),
+            openapi.Parameter(
+                'certificado_arquivo',
+                openapi.IN_FORM,
+                description='Arquivo do certificado (.pdf, .jpg, .jpeg, .png).',
+                type=openapi.TYPE_FILE,
+                required=True
+            ),
+        ],
+        responses={
+            201: SubmissaoReadSerializer,
+            400: 'Dados inválidos.',
+            401: 'Não autenticado.',
+            403: 'Sem permissão.',
+        },
+        tags=['Submissão']
+    )
+
+
+
     @transaction.atomic
     def perform_create(self, serializer):
         usuario = self.request.user
