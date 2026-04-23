@@ -36,6 +36,8 @@ from api.notificacao_service import NotificacaoService
 from api.recuperar_service import RecuperacaoSenhaService
 from api.redefinir_service import RedefinirSenhaService
 from api.utils_auditoria import set_audit_context
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
     """Listando usuários, sem permitir criação, deleteção e etc, esses metodos
@@ -480,6 +482,22 @@ class SuperAdminViewSet(viewsets.ReadOnlyModelViewSet):
 class LoginAPIView(APIView):
     permission_classes = [AllowAny]
     
+    @swagger_auto_schema(
+        operation_summary="Login do usuário",
+        operation_description="Realiza autenticação e retorna token JWT.",
+        request_body=LoginSerializer,
+        responses={
+            200: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'access_token': openapi.Schema(type=openapi.TYPE_STRING),
+                    'email': openapi.Schema(type=openapi.TYPE_STRING),
+                    'tipo': openapi.Schema(type=openapi.TYPE_STRING),
+                }
+            )
+        }
+    )
+
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
 

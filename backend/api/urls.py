@@ -1,4 +1,5 @@
 from django.urls import path, include
+
 from rest_framework import routers
 from api.views import (
     UsuarioViewSet, CoordenadorViewSet, AlunoViewSet,
@@ -28,4 +29,5 @@ urlpatterns = [
     path('redefinir-senha/', RedefinirSenhaAPIView.as_view(), name='redefinir-senha'),
     path('recuperar-senha/', RecuperarSenhaAPIView.as_view(), name='recuperar-senha'),
     path('', include(router.urls)),
+
 ]

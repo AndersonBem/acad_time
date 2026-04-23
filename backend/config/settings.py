@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'storages',
     'api',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -158,4 +159,16 @@ STORAGES = {
         "staticfiles": {
                 "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
             },
+}
+
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': 'JWT Authorization header. Exemplo: Bearer <seu_token>'
+        }
+    }
 }
