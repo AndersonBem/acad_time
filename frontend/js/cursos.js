@@ -72,3 +72,13 @@ function editarCurso(id) {
     window.location.href = `cadastrarCurso.html?id=${id}`;
 }
 
+
+
+function logout() {
+    // Limpar dados de sessão
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Redirecionar para a página de login
+    window.location.href = "login.html";
+}

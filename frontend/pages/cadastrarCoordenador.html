@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title>Coordenadores</title>
 
   <link rel="stylesheet" href="../css/global.css">
@@ -20,14 +21,51 @@
     </div>
 
     <aside class="sidebar">
-      <ul>
-        <li>Dashboard</li>
-        <li><a href="cursos.html">Cursos</a></li>
-        <li><a href="coordenadores.html">Coordenadores</a></li>
-        <li><a href="alunos.html">Alunos</a></li>
-        <li><a href="horasComplementares.html">Horas Complementares</a></li>
-        <li><a href="listarCertificados.html">Análise de Certificados</a></li>
-      </ul>
+      <button class="menu-toggle" id="menuToggle">☰</button>
+               <ul>
+    <li>
+        <a href="dashboard.html">
+            <img src="../assets/img/Performance Macbook.png" alt="Dashboard" class="menu-icon">
+            <span>Dashboard</span>
+        </a>
+    </li>
+    <li>
+        <a href="cursos.html">
+            <img src="../assets/img/Graduation Cap (1).png" alt="Cursos" class="menu-icon">
+            <span>Cursos</span>
+        </a>
+    </li>
+    <li>
+        <a href="coordenadores.html">
+            <img src="../assets/img/People.png" alt="Coordenadores" class="menu-icon">
+            <span>Coordenadores</span>
+        </a>
+    </li>
+    <li>
+        <a href="alunos.html">
+            <img src="../assets/img/People.png" alt="Alunos" class="menu-icon">
+            <span>Alunos</span>
+        </a>
+    </li>
+    <li>
+        <a href="horasComplementares.html">
+            <img src="../assets/img/Rollback.png" alt="Horas Complementares" class="menu-icon">
+            <span>Horas Complementares</span>
+        </a>
+    </li>
+    <li>
+        <a href="listarCertificados.html">
+            <img src="../assets/img/Diploma.png" alt="Análise de Certificados" class="menu-icon">
+            <span>Análise de Certificados</span>
+        </a>
+    </li>
+</ul>
+<button class="btn-logout" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> 
+        <span>Sair</span>
+    </button>
+
+
     </aside>
   </div>
 
@@ -105,7 +143,7 @@
   </main>
 
 </div>
-
+<button class="btn-abrir" id="btnAbrirMenu">☰ </button>
 <script src="../js/config.js"></script>
 <script src="../js/utils.js"></script>
 <script src="../js/cadastrarCoordenador.js"></script>

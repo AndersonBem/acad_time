@@ -14,49 +14,256 @@ body {
 .layout {
   display: flex;
   min-height: 100vh;
-  padding-left: 16px;
 }
 
 .sidebar {
-  position: relative;
-  overflow-y: auto;
-  top: 0;
+  margin: 0;
+  position: fixed;
+  top: 150px;
   left: 0;
-  width: 300px;
-  height: 200vh;
-  background: #0d3b82;
+  width: 280px;
+  height: 100vh;
+  background: linear-gradient(135deg, #0d3b82 0%, #0a2e68 100%);
   color: white;
   padding: 20px;
   box-sizing: border-box;
   border-top-right-radius: 20px;
   border-bottom-right-radius: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Sidebar pequena (encolhida - NÃO SOMA) */
+.sidebar.small {
+  width: 80px;
+  padding: 20px 10px;
+}
+
+/* Esconde o logo quando pequeno */
+.sidebar.small .logo-box img {
+  width: 50px;
+  margin: 0 auto;
+}
+
+/* Esconde o título quando pequeno */
+.sidebar.small h2 {
+  display: none;
+}
+
+/* Ajusta a lista quando pequena */
+.sidebar.small ul {
+  margin-top: 20px;
+}
+
+/* Ajusta os links quando pequeno */
+.sidebar.small li a {
+  text-align: center;
+  padding: 12px 5px;
+  font-size: 0;
+}
+
+.sidebar.small li a::before {
+  display: none;
+}
+
+/* Ícone emoji para cada link quando pequeno */
+.sidebar.small li:nth-child(1) a::after {
+  content: '';
+  font-size: 24px;
+  display: block;
+}
+
+.sidebar.small li:nth-child(2) a::after {
+  content: '';
+  font-size: 24px;
+  display: block;
+}
+
+.sidebar.small li:nth-child(3) a::after {
+  content: '';
+  font-size: 24px;
+  display: block;
+}
+
+.sidebar.small li:nth-child(4) a::after {
+  content: '';
+  font-size: 24px;
+  display: block;
+}
+
+.sidebar.small li:nth-child(5) a::after {
+  content: '';
+  font-size: 24px;
+  display: block;
+}
+
+.sidebar.small li:nth-child(6) a::after {
+  content: '';
+  font-size: 24px;
+  display: block;
+}
+
+/* Botão de logout */
+.sidebar .btn-logout {
+  background:#e08600;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 16px;
+  cursor: pointer;
+  width: 100%;
+  height: 60px;
+  margin-top: 100px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 35vh;
+  transition: all 0.2s ease;
+}
+
+.sidebar .btn-logout:hover {
+  transform: translateX(3px);
+}
+
+.sidebar .btn-logout i {
+  font-size: 16px;
+}
+
+/* Botão de logout quando sidebar está pequena */
+.sidebar.small .btn-logout {
+  padding: 10px 5px;
+  margin-top: 100px;
+  font-size: 0;
+  gap: 0;
+}
+
+.sidebar.small .btn-logout i {
+  font-size: 20px;
+  margin: 0;
+}
+
+.sidebar.small .btn-logout span {
+  display: none;
+}
+
+.sidebar.small .btn-logout::after {
+  content: '🚪';
+  font-size: 20px;
+}
+
+/* Remove o hover com deslocamento quando pequeno */
+.sidebar.small li:hover {
+  transform: scale(1.05);
+  transform: translateX(0);
+}
+
+.sidebar.small li a:hover {
+  padding-left: 5px;
+}
+
+/* Botão de menu */
+.menu-toggle {
+  background: #F8970A;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 18px;
+  z-index: 101;
+  transition: 0.2s;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-toggle:hover {
+  background: #e08600;
+  transform: scale(1.05);
+}
+
+/* Quando sidebar está pequena, mantém o botão */
+.sidebar.small .menu-toggle {
+  right: 20px;
+}
+
+/* Estilização da barra de scroll */
+.sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: #1e4a8a;
+  border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #60a5fa;
+  border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #93c5fd;
 }
 
 .sidebar h2 {
   margin-bottom: 32px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  position: relative;
+  padding-bottom: 12px;
+}
+
+.sidebar h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: #60a5fa;
+  border-radius: 3px;
 }
 
 .sidebar ul {
   list-style: none;
   padding: 0;
   margin: 0;
+  margin-top: 70px;
 }
 
 .sidebar li {
   margin-bottom: 18px;
   padding: 0;
+  transition: transform 0.2s ease;
 }
 
+.sidebar li:hover {
+  transform: translateX(5px);
+}
 
 .sidebar li a {
   color: white;
   text-decoration: none;
   display: block;
   width: 100%;
-  font-weight: bold;
+  font-weight: 500;
   line-height: 1.2;
-  padding: 0;
+  padding: 10px 12px;
   margin: 0;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .sidebar li a:visited {
@@ -65,17 +272,42 @@ body {
 
 .sidebar li a:hover {
   color: white;
+  background: rgba(96, 165, 250, 0.2);
+  padding-left: 16px;
 }
 
 .sidebar li a:active {
-  font-weight: bold;
+  font-weight: 600;
   color: white;
+  background: rgba(96, 165, 250, 0.3);
+  transform: scale(0.98);
 }
 
+.sidebar li a::before {
+  content: '›';
+  margin-right: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease, margin-right 0.2s ease;
+  display: inline-block;
+}
+
+.sidebar li a:hover::before {
+  opacity: 1;
+  margin-right: 12px;
+}
+
+/* Conteúdo principal */
 .content {
   flex: 1;
   padding: 32px;
   color: #0d3b82;
+  margin-left: 280px;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+/* Quando sidebar está pequena */
+.sidebar.small ~ .content {
+  margin-left: 80px;
 }
 
 .card {
@@ -93,21 +325,36 @@ body {
   margin-top: 10px;
 }
 
-
-/*M0obile*/
-
-@media (max-width: 900px) {
-  .layout {
-    flex-direction: column;
+/* ===== RESPONSIVO PARA MOBILE ===== */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 260px;
+    top: 0;
+    height: 100vh;
+    border-radius: 0;
   }
 
-  .menu-lateral {
+  .sidebar.small {
+    width: 70px;
+  }
+
+  .menu-toggle {
     position: fixed;
-    top: 0;
-    left: 0;
-    margin: 0;
-    width: 300px;
-    height: 100vh;
+    top: 15px;
+    left: 15px;
+    right: auto;
+    z-index: 1002;
+  }
+
+  .content {
+    margin-left: 0;
+    padding: 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .sidebar.small ~ .content {
+    margin-left: 70px;
   }
 
   .logo-box {
@@ -117,92 +364,88 @@ body {
     justify-content: center;
   }
 
-  .logo {
-    width: 180px;
-    max-width: 100%;
+  .logo-box img {
+    width: 200px;
   }
 
-  .sidebar {
-    width: 100%;
-    min-height: auto;
-    height: auto;
-    margin-top: 0;
-    border-radius: 0;
-    padding: 12px 16px;
-    margin-top: 0;
-  }
-
-  .sidebar.open {
-    display: block;
-    width: 100%;
-    min-height: auto;
-    height: auto;
-    margin-top: 0;
-    border-radius: 0;
+  .sidebar.small .logo-box img {
+    width: 40px;
   }
 
   .sidebar ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px 16px;
-    justify-content: center;
-  }
-
-  .sidebar li {
-    margin-bottom: 0;
+    margin-top: 60px;
   }
 
   .sidebar li a {
     font-size: 14px;
-    padding: 6px 8px;
+    padding: 8px 12px;
   }
 
-  .content,
-  .container {
-    width: 100%;
-    padding: 16px;
-    box-sizing: border-box;
+  .sidebar.small li a::after {
+    font-size: 20px;
   }
 
-  .card,
-  .card-form {
-    width: 100%;
-    box-sizing: border-box;
+  .card {
+    padding: 15px;
   }
 
-  .topo-cursos {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
+  .Logo {
+    width: 250px;
+  }
+  
+  .sidebar .btn-logout {
+    margin-top: 20px;
+  }
+}
+
+/* Mobile pequeno */
+@media (max-width: 480px) {
+  .sidebar {
+    width: 240px;
   }
 
-  .topo-cursos input,
-  .topo-cursos select,
-  .topo-cursos button {
-    width: 100%;
-    box-sizing: border-box;
+  .sidebar.small {
+    width: 60px;
   }
 
-  .linha-dupla {
-    flex-direction: column;
-    gap: 0;
+  .menu-toggle {
+    top: 10px;
+    left: 10px;
+    width: 35px;
+    height: 35px;
+    font-size: 16px;
   }
 
-  .acoes-form {
-    flex-direction: column;
-    align-items: stretch;
+  .content {
+    padding: 12px;
   }
 
-  .btn-cancelar,
-  .btn-salvar,
-  .btn-salvar-alt,
-  .btn-salvar-azul {
-    width: 100%;
+  .sidebar.small ~ .content {
+    margin-left: 60px;
   }
 
-  table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
+  .sidebar ul {
+    margin-top: 50px;
+  }
+
+  .sidebar li a {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  .sidebar.small li a::after {
+    font-size: 18px;
+  }
+
+  .card {
+    padding: 12px;
+  }
+
+  .Logo {
+    width: 200px;
+  }
+  
+  .sidebar .btn-logout {
+    margin-top: 15px;
   }
 }

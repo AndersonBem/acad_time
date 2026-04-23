@@ -124,3 +124,14 @@ document.getElementById("buscar").addEventListener("input", listarAlunos);
 document.getElementById("filtro-status").addEventListener("change", listarAlunos);
 
 listarAlunos();
+
+
+
+function logout() {
+    // Limpar dados de sessão
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Redirecionar para a página de login
+    window.location.href = "login.html";
+}

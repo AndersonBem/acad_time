@@ -413,3 +413,15 @@ async function iniciarTelaCoordenador() {
 }
 
 iniciarTelaCoordenador();
+
+
+
+
+function logout() {
+    // Limpar dados de sessão
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Redirecionar para a página de login
+    window.location.href = "login.html";
+}
