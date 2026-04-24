@@ -377,3 +377,14 @@ class RecuperarSenhaSerializer(serializers.Serializer):
 class RedefinirSenhaSerializer(serializers.Serializer):
     token = serializers.CharField()
     nova_senha = serializers.CharField(min_length=6)
+
+class CertificadoExtracaoSerializer(serializers.Serializer):
+    certificado_arquivo = serializers.FileField(required=True)
+    
+
+    def validate_certificado_arquivo(self, value):
+        extensoes_permitidas = ["pdf", "png", "jpg", "jpeg"]
+        extensao = value.name.split(".")[-1].lower()
+        if extensao not in extensoes_permitidas:
+            raise serializers.ValidationError("Envie um arquivo PDF ou imagem PNG/JPG/JPEG.")
+        return value

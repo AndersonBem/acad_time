@@ -6,6 +6,8 @@ from rest_framework.exceptions import PermissionDenied, ValidationError,Authenti
 from django.db import (connection, IntegrityError, DatabaseError,
                         InternalError, transaction)
 
+from .services.ocr_service import CertificadoExtracaoService
+
 from django.core.files.storage import default_storage
 import uuid 
 import os
@@ -28,7 +30,7 @@ from api.serializers import (
     TipoAtividadeSerializer,RegraAtividadeSerializer,StatusSubmissaoSerializer,
     AtividadeComplementarSerializer, SubmissaoReadSerializer, CursoSerializer,
     SubmissaoCreateSerializer, SubmissaoUpdateSerializer,LogAuditoriaReadSerializer,
-    NotificacaoEmailReadSerializer, RecuperarSenhaSerializer, RedefinirSenhaSerializer)
+    NotificacaoEmailReadSerializer, RecuperarSenhaSerializer, RedefinirSenhaSerializer,CertificadoExtracaoSerializer)
 
 from api.jwt_utils import gerar_access_token
 from .mixins import AuditContextMixin
@@ -758,7 +760,7 @@ class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
         if not coordenacao_ativa:
             raise ValidationError('O curso informado não possui coordenador ativo.')
 
-        status_pendente = StatusSubmissao.objects.get(nome_status = 'PENDENTE')    
+          
 
         submissao = serializer.save(
             aluno=aluno,
@@ -910,3 +912,31 @@ class RedefinirSenhaAPIView(APIView):
             status=status.HTTP_200_OK
         )
 
+class ExtrairDadosCertificadoView(APIView):
+    def post(self, request):
+        serializer = CertificadoExtracaoSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        arquivo = serializer.validated_data["certificado_arquivo"]
+
+        try:
+            texto = CertificadoExtracaoService.extrair_texto_arquivo(arquivo)
+            dados = CertificadoExtracaoService.extrair_dados(texto)
+
+            return Response({
+                "sucesso": True,
+                "dados_extraidos": dados
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({
+                "sucesso": False,
+                "dados_extraidos": {
+                    "carga_horaria": "",
+                    "data_certificado": "",
+                    "curso": "",
+                    "instituicao": "",
+                    "texto_extraido": ""
+                },
+                "erro": f"Não foi possível extrair os dados do certificado: {str(e)}"
+            }, status=status.HTTP_200_OK)

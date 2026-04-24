@@ -30,3 +30,13 @@ tzdata==2025.3
 uritemplate==4.2.0
 urllib3==2.6.3
 whitenoise==6.12.0
+
+# Extração/OCR de certificados
+pdfplumber==0.11.9
+easyocr==1.7.2
+numpy==2.4.4
+pillow==12.2.0
+pdf2image==1.17.0
+torch==2.11.0+cpu
+torchvision==0.26.0+cpu
+opencv-python-headless==4.13.0.92
