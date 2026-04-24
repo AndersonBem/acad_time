@@ -914,8 +914,9 @@ class ExtrairDadosCertificadoView(APIView):
         arquivo = serializer.validated_data["certificado_arquivo"]
 
         try:
-            texto = CertificadoExtracaoService.extrair_texto_pdf(arquivo)
+            texto = CertificadoExtracaoService.extrair_texto_arquivo(arquivo)
             dados = CertificadoExtracaoService.extrair_dados(texto)
+            
 
             return Response({
                 "sucesso": True,

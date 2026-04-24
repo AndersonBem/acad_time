@@ -383,7 +383,8 @@ class CertificadoExtracaoSerializer(serializers.Serializer):
     certificado_arquivo = serializers.FileField(required=True)
 
     def validate_certificado_arquivo(self, value):
+        extensoes_permitidas = ["pdf", "png", "jpg", "jpeg"]
         extensao = value.name.split(".")[-1].lower()
-        if extensao != "pdf":
-            raise serializers.ValidationError("Envie um arquivo PDF.")
+        if extensao not in extensoes_permitidas:
+            raise serializers.ValidationError("Envie um arquivo PDF ou imagem PNG/JPG/JPEG.")
         return value
