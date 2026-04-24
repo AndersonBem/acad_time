@@ -1449,6 +1449,53 @@ class RedefinirSenhaAPIView(APIView):
         )
 
 class ExtrairDadosCertificadoView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+
+    @swagger_auto_schema(
+        operation_summary="Extrair dados do certificado",
+        operation_description="""
+Extrai informações de um certificado enviado pelo usuário.
+
+Este endpoint simula o botão "Extrair dados" da tela de submissão.
+
+Ele não salva a submissão e não grava dados no banco. Apenas lê o arquivo
+e retorna os dados identificados para que o usuário possa revisar antes de salvar.
+
+Formatos aceitos:
+- PDF
+- PNG
+- JPG
+- JPEG
+        """,
+        manual_parameters=[
+            openapi.Parameter(
+                "certificado_arquivo",
+                openapi.IN_FORM,
+                description="Arquivo do certificado para extração OCR.",
+                type=openapi.TYPE_FILE,
+                required=True
+            )
+        ],
+        responses={
+            200: openapi.Response(
+                description="Resultado da extração OCR.",
+                examples={
+                    "application/json": {
+                        "sucesso": True,
+                        "dados_extraidos": {
+                            "carga_horaria": "40",
+                            "data_certificado": "2026-04-24",
+                            "curso": "Curso de Python",
+                            "instituicao": "Senac",
+                            "texto_extraido": "Texto completo extraído do certificado..."
+                        }
+                    }
+                }
+            ),
+            400: "Arquivo inválido ou não enviado.",
+        },
+        tags=["03 - OCR Certificado"]
+    )
     def post(self, request):
         serializer = CertificadoExtracaoSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
