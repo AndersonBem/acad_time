@@ -7,7 +7,7 @@ from rest_framework.exceptions import PermissionDenied, ValidationError,Authenti
 from django.db import (connection, IntegrityError, DatabaseError,
                         InternalError, transaction)
 
-from .services.ocr_service import CertificadoExtracaoService
+
 
 from django.core.files.storage import default_storage
 import uuid 
@@ -1448,6 +1448,7 @@ class RedefinirSenhaAPIView(APIView):
             status=status.HTTP_200_OK
         )
 
+
 class ExtrairDadosCertificadoView(APIView):
     parser_classes = [MultiPartParser, FormParser]
 
@@ -1497,6 +1498,8 @@ Formatos aceitos:
         tags=["03 - OCR Certificado"]
     )
     def post(self, request):
+        from .services.ocr_service import CertificadoExtracaoService
+        
         serializer = CertificadoExtracaoSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -1523,3 +1526,50 @@ Formatos aceitos:
                 },
                 "erro": f"Não foi possível extrair os dados do certificado: {str(e)}"
             }, status=status.HTTP_200_OK)
+        
+
+class ExtrairDadosCertificadoViewMock(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+
+    @swagger_auto_schema(
+        operation_summary="Extrair dados do certificado (Mock)",
+        operation_description="Versão mockada para ambiente de produção.",
+        manual_parameters=[
+            openapi.Parameter(
+                "certificado_arquivo",
+                openapi.IN_FORM,
+                description="Arquivo do certificado.",
+                type=openapi.TYPE_FILE,
+                required=True
+            )
+        ],
+        responses={
+            200: openapi.Response(
+                description="Resultado mockado.",
+                examples={
+                    "application/json": {
+                        "sucesso": True,
+                        "dados_extraidos": {
+                            "carga_horaria": "40",
+                            "data_certificado": "2026-04-24",
+                            "curso": "Curso de Python",
+                            "instituicao": "Senac",
+                            "texto_extraido": "Texto mockado para demonstração."
+                        }
+                    }
+                }
+            )
+        },
+        tags=["03 - OCR Certificado"]
+    )
+    def post(self, request):
+        return Response({
+            "sucesso": True,
+            "dados_extraidos": {
+                "carga_horaria": "40",
+                "data_certificado": "2026-04-24",
+                "curso": "Curso de Python",
+                "instituicao": "Senac",
+                "texto_extraido": "Texto mockado para demonstração."
+            }
+        })

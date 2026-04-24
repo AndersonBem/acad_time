@@ -85,7 +85,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5500",
     "http://localhost:5500",
-    "https://acadtime.netlify.app"
+    "https://acadtime.netlify.app",
+    "https://acad-time-1.onrender.com"
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -94,7 +95,8 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     "https://acadtime.netlify.app",
     "https://acad-time-api.onrender.com",
-    "https://acad-time.onrender.com"
+    "https://acad-time.onrender.com",
+    "https://acad-time-1.onrender.com"
 ]
 
 REST_FRAMEWORK = {
