@@ -172,5 +172,6 @@ SWAGGER_SETTINGS = {
             'in': 'header',
             'description': 'JWT Authorization header. Exemplo: Bearer <seu_token>'
         }
-    }
+    },
+    'TAGS_SORTER': 'alpha',
 }
