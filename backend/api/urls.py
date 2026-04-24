@@ -7,7 +7,7 @@ from api.views import (
     CoordenadorCursoViewSet, TipoAtividadeViewSet, RegraAtividadeViewSet,
     StatusSubmissaoViewSet,AtividadeComplementarViewSet,SubmissaoViewSet, CursoViewSet,
     LogAuditoriaViewSet,NotificacaoEmailViewSet, RecuperarSenhaAPIView,
-    RedefinirSenhaAPIView,)
+    RedefinirSenhaAPIView,ExtrairDadosCertificadoView,)
 
 router = routers.DefaultRouter()
 router.register('usuarios', UsuarioViewSet, basename='usuarios')
@@ -28,6 +28,7 @@ urlpatterns = [
     path('login/', LoginAPIView.as_view(), name='login'),
     path('redefinir-senha/', RedefinirSenhaAPIView.as_view(), name='redefinir-senha'),
     path('recuperar-senha/', RecuperarSenhaAPIView.as_view(), name='recuperar-senha'),
+    path('certificados/extrair/', ExtrairDadosCertificadoView.as_view(), name='extrair-dados-certificado'),
     path('', include(router.urls)),
 
 ]
