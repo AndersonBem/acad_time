@@ -1,6 +1,7 @@
 from rest_framework import status,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.exceptions import PermissionDenied, ValidationError,AuthenticationFailed
 from django.db import (connection, IntegrityError, DatabaseError,
@@ -51,6 +52,20 @@ class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
         if hasattr(usuario, 'superadmin'):
             return Usuario.objects.all()
         raise PermissionDenied('Apenas superadmin pode acessar usuários.')
+    
+    @swagger_auto_schema(
+        operation_summary="Detalhar usuário",
+        operation_description="Retorna os dados de um usuário específico. Apenas superadmin pode acessar.",
+        responses={
+            200: UsuarioSerializer,
+            401: "Não autenticado.",
+            403: "Apenas superadmin pode acessar usuários.",
+            404: "Usuário não encontrado.",
+        },
+        tags=["13 - Usuario"]
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
 
 class CoordenadorViewSet(AuditContextMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -92,6 +107,30 @@ class CoordenadorViewSet(AuditContextMixin, viewsets.ModelViewSet):
         usuario.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @swagger_auto_schema(
+        operation_summary="Criar coordenador",
+        operation_description="""
+    Cria um novo coordenador no sistema, incluindo o usuário associado.
+
+    Regras:
+    - Apenas superadmin pode criar coordenadores.
+    - A criação é feita via procedure no banco de dados.
+    - O email deve ser único.
+    - Pode incluir telefone opcional.
+
+    Erros possíveis:
+    - Email já em uso
+        """,
+        request_body=CoordenadorCreateSerializer,
+        responses={
+            201: CoordenadorSerializer,
+            400: "Dados inválidos ou email já existente.",
+            401: "Não autenticado.",
+            403: "Apenas superadmin pode criar coordenador.",
+        },
+        tags=["12 - Coordenador"]
+    )
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):
@@ -140,6 +179,26 @@ class CoordenadorViewSet(AuditContextMixin, viewsets.ModelViewSet):
         response_serializer = CoordenadorSerializer(coordenador)
 
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
+    @swagger_auto_schema(
+        operation_summary="Atualizar coordenador",
+        operation_description="""
+    Atualiza os dados de um coordenador.
+
+    Regras:
+    - Apenas superadmin pode atualizar coordenadores.
+    - Email deve continuar único.
+        """,
+        request_body=CoordenadorUpdateSerializer,
+        responses={
+            200: CoordenadorSerializer,
+            400: "Dados inválidos.",
+            401: "Não autenticado.",
+            403: "Apenas superadmin pode atualizar coordenador.",
+            404: "Coordenador não encontrado.",
+        },
+        tags=["12 - Coordenador"]
+    )
 
     @transaction.atomic
     def update(self, request, *args, **kwargs):
@@ -212,6 +271,25 @@ class CoordenadorCursoViewSet(AuditContextMixin, viewsets.ModelViewSet):
         if not hasattr(usuario, 'superadmin'):
             raise PermissionDenied('Apenas superadmin pode realizar esta ação.')
 
+    @swagger_auto_schema(
+        operation_summary="Criar vínculo coordenador-curso",
+        operation_description="""
+    Cria um vínculo entre um coordenador e um curso.
+
+    Regras:
+    - Apenas usuários do tipo superadmin podem criar vínculos.
+    - Define qual coordenador é responsável por determinado curso.
+        """,
+        request_body=CoordenacaoCursoCreateSerializer,
+        responses={
+            201: CoordenacaoCursoReadSerializer,
+            400: "Dados inválidos.",
+            401: "Não autenticado.",
+            403: "Apenas superadmin pode criar vínculo.",
+        },
+        tags=["07 - Coordenacao Curso"]
+    )
+
     @transaction.atomic
     def create(self, request, *args, **kwargs):
         self._validar_superadmin(request)
@@ -221,6 +299,26 @@ class CoordenadorCursoViewSet(AuditContextMixin, viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         self._validar_superadmin(request)
         return super().update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="Atualizar vínculo coordenador-curso",
+        operation_description="""
+    Atualiza um vínculo entre coordenador e curso.
+
+    Regras:
+    - Apenas superadmin pode atualizar vínculos.
+    - Usado, por exemplo, para encerrar um vínculo (definir data_fim).
+        """,
+        request_body=CoordenacaoCursoUpdateSerializer,
+        responses={
+            200: CoordenacaoCursoReadSerializer,
+            400: "Dados inválidos.",
+            401: "Não autenticado.",
+            403: "Apenas superadmin pode atualizar vínculo.",
+            404: "Vínculo não encontrado.",
+        },
+        tags=["07 - Coordenacao Curso"]
+    )
 
     @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
@@ -278,6 +376,26 @@ class InscricaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
         if not (eh_coordenador or eh_superadmin):
             raise PermissionDenied('Apenas coordenador ou superadmin pode realizar esta ação.')
     
+    @swagger_auto_schema(
+        operation_summary="Criar inscrição",
+        operation_description="""
+    Cria uma inscrição de aluno em um curso.
+
+    Regras:
+    - Apenas coordenador ou superadmin podem criar inscrições.
+    - Coordenador só pode criar inscrição para cursos sob sua coordenação ativa.
+    - Aluno não pode criar inscrição diretamente.
+        """,
+        request_body=InscricaoCreateSerializer,
+        responses={
+            201: InscricaoReadSerializer,
+            400: "Dados inválidos.",
+            401: "Não autenticado.",
+            403: "Sem permissão para criar inscrição.",
+        },
+        tags=["06 - Inscricao"]
+    )
+
     @transaction.atomic
     def create(self, request, *args, **kwargs):
         self._validar_coordenador_ou_superadmin(request)
@@ -317,6 +435,27 @@ class InscricaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
         self._validar_coordenador_ou_superadmin(request)
         return super().update(request, *args, **kwargs)
 
+    @swagger_auto_schema(
+        operation_summary="Atualizar status da inscrição",
+        operation_description="""
+    Atualiza parcialmente uma inscrição, geralmente para alterar seu status.
+
+    Regras:
+    - Apenas coordenador ou superadmin podem atualizar inscrições.
+    - Coordenador só pode atuar sobre inscrições de cursos sob sua coordenação.
+    - Exclusão de inscrição não é permitida.
+        """,
+        request_body=InscricaoUpdateSerializer,
+        responses={
+            200: InscricaoReadSerializer,
+            400: "Dados inválidos.",
+            401: "Não autenticado.",
+            403: "Sem permissão para atualizar inscrição.",
+            404: "Inscrição não encontrada.",
+        },
+        tags=["06 - Inscricao"]
+    )
+
     @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
         self.get_object()
@@ -324,7 +463,6 @@ class InscricaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
         return super().partial_update(request, *args, **kwargs)
 
 class AlunoViewSet(AuditContextMixin, viewsets.ModelViewSet):
-    """repete coordenadorviewset, com modificações pertinentes"""
     permission_classes = [IsAuthenticated]
     def get_queryset(self):
         usuario = self.request.user
@@ -376,6 +514,30 @@ class AlunoViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
         return Response(status= status.HTTP_204_NO_CONTENT)
     
+    @swagger_auto_schema(
+        operation_summary="Criar aluno",
+        operation_description="""
+    Cria um novo aluno no sistema, incluindo o usuário associado.
+
+    Regras:
+    - Apenas superadmin pode criar alunos.
+    - A criação é feita via procedure no banco de dados.
+    - Email e matrícula devem ser únicos.
+
+    Erros possíveis:
+    - Email já em uso
+    - Matrícula já em uso
+        """,
+        request_body=AlunoCreateSerializer,
+        responses={
+            201: AlunoSerializer,
+            400: "Dados inválidos ou email/matrícula já existentes.",
+            401: "Não autenticado.",
+            403: "Apenas superadmin pode criar aluno.",
+        },
+        tags=["11 - Aluno"]
+    )
+
     @transaction.atomic
     def create(self, request, *args, **kwargs):
         set_audit_context(request)
@@ -416,6 +578,27 @@ class AlunoViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
         return Response(response_serializer.data, status= status.HTTP_201_CREATED)
     
+
+    @swagger_auto_schema(
+        operation_summary="Atualizar aluno",
+        operation_description="""
+    Atualiza os dados de um aluno e do usuário associado.
+
+    Regras:
+    - Apenas superadmin pode atualizar.
+    - Email e matrícula devem continuar únicos.
+        """,
+        request_body=AlunoUpdateSerializer,
+        responses={
+            200: AlunoSerializer,
+            400: "Dados inválidos ou conflito de email/matrícula.",
+            401: "Não autenticado.",
+            403: "Apenas superadmin pode atualizar aluno.",
+            404: "Aluno não encontrado.",
+        },
+        tags=["11 - Aluno"]
+    )
+
     @transaction.atomic
     def update(self, request, *args, **kwargs):
         set_audit_context(request)
@@ -467,8 +650,6 @@ class AlunoViewSet(AuditContextMixin, viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
 
-"""SuperAdmin deve ser criado apenas diretamente no banco,
-   não vamos permitir criação via api"""
 class SuperAdminViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = SuperAdminSerializer
@@ -480,24 +661,59 @@ class SuperAdminViewSet(viewsets.ReadOnlyModelViewSet):
             return SuperAdmin.objects.all()
 
         raise PermissionDenied('Apenas superadmin pode acessar este endpoint.')
+    
+    @swagger_auto_schema(
+        operation_summary="Detalhar superadmin",
+        operation_description="Retorna os dados de um superadmin específico.",
+        responses={
+            200: SuperAdminSerializer,
+            401: "Não autenticado.",
+            403: "Apenas superadmin pode acessar este endpoint.",
+            404: "Superadmin não encontrado.",
+        },
+        tags=["14 - SuperAdmin"]
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
 
 class LoginAPIView(APIView):
     permission_classes = [AllowAny]
     
     @swagger_auto_schema(
         operation_summary="Login do usuário",
-        operation_description="Realiza autenticação e retorna token JWT.",
+        operation_description="""
+                            Autentica o usuário e retorna um token JWT.
+
+                            Tipos de usuário possíveis:
+                            - aluno
+                            - coordenador
+                            - superadmin
+
+                            Após o login, utilize o token no header:
+
+                            Authorization: Bearer <token>
+                                """,
         request_body=LoginSerializer,
         responses={
-            200: openapi.Schema(
-                type=openapi.TYPE_OBJECT,
-                properties={
-                    'access_token': openapi.Schema(type=openapi.TYPE_STRING),
-                    'email': openapi.Schema(type=openapi.TYPE_STRING),
-                    'tipo': openapi.Schema(type=openapi.TYPE_STRING),
+            200: openapi.Response(
+                description="Login realizado com sucesso.",
+                examples={
+                    "application/json": {
+                        "mensagem": "Login realizado com sucesso.",
+                        "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                        "usuario": {
+                            "id": 1,
+                            "nome": "João Silva",
+                            "email": "joao@email.com",
+                            "tipo": "aluno"
+                        }
+                    }
                 }
-            )
-        }
+            ),
+            400: "Dados inválidos.",
+            401: "Email ou senha inválidos."
+        },
+        tags=["01 - Login"]
     )
 
     def post(self, request):
@@ -557,6 +773,29 @@ class TipoAtividadeViewSet(AuditContextMixin, viewsets.ModelViewSet):
         if not hasattr(request.user, 'superadmin'):
             raise PermissionDenied('Apenas superadmin pode realizar esta ação.')
 
+    @swagger_auto_schema(
+        operation_summary="Criar tipo de atividade",
+        operation_description="""
+    Cria um novo tipo de atividade complementar.
+
+    Exemplos:
+    - Curso
+    - Palestra
+    - Evento
+
+    Regras:
+    - Apenas usuários do tipo superadmin podem criar tipos de atividade.
+        """,
+        request_body=TipoAtividadeSerializer,
+        responses={
+            201: TipoAtividadeSerializer,
+            400: "Dados inválidos.",
+            401: "Não autenticado.",
+            403: "Apenas superadmin pode criar tipo de atividade.",
+        },
+        tags=["09 - Tipo Atividade"]
+    )
+
     def create(self, request, *args, **kwargs):
         self._validar_apenas_superadmin(request)
         return super().create(request, *args, **kwargs)
@@ -564,6 +803,25 @@ class TipoAtividadeViewSet(AuditContextMixin, viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         self._validar_apenas_superadmin(request)
         return super().update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="Atualizar tipo de atividade",
+        operation_description="""
+    Atualiza um tipo de atividade complementar.
+
+    Regras:
+    - Apenas superadmin pode atualizar.
+        """,
+        request_body=TipoAtividadeSerializer,
+        responses={
+            200: TipoAtividadeSerializer,
+            400: "Dados inválidos.",
+            401: "Não autenticado.",
+            403: "Apenas superadmin pode atualizar tipo de atividade.",
+            404: "Tipo de atividade não encontrado.",
+        },
+        tags=["09 - Tipo Atividade"]
+    )
 
     def partial_update(self, request, *args, **kwargs):
         self._validar_apenas_superadmin(request)
@@ -581,6 +839,29 @@ class RegraAtividadeViewSet(AuditContextMixin, viewsets.ModelViewSet):
         if not hasattr(request.user, 'superadmin'):
             raise PermissionDenied('Apenas superadmin pode realizar esta ação.')
 
+    @swagger_auto_schema(
+        operation_summary="Criar regra de atividade",
+        operation_description="""
+    Define uma regra de atividade para um curso.
+
+    Exemplo de uso:
+    - Limitar carga horária máxima por tipo de atividade
+    - Definir se exige comprovante
+
+    Regras:
+    - Apenas usuários do tipo superadmin podem criar regras de atividade.
+    - Cada regra está vinculada a um curso e a um tipo de atividade.
+        """,
+        request_body=RegraAtividadeSerializer,
+        responses={
+            201: RegraAtividadeSerializer,
+            400: "Dados inválidos.",
+            401: "Não autenticado.",
+            403: "Apenas superadmin pode criar regra de atividade.",
+        },
+        tags=["10 - Regra Atividade"]
+    )
+
     def create(self, request, *args, **kwargs):
         self._validar_apenas_superadmin(request)
         return super().create(request, *args, **kwargs)
@@ -588,6 +869,25 @@ class RegraAtividadeViewSet(AuditContextMixin, viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         self._validar_apenas_superadmin(request)
         return super().update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="Atualizar regra de atividade",
+        operation_description="""
+    Atualiza uma regra de atividade vinculada a um curso.
+
+    Regras:
+    - Apenas superadmin pode atualizar regras de atividade.
+        """,
+        request_body=RegraAtividadeSerializer,
+        responses={
+            200: RegraAtividadeSerializer,
+            400: "Dados inválidos.",
+            401: "Não autenticado.",
+            403: "Apenas superadmin pode atualizar regra de atividade.",
+            404: "Regra não encontrada.",
+        },
+        tags=["10 - Regra Atividade"]
+    )
 
     def partial_update(self, request, *args, **kwargs):
         self._validar_apenas_superadmin(request)
@@ -600,6 +900,27 @@ class StatusSubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = StatusSubmissao.objects.all().order_by('nome_status')
     serializer_class = StatusSubmissaoSerializer
+
+    @swagger_auto_schema(
+        operation_summary="Listar status de submissão",
+        operation_description="""
+Retorna todos os status possíveis de uma submissão.
+
+Exemplos:
+- PENDENTE
+- APROVADA
+- REPROVADA
+
+Utilizado para definir ou exibir o status de uma submissão.
+        """,
+        responses={
+            200: StatusSubmissaoSerializer(many=True),
+            401: "Não autenticado."
+        },
+        tags=["05 - Status Submissao"]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 class AtividadeComplementarViewSet(AuditContextMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -625,6 +946,44 @@ class AtividadeComplementarViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
         return queryset.none()
 
+    @swagger_auto_schema(
+        operation_summary="Listar atividades complementares",
+        operation_description="""
+Lista as atividades complementares visíveis para o usuário autenticado.
+
+Regras:
+- Superadmin visualiza todas.
+- Coordenador visualiza atividades vinculadas às submissões dos cursos sob sua coordenação ativa.
+- Aluno visualiza atividades vinculadas às suas próprias submissões.
+        """,
+        responses={
+            200: AtividadeComplementarSerializer(many=True),
+            401: "Não autenticado.",
+        },
+        tags=["04 - Atividade Complementar"]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="Criar atividade complementar",
+        operation_description="""
+    Cria uma nova atividade complementar.
+
+    Regras:
+    - Apenas alunos autenticados podem criar.
+    - Coordenadores, superadmins e outros perfis não podem criar por este endpoint.
+        """,
+        request_body=AtividadeComplementarSerializer,
+        responses={
+            201: AtividadeComplementarSerializer,
+            400: "Dados inválidos.",
+            401: "Não autenticado.",
+            403: "Apenas aluno pode criar atividade complementar.",
+        },
+        tags=["04 - Atividade Complementar"]
+    )
+
     def create(self, request, *args, **kwargs):
         if not hasattr(request.user, 'aluno'):
             raise PermissionDenied('Apenas aluno pode criar atividade complementar.')
@@ -648,6 +1007,24 @@ class CursoViewSet(AuditContextMixin, viewsets.ModelViewSet):
         if not hasattr(request.user, 'superadmin'):
             raise PermissionDenied('Apenas superadmin pode realizar esta ação.')
 
+    @swagger_auto_schema(
+        operation_summary="Criar curso",
+        operation_description="""
+    Cria um novo curso no sistema.
+
+    Regras:
+    - Apenas usuários do tipo superadmin podem criar cursos.
+        """,
+        request_body=CursoSerializer,
+        responses={
+            201: CursoSerializer,
+            400: "Dados inválidos.",
+            401: "Não autenticado.",
+            403: "Apenas superadmin pode criar cursos.",
+        },
+        tags=["08 - Curso"]
+    )
+
     def create(self, request, *args, **kwargs):
         self._validar_apenas_superadmin(request)
         return super().create(request, *args, **kwargs)
@@ -668,7 +1045,8 @@ class CursoViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
 
 class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
-    """permission_classes = [IsAuthenticated]"""
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
     def get_queryset(self):
         usuario = self.request.user
 
@@ -706,6 +1084,62 @@ class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
             return SubmissaoUpdateSerializer
         return SubmissaoReadSerializer
     
+    @swagger_auto_schema(
+        operation_summary="Criar submissão",
+        operation_description="""
+                            Cria uma nova submissão de atividade complementar.
+
+                            Este endpoint recebe dados em multipart/form-data e exige o envio
+                            do arquivo do certificado no campo certificado_arquivo.
+
+                            Regras:
+                            - Apenas alunos autenticados podem criar submissões.
+                            - O aluno precisa possuir inscrição ativa no curso informado.
+                            - O curso precisa possuir coordenador ativo.
+                            - O arquivo deve estar nos formatos: PDF, JPG, JPEG ou PNG.
+                            - A submissão é criada automaticamente com status PENDENTE.
+                                    """,
+        manual_parameters=[
+            openapi.Parameter(
+                'curso',
+                openapi.IN_FORM,
+                description='ID do curso da submissão.',
+                type=openapi.TYPE_INTEGER,
+                required=True
+            ),
+            openapi.Parameter(
+                'atividade_complementar',
+                openapi.IN_FORM,
+                description='ID da atividade complementar.',
+                type=openapi.TYPE_INTEGER,
+                required=True
+            ),
+            openapi.Parameter(
+                'certificado_arquivo',
+                openapi.IN_FORM,
+                description='Arquivo do certificado (.pdf, .jpg, .jpeg, .png).',
+                type=openapi.TYPE_FILE,
+                required=True
+            ),
+        ],
+        responses={
+            201: openapi.Response(
+                description="Submissão criada com sucesso.",
+                schema=SubmissaoReadSerializer
+            ),
+            400: "Dados inválidos ou regra de negócio não atendida.",
+            401: "Não autenticado.",
+            403: "Sem permissão.",
+        },
+
+        tags=["02 - Submissao"]
+    )
+
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+
+
     @transaction.atomic
     def perform_create(self, serializer):
         usuario = self.request.user
@@ -859,6 +1293,30 @@ class LogAuditoriaViewSet(viewsets.ReadOnlyModelViewSet):
             'usuario',
             'tipo_acao'
         ).order_by('-data_hora')
+    
+    @swagger_auto_schema(
+        operation_summary="Listar logs de auditoria",
+        operation_description="""
+    Retorna os registros de auditoria do sistema.
+
+    Inclui informações como:
+    - Usuário que realizou a ação
+    - Tipo de ação
+    - Data e hora
+
+    Regras:
+    - Apenas superadmin pode acessar.
+    - Endpoint somente leitura.
+        """,
+        responses={
+            200: LogAuditoriaReadSerializer(many=True),
+            401: "Não autenticado.",
+            403: "Apenas superadmin pode acessar logs de auditoria.",
+        },
+        tags=["17 - Log Auditoria"]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 class NotificacaoEmailViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = NotificacaoEmailReadSerializer
@@ -873,8 +1331,56 @@ class NotificacaoEmailViewSet(viewsets.ReadOnlyModelViewSet):
 
         return NotificacaoEmail.objects.order_by('-data', '-id_notificacao_email')
     
+    @swagger_auto_schema(
+        operation_summary="Listar notificações de e-mail",
+        operation_description="""
+    Retorna o histórico de notificações de e-mail enviadas pelo sistema.
+
+    Regras:
+    - Apenas superadmin pode acessar.
+    - Endpoint somente leitura.
+        """,
+        responses={
+            200: NotificacaoEmailReadSerializer(many=True),
+            401: "Não autenticado.",
+            403: "Apenas superadmin pode acessar notificações.",
+        },
+        tags=["18 - Notificacao Email"]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+    
 class RecuperarSenhaAPIView(APIView):
-    permission_classes = []
+    permission_classes = [AllowAny]
+
+    @swagger_auto_schema(
+        operation_summary="Solicitar recuperação de senha",
+        operation_description="""
+    Solicita a recuperação de senha para um usuário.
+
+    Fluxo:
+    - O usuário informa o e-mail.
+    - Se o e-mail existir, um link de redefinição é enviado.
+    - A resposta é sempre genérica por segurança.
+
+    Observação:
+    - Não informa se o e-mail existe ou não no sistema.
+        """,
+        request_body=RecuperarSenhaSerializer,
+        responses={
+            200: openapi.Response(
+                description="Solicitação processada com sucesso.",
+                examples={
+                    "application/json": {
+                        "mensagem": "Se o e-mail existir, o link de recuperação foi enviado."
+                    }
+                }
+            ),
+            400: "Dados inválidos."
+        },
+        tags=["15 - Recuperar Senha"]
+    )
+
 
     def post(self, request):
         serializer = RecuperarSenhaSerializer(data=request.data)
@@ -895,6 +1401,36 @@ class RecuperarSenhaAPIView(APIView):
 class RedefinirSenhaAPIView(APIView):
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        operation_summary="Redefinir senha",
+        operation_description="""
+    Redefine a senha do usuário a partir de um token de recuperação.
+
+    Regras:
+    - O token deve ser válido.
+    - O token pode expirar.
+    - A nova senha deve atender às regras de validação.
+
+    Fluxo:
+    - Usuário recebe link com token.
+    - Envia token + nova senha.
+    - Senha é atualizada.
+        """,
+        request_body=RedefinirSenhaSerializer,
+        responses={
+            200: openapi.Response(
+                description="Senha redefinida com sucesso.",
+                examples={
+                    "application/json": {
+                        "mensagem": "Senha redefinida com sucesso."
+                    }
+                }
+            ),
+            400: "Token inválido ou dados incorretos."
+        },
+        tags=["16 - Redefinir Senha"]
+    )
+    
     def post(self, request):
         serializer = RedefinirSenhaSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
