@@ -97,3 +97,7 @@ function logout() {
     // Redirecionar para a página de login
     window.location.href = "login.html";
 }
+
+function toggleMenu() {
+  document.querySelector('.sidebar').classList.toggle('active');
+}

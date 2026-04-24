@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,235 +13,241 @@
 </head>
 
 <body>
-<div class="layout">
+    <div class="layout">
 
-    <div class="menu-lateral">
-        <div class="logo-box">
-            <a href="dashboard.html">
-                <img src="../assets/Logo.png" alt="Logo AcadTime" class="Logo">
-            </a>
+        <div class="menu-lateral">
+            <div class="logo-box">
+                <a href="dashboard.html">
+                    <img src="../assets/Logo.png" alt="Logo AcadTime" class="logo">
+                </a>
+            </div>
+
+            <aside class="sidebar">
+                <button class="menu-btn" onclick="toggleMenu()">☰</button>
+                <ul>
+                    <li>
+                        <a href="dashboard.html">
+                            <img src="../assets/img/Graph.png" class="menu-icon">
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="cursos.html">
+                            <img src="../assets/img/Graduation Cap (1).png" class="menu-icon">
+                            <span>Cursos</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="coordenadores.html">
+                            <img src="../assets/img/People.png" class="menu-icon">
+                            <span>Coordenadores</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="alunos.html">
+                            <img src="../assets/img/People.png" class="menu-icon">
+                            <span>Alunos</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="horasComplementares.html">
+                            <img src="../assets/img/Rollback.png" class="menu-icon">
+                            <span>Horas Complementares</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="listarCertificados.html">
+                            <img src="../assets/img/Diploma.png" class="menu-icon">
+                            <span>Análise de Certificados</span>
+                        </a>
+                    </li>
+                </ul>
+                </ul>
+
+                <button class="btn-logout" onclick="logout()">
+                    <img src="../assets/img/logout.png" alt="" class="logout-icon">
+                    <span>Sair</span>
+                </button>
+            </aside>
         </div>
 
-        <aside class="sidebar">
-            <button class="menu-toggle" id="menuToggle">☰</button>
-                    <ul>
-    <li>
-        <a href="dashboard.html">
-            <img src="../assets/img/Performance Macbook.png" alt="Dashboard" class="menu-icon">
-            <span>Dashboard</span>
-        </a>
-    </li>
-    <li>
-        <a href="cursos.html">
-            <img src="../assets/img/Graduation Cap (1).png" alt="Cursos" class="menu-icon">
-            <span>Cursos</span>
-        </a>
-    </li>
-    <li>
-        <a href="coordenadores.html">
-            <img src="../assets/img/People.png" alt="Coordenadores" class="menu-icon">
-            <span>Coordenadores</span>
-        </a>
-    </li>
-    <li>
-        <a href="alunos.html">
-            <img src="../assets/img/People.png" alt="Alunos" class="menu-icon">
-            <span>Alunos</span>
-        </a>
-    </li>
-    <li>
-        <a href="horasComplementares.html">
-            <img src="../assets/img/Rollback.png" alt="Horas Complementares" class="menu-icon">
-            <span>Horas Complementares</span>
-        </a>
-    </li>
-    <li>
-        <a href="listarCertificados.html">
-            <img src="../assets/img/Diploma.png" alt="Análise de Certificados" class="menu-icon">
-            <span>Análise de Certificados</span>
-        </a>
-    </li>
-</ul>
-<button class="btn-logout" onclick="logout()">
-        <i class="fas fa-sign-out-alt"></i> 
-        <span>Sair</span>
-    </button>
+        <main class="content">
 
 
+            <div class="card card-horas">
+                 <button class="menu-menu" onclick="toggleMenu()">☰</button>
+                <h1>Regras de Atividades por Curso</h1>
+                <div class="campo">
+                    <label for="curso">Curso</label>
+                    <select id="curso">
+                        <option value="">Selecione um curso</option>
+                    </select>
+                </div>
 
-        </aside>
+                <div class="campo-inline">
+                    <label for="cargaMinima">Carga horária mínima para conclusão de curso:</label>
+                    <div class="input-com-texto">
+                        <input type="text" id="cargaMinima" readonly>
+                        <span>Horas</span>
+                    </div>
+                </div>
+
+                <div class="cabecalho-regras">
+                    <div>Categorias de Atividades</div>
+                    <div>Limites de Horas</div>
+                    <div>Regras Específicas de Validação</div>
+                    <div>Exige Comprovante</div>
+                    <div>Status</div>
+                </div>
+
+                <div class="linha-regra" data-tipo="Curso">
+                    <div class="categoria">
+                        <strong>Curso</strong>
+                        <p>Cursos livres</p>
+                    </div>
+
+                    <div class="limite">
+                        <div class="input-com-texto">
+                            <input type="number" value="0">
+                            <span>Horas</span>
+                        </div>
+                    </div>
+
+                    <div class="regra">
+                        <textarea></textarea>
+                    </div>
+
+                    <div class="comprovante">
+                        <label class="switch">
+                            <input type="checkbox" class="chk-comprovante">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="status">
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="linha-regra" data-tipo="Palestra">
+                    <div class="categoria">
+                        <strong>Palestra</strong>
+                        <p>Palestras e apresentações</p>
+                    </div>
+
+                    <div class="limite">
+                        <div class="input-com-texto">
+                            <input type="number" value="0">
+                            <span>Horas</span>
+                        </div>
+                    </div>
+
+                    <div class="regra">
+                        <textarea></textarea>
+                    </div>
+
+                    <div class="comprovante">
+                        <label class="switch">
+                            <input type="checkbox" class="chk-comprovante">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="status">
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="linha-regra" data-tipo="Workshop">
+                    <div class="categoria">
+                        <strong>Workshop</strong>
+                        <p>Workshops e oficinas</p>
+                    </div>
+
+                    <div class="limite">
+                        <div class="input-com-texto">
+                            <input type="number" value="0">
+                            <span>Horas</span>
+                        </div>
+                    </div>
+
+                    <div class="regra">
+                        <textarea></textarea>
+                    </div>
+
+                    <div class="comprovante">
+                        <label class="switch">
+                            <input type="checkbox" class="chk-comprovante">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="status">
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="linha-regra" data-tipo="Monitoria">
+                    <div class="categoria">
+                        <strong>Monitoria</strong>
+                        <p>Monitorias acadêmicas</p>
+                    </div>
+
+                    <div class="limite">
+                        <div class="input-com-texto">
+                            <input type="number" value="0">
+                            <span>Horas</span>
+                        </div>
+                    </div>
+
+                    <div class="regra">
+                        <textarea></textarea>
+                    </div>
+
+                    <div class="comprovante">
+                        <label class="switch">
+                            <input type="checkbox" class="chk-comprovante">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="status">
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="acoes-horas">
+                    <button id="btnSalvarRegras" class="btn-salvar-alt">
+                        SALVAR ALTERAÇÕES
+                    </button>
+                </div>
+
+            </div>
+        </main>
+
     </div>
 
-    <main class="content">
-        <h1>Regras de Atividades por Curso</h1>
-
-        <div class="card card-horas">
-
-            <div class="campo">
-                <label for="curso">Curso</label>
-                <select id="curso">
-                    <option value="">Selecione um curso</option>
-                </select>
-            </div>
-
-            <div class="campo-inline">
-                <label for="cargaMinima">Carga horária mínima para conclusão de curso:</label>
-                <div class="input-com-texto">
-                    <input type="text" id="cargaMinima" readonly>
-                    <span>Horas</span>
-                </div>
-            </div>
-
-            <div class="cabecalho-regras">
-                <div>Categorias de Atividades</div>
-                <div>Limites de Horas</div>
-                <div>Regras Específicas de Validação</div>
-                <div>Exige Comprovante</div>
-                <div>Status</div>
-            </div>
-
-            <div class="linha-regra" data-tipo="Curso">
-                <div class="categoria">
-                    <strong>Curso</strong>
-                    <p>Cursos livres</p>
-                </div>
-
-                <div class="limite">
-                    <div class="input-com-texto">
-                        <input type="number" value="0">
-                        <span>Horas</span>
-                    </div>
-                </div>
-
-                <div class="regra">
-                    <textarea></textarea>
-                </div>
-
-                <div class="comprovante">
-                    <label class="switch">
-                        <input type="checkbox" class="chk-comprovante">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="status">
-                    <label class="switch">
-                        <input type="checkbox">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="linha-regra" data-tipo="Palestra">
-                <div class="categoria">
-                    <strong>Palestra</strong>
-                    <p>Palestras e apresentações</p>
-                </div>
-
-                <div class="limite">
-                    <div class="input-com-texto">
-                        <input type="number" value="0">
-                        <span>Horas</span>
-                    </div>
-                </div>
-
-                <div class="regra">
-                    <textarea></textarea>
-                </div>
-
-                <div class="comprovante">
-                    <label class="switch">
-                        <input type="checkbox" class="chk-comprovante">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="status">
-                    <label class="switch">
-                        <input type="checkbox">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="linha-regra" data-tipo="Workshop">
-                <div class="categoria">
-                    <strong>Workshop</strong>
-                    <p>Workshops e oficinas</p>
-                </div>
-
-                <div class="limite">
-                    <div class="input-com-texto">
-                        <input type="number" value="0">
-                        <span>Horas</span>
-                    </div>
-                </div>
-
-                <div class="regra">
-                    <textarea></textarea>
-                </div>
-
-                <div class="comprovante">
-                    <label class="switch">
-                        <input type="checkbox" class="chk-comprovante">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="status">
-                    <label class="switch">
-                        <input type="checkbox">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="linha-regra" data-tipo="Monitoria">
-                <div class="categoria">
-                    <strong>Monitoria</strong>
-                    <p>Monitorias acadêmicas</p>
-                </div>
-
-                <div class="limite">
-                    <div class="input-com-texto">
-                        <input type="number" value="0">
-                        <span>Horas</span>
-                    </div>
-                </div>
-
-                <div class="regra">
-                    <textarea></textarea>
-                </div>
-
-                <div class="comprovante">
-                    <label class="switch">
-                        <input type="checkbox" class="chk-comprovante">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="status">
-                    <label class="switch">
-                        <input type="checkbox">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="acoes-horas">
-                <button id="btnSalvarRegras" class="btn-salvar-alt">
-                    SALVAR ALTERAÇÕES
-                </button>
-            </div>
-
-        </div>
-    </main>
-
-</div>
-
-<script src="../js/config.js"></script>
-<script src="../js/utils.js"></script>
-<script src="../js/horasComplementares.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/horasComplementares.js"></script>
 
 </body>
+
 </html>

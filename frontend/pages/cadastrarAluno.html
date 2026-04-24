@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Cadastro de Aluno</title>
 
-    <link rel="stylesheet" href="../css/global.css">
-    <link rel="stylesheet" href="../css/cadastrarCurso.css">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Cadastro de Aluno</title>
+
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/cadastrarCurso.css">
 </head>
 
 <body>
@@ -15,60 +16,66 @@
     <div class="menu-lateral">
       <div class="logo-box">
         <a href="dashboard.html">
-          <img src="../assets/Logo.png" alt="Logo AcadTime" class="Logo">
+          <img src="../assets/Logo.png" alt="Logo AcadTime" class="logo">
         </a>
       </div>
 
       <aside class="sidebar">
-        <button class="menu-toggle" id="menuToggle">☰</button>
-               <ul>
-    <li>
-        <a href="dashboard.html">
-            <img src="../assets/img/Performance Macbook.png" alt="Dashboard" class="menu-icon">
-            <span>Dashboard</span>
-        </a>
-    </li>
-    <li>
-        <a href="cursos.html">
-            <img src="../assets/img/Graduation Cap (1).png" alt="Cursos" class="menu-icon">
-            <span>Cursos</span>
-        </a>
-    </li>
-    <li>
-        <a href="coordenadores.html">
-            <img src="../assets/img/People.png" alt="Coordenadores" class="menu-icon">
-            <span>Coordenadores</span>
-        </a>
-    </li>
-    <li>
-        <a href="alunos.html">
-            <img src="../assets/img/People.png" alt="Alunos" class="menu-icon">
-            <span>Alunos</span>
-        </a>
-    </li>
-    <li>
-        <a href="horasComplementares.html">
-            <img src="../assets/img/Rollback.png" alt="Horas Complementares" class="menu-icon">
-            <span>Horas Complementares</span>
-        </a>
-    </li>
-    <li>
-        <a href="listarCertificados.html">
-            <img src="../assets/img/Diploma.png" alt="Análise de Certificados" class="menu-icon">
-            <span>Análise de Certificados</span>
-        </a>
-    </li>
-</ul>
-<button class="btn-logout" onclick="logout()">
-        <i class="fas fa-sign-out-alt"></i> 
-        <span>Sair</span>
-    </button>
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+        <ul>
+          <li>
+            <a href="dashboard.html">
+              <img src="../assets/img/Graph.png" class="menu-icon">
+              <span>Dashboard</span>
+            </a>
+          </li>
 
+          <li>
+            <a href="cursos.html">
+              <img src="../assets/img/Graduation Cap (1).png" class="menu-icon">
+              <span>Cursos</span>
+            </a>
+          </li>
 
+          <li>
+            <a href="coordenadores.html">
+              <img src="../assets/img/People.png" class="menu-icon">
+              <span>Coordenadores</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="alunos.html">
+              <img src="../assets/img/People.png" class="menu-icon">
+              <span>Alunos</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="horasComplementares.html">
+              <img src="../assets/img/Rollback.png" class="menu-icon">
+              <span>Horas Complementares</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="listarCertificados.html">
+              <img src="../assets/img/Diploma.png" class="menu-icon">
+              <span>Análise de Certificados</span>
+            </a>
+          </li>
+        </ul>
+        </ul>
+
+        <button class="btn-logout" onclick="logout()">
+          <img src="../assets/img/logout.png" alt="" class="logout-icon">
+          <span>Sair</span>
+        </button>
       </aside>
     </div>
 
     <main class="content">
+       <button class="menu-menu" onclick="toggleMenu()">☰</button>
       <h1>Cadastro/Edição de Aluno(a)</h1>
       <p>Preencha os dados do aluno(a)</p>
 
@@ -134,4 +141,5 @@
   <script src="../js/utils.js"></script>
   <script src="../js/cadastrarAluno.js"></script>
 </body>
+
 </html>

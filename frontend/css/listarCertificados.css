@@ -1,6 +1,7 @@
 .content{
-  margin-top: 120px;
-  margin-left: -30px;
+  margin-top: 100px;
+  margin-left: 0px;
+  width: 100%;
 }
 
 
@@ -20,15 +21,6 @@
 .menu-icon{
     width: 30px;
     margin-top: 20px;
-}
-button {
-  background: orange;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 14px;
-  cursor: pointer;
-  margin-left: 90%;
 }
 
 .cabecalho-pagina h1 {

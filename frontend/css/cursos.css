@@ -1,7 +1,9 @@
 .content {
-  margin-top: 10px;
-  margin-left: -30px;
+  margin-top: 0px;
+  margin-left: 0px;
+   width: 100%;
 }
+
 
 .topo-cursos {
   display: flex;
