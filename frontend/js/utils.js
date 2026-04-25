@@ -25,3 +25,11 @@ async function fazerRequisicao(url, metodo = 'GET', dados = null) {
         dados: conteudo
     };
 }
+
+function toggleMenu() {
+    const sidebar = document.querySelector(".sidebar");
+
+    if (sidebar) {
+        sidebar.classList.toggle("active");
+    }
+}
