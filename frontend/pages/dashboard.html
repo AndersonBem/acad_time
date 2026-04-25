@@ -1,32 +1,183 @@
 <!DOCTYPE html>
-<html lang='pt-br'>
+<html lang="pt-br">
+
 <head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>Cursos</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
 
-    <link rel="stylesheet" href="../css/global.css">    
-    <link rel="stylesheet" href="../css/cursos.css"> 
-
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
 </head>
 
 <body>
-  <div class="layout">
-    <div class="menu-lateral">
-        <div class ="logo-box">
-            <a href = "dashboard.html"><img src = "../assets/Logo.png" alt="Logo AcadTime" class="Logo"></a>  
+    <div class="layout">
+
+
+        <div class="menu-lateral">
+            <div class="logo-box">
+                <a href="dashboard.html">
+                    <img src="../assets/Logo.png" alt="Logo AcadTime" class="logo">
+                </a>
+            </div>
+
+            <aside class="sidebar">
+
+
+
+                <button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+                <ul>
+                    <li>
+                        <a href="dashboard.html">
+                            <img src="../assets/img/Graph.png" class="menu-icon">
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="cursos.html">
+                            <img src="../assets/img/Graduation Cap (1).png" class="menu-icon">
+                            <span>Cursos</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="coordenadores.html">
+                            <img src="../assets/img/People.png" class="menu-icon">
+                            <span>Coordenadores</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="alunos.html">
+                            <img src="../assets/img/People.png" class="menu-icon">
+                            <span>Alunos</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="horasComplementares.html">
+                            <img src="../assets/img/Rollback.png" class="menu-icon">
+                            <span>Horas Complementares</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="listarCertificados.html">
+                            <img src="../assets/img/Diploma.png" class="menu-icon">
+                            <span>Análise de Certificados</span>
+                        </a>
+                    </li>
+                </ul>
+                <button class="btn-btn" onclick="logout()">
+                    <img src="../assets/img/logout.png" alt="" class="logout-icon">
+                    <span>Sair</span>
+                </button>
+
+
+
+            </aside>
+        </div>
+
+        <!-- CONTEÚDO -->
+        <main class="content">
+                
+            
+
+            <section class="section header-section">
+                 <button class="menu-menu" onclick="toggleMenu()">☰</button>
+                <h1>Dashboard</h1>
+                <p>Bem-vindo(a), Super Admin</p>
+
+
+            </section>
+
+            <!-- CARDS -->
+            <section class="section cards-section">
+
+                <div class="card">
+                    <img src="../assets/img/Graduation Cap (1).png" alt="Cursos" class="card-icon">
+                    <h3>Cursos</h3>
+                </div>
+
+                <div class="card">
+                    <img src="../assets/img/People.png" alt="Coordenadores" class="card-icon">
+                    <h3>Coordenadores</h3>
+                </div>
+
+                <div class="card">
+                    <img src="../assets/img/Student Male.png" alt="Alunos" class="card-icon">
+                    <h3>Alunos</h3>
+                </div>
+
+                <div class="card">
+                    <img src="../assets/img/Task Planning.png" alt="Solicitações" class="card-icon">
+                    <h3>Solicitações</h3>
+                </div>
+
+            </section>
+            <!-- STATUS -->
+            <section class="section status-section">
+                <div class="status aprovados">
+                    <h3>Aprovados</h3>
+                </div>
+                <div class="status pendentes">
+                    <h3>Pendentes</h3>
+                </div>
+                <div class="status reprovados">
+                    <h3>Reprovados</h3>
+                </div>
+            </section>
+
+            <!-- GRÁFICOS -->
+            <section class="section charts-section">
+
+                <div class="chart">
+                    <canvas id="grafico1"></canvas>
+                </div>
+
+                <div class="chart">
+                    <canvas id="grafico2"></canvas>
+                </div>
+
+            </section>
+
+            <!-- AÇÕES -->
+            <section class="section actions-section">
+
+                <button onclick="location.href='cursos.html'" class="btn-action">
+                    <img src="../assets/img/add.png" alt="Cursos">
+                    <span>
+                        <h3>Cadastrar Cursos</h3>
+                    </span>
+                </button>
+
+                <button onclick="location.href='coordenadores.html'" class="btn-action">
+                    <img src="../assets/img/people.png" alt="Coordenadores">
+                    <span>
+                        <h3>Cadastrar Coordenadores</h3>
+                    </span>
+                </button>
+
+                <button onclick="location.href='configuracoes.html'" class="btn-action">
+                    <img src="../assets/img/Gear.png" alt="Configurações">
+                    <span>
+                        <h3>Configurações</h3>
+                    </span>
+                </button>
+
+            </section>
+
+        </main>
     </div>
 
+    <!-- CHART.JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <!-- SEU JS -->
+    <script src="../js/dashboard.js"></script>
 
-    <aside class="sidebar">
-      <ul>
-        <li>Dashboard</li>
-        <li><a href="cursos.html">Cursos</a></li>
-        <li><a href="coordenadores.html">Coordenadores</a></li>
-        <li><a href="alunos.html">Alunos</a></li>
-        <li><a href="horasComplementares.html">Horas Complementares</a></li>
-        <li><a href="listarCertificados.html">Análise de Certificados</a></li>
-      </ul>
-    </aside>
-</div>
+</body>
+
+</html>

@@ -1,77 +1,124 @@
 <!DOCTYPE html>
 <html lang='pt-br'>
+
 <head>
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Cursos</title>
 
-    <link rel="stylesheet" href="../css/global.css">    
-    <link rel="stylesheet" href="../css/cursos.css"> 
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/cursos.css">
 
 </head>
 
 <body>
-  <div class="layout">
-    <div class="menu-lateral">
-        <div class ="logo-box">
-            <a href = "dashboard.html"><img src = "../assets/Logo.png" alt="Logo AcadTime" class="Logo"></a>  
-    </div>
+    <div class="layout">
+        <div class="menu-lateral">
+            <div class="logo-box">
+                <a href="dashboard.html">
+                    <img src="../assets/Logo.png" alt="Logo AcadTime" class="logo">
+                </a>
+            </div>
 
-<aside class="sidebar">
-      <ul>
-        <li>Dashboard</li>
-        <li><a href="cursos.html">Cursos</a></li>
-        <li><a href="coordenadores.html">Coordenadores</a></li>
-        <li><a href="alunos.html">Alunos</a></li>
-        <li><a href="horasComplementares.html">Horas Complementares</a></li>
-        <li><a href="listarCertificados.html">Análise de Certificados</a></li>
-      </ul>
-    </aside>
+            <aside class="sidebar">
+                <button class="menu-btn" onclick="toggleMenu()">☰</button>
+                <ul>
+                    <li>
+                        <a href="dashboard.html">
+                            <img src="../assets/img/Graph.png" class="menu-icon">
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
 
-    
-</div>
+                    <li>
+                        <a href="cursos.html">
+                            <img src="../assets/img/Graduation Cap (1).png" class="menu-icon">
+                            <span>Cursos</span>
+                        </a>
+                    </li>
 
-    <main class="content">
-      <h1>Listagem de Cursos</h1>
-      <p>Gerencie os cursos cadastrados aqui</p>
+                    <li>
+                        <a href="coordenadores.html">
+                            <img src="../assets/img/People.png" class="menu-icon">
+                            <span>Coordenadores</span>
+                        </a>
+                    </li>
 
-      <div class="card">
-        <div class="topo-cursos">
-          <input type="text" id="buscar" placeholder="Buscar">
+                    <li>
+                        <a href="alunos.html">
+                            <img src="../assets/img/People.png" class="menu-icon">
+                            <span>Alunos</span>
+                        </a>
+                    </li>
 
-          <select id="filtro-status">
-            <option value="">Filtrar por status</option>
-            <option value="ativo">Ativos</option>
-            <option value="inativo">Inativos</option>
-          </select>
+                    <li>
+                        <a href="horasComplementares.html">
+                            <img src="../assets/img/Rollback.png" class="menu-icon">
+                            <span>Horas Complementares</span>
+                        </a>
+                    </li>
 
-          <button onclick="window.location.href='cadastrarCurso.html'">
-            + Cadastrar Novo Curso
-          </button>
+                    <li>
+                        <a href="listarCertificados.html">
+                            <img src="../assets/img/Diploma.png" class="menu-icon">
+                            <span>Análise de Certificados</span>
+                        </a>
+                    </li>
+                </ul>
+                </ul>
+
+                <button class="btn-logout" onclick="logout()">
+                    <img src="../assets/img/logout.png" alt="" class="logout-icon">
+                    <span>Sair</span>
+                </button>
+            </aside>
         </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Nome do Curso</th>
-              <th>Status</th>
-              <th>Código do Curso</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
+        <main class="content">
+             <button class="menu-menu" onclick="toggleMenu()">☰</button>
+            <h1>Listagem de Cursos</h1>
+            <p>Gerencie os cursos cadastrados aqui</p>
 
-          <tbody id="lista-cursos">
-            
-          </tbody>
-        </table>
-      </div>
-    </main>
-  </div>
+            <div class="card">
 
-  <script src="../js/config.js"></script>
-  <script src="../js/utils.js"></script>
-  <script src="../js/cursos.js"></script>
+                <div class="topo-cursos">
+                    <input type="text" id="buscar" placeholder="Buscar">
+
+                    <select id="filtro-status">
+                        <option value="">Filtrar por status</option>
+                        <option value="ativo">Ativos</option>
+                        <option value="inativo">Inativos</option>
+                    </select>
+
+                    <button class="button1" onclick="window.location.href='cadastrarCurso.html'">
+                        + Cadastrar Novo Curso
+                    </button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome do Curso</th>
+                            <th>Status</th>
+                            <th>Código do Curso</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="lista-cursos">
+
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/cursos.js"></script>
 
 
 </body>
+
 </html>

@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title>Coordenadores</title>
 
   <link rel="stylesheet" href="../css/global.css">
@@ -10,104 +12,149 @@
 </head>
 
 <body>
-<div class="layout">
+  <div class="layout">
 
-  <div class="menu-lateral">
-    <div class="logo-box">
-      <a href="dashboard.html">
-        <img src="../assets/Logo.png" alt="Logo AcadTime" class="Logo">
-      </a>
+    <div class="menu-lateral">
+      <div class="logo-box">
+        <a href="dashboard.html">
+          <img src="../assets/Logo.png" alt="Logo AcadTime" class="logo">
+        </a>
+      </div>
+
+      <aside class="sidebar">
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+        <ul>
+          <li>
+            <a href="dashboard.html">
+              <img src="../assets/img/Graph.png" class="menu-icon">
+              <span>Dashboard</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="cursos.html">
+              <img src="../assets/img/Graduation Cap (1).png" class="menu-icon">
+              <span>Cursos</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="coordenadores.html">
+              <img src="../assets/img/People.png" class="menu-icon">
+              <span>Coordenadores</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="alunos.html">
+              <img src="../assets/img/People.png" class="menu-icon">
+              <span>Alunos</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="horasComplementares.html">
+              <img src="../assets/img/Rollback.png" class="menu-icon">
+              <span>Horas Complementares</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="listarCertificados.html">
+              <img src="../assets/img/Diploma.png" class="menu-icon">
+              <span>Análise de Certificados</span>
+            </a>
+          </li>
+        </ul>
+        </ul>
+
+        <button class="btn-logout" onclick="logout()">
+          <img src="../assets/img/logout.png" alt="" class="logout-icon">
+          <span>Sair</span>
+        </button>
+      </aside>
     </div>
 
-    <aside class="sidebar">
-      <ul>
-        <li>Dashboard</li>
-        <li><a href="cursos.html">Cursos</a></li>
-        <li><a href="coordenadores.html">Coordenadores</a></li>
-        <li><a href="alunos.html">Alunos</a></li>
-        <li><a href="horasComplementares.html">Horas Complementares</a></li>
-        <li><a href="listarCertificados.html">Análise de Certificados</a></li>
-      </ul>
-    </aside>
+
+    <main class="content">
+       <button class="menu-menu" onclick="toggleMenu()">☰</button>
+      <h1>Cadastro/Edição de Coordenador(a)</h1>
+      <p>Preencha os dados do coordenador(a)</p>
+
+      <div class="card-form">
+
+        <div class="campo">
+          <label for="nome">Nome do coordenador(a)</label>
+          <input type="text" id="nome">
+        </div>
+
+        <div class="linha-dupla">
+          <div class="campo">
+            <label for="email">Digite um email para o coordenador(a)</label>
+            <input type="text" id="email">
+          </div>
+
+          <div class="campo">
+            <label>Status</label>
+
+            <div class="radio-group">
+              <input type="radio" id="ativo" name="status" value="ativo">
+              <label for="ativo">Ativo</label>
+
+              <input type="radio" id="inativo" name="status" value="inativo">
+              <label for="inativo">Inativo</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="senha">Digite uma senha para o coordenador(a)</label>
+          <input type="password" id="senha">
+        </div>
+
+        <div class="campo">
+          <label>Cursos Vinculados</label>
+
+          <div class="cabecalho-cursos">
+            <div></div>
+            <div>Data de início</div>
+            <div>Data de término</div>
+            <div></div>
+          </div>
+
+          <div id="lista-cursos-coordenador">
+            <div class="linha-curso">
+              <select class="curso-select">
+                <option value="">Selecione um curso</option>
+              </select>
+
+              <input type="date" class="data-inicio">
+
+              <input type="date" class="data-fim">
+
+              <button type="button" class="btn-add-curso" onclick="adicionarCampoCurso()">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="acoes-form">
+          <button class="btn-cancelar" type="button" onclick="window.location.href='coordenadores.html'">
+            Cancelar
+          </button>
+
+          <button class="btn-salvar" type="button" onclick="salvarCoordenador()">
+            Salvar
+          </button>
+        </div>
+
+      </div>
+    </main>
+
   </div>
-
-  <main class="content">
-    <h1>Cadastro/Edição de Coordenador(a)</h1>
-    <p>Preencha os dados do coordenador(a)</p>
-
-    <div class="card-form">
-
-      <div class="campo">
-        <label for="nome">Nome do coordenador(a)</label>
-        <input type="text" id="nome">
-      </div>
-
-      <div class="linha-dupla">
-        <div class="campo">
-          <label for="email">Digite um email para o coordenador(a)</label>
-          <input type="text" id="email">
-        </div>
-
-        <div class="campo">
-          <label>Status</label>
-
-          <div class="radio-group">
-            <input type="radio" id="ativo" name="status" value="ativo">
-            <label for="ativo">Ativo</label>
-
-            <input type="radio" id="inativo" name="status" value="inativo">
-            <label for="inativo">Inativo</label>
-          </div>
-        </div>
-      </div>
-
-      <div class="campo">
-        <label for="senha">Digite uma senha para o coordenador(a)</label>
-        <input type="password" id="senha">
-      </div>
-
-      <div class="campo">
-        <label>Cursos Vinculados</label>
-
-        <div class="cabecalho-cursos">
-          <div></div>
-          <div>Data de início</div>
-          <div>Data de término</div>
-          <div></div>
-        </div>
-
-        <div id="lista-cursos-coordenador">
-          <div class="linha-curso">
-            <select class="curso-select">
-              <option value="">Selecione um curso</option>
-            </select>
-
-            <input type="date" class="data-inicio">
-
-            <input type="date" class="data-fim">
-
-            <button type="button" class="btn-add-curso" onclick="adicionarCampoCurso()">+</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="acoes-form">
-        <button class="btn-cancelar" type="button" onclick="window.location.href='coordenadores.html'">
-          Cancelar
-        </button>
-
-        <button class="btn-salvar" type="button" onclick="salvarCoordenador()">
-          Salvar
-        </button>
-      </div>
-
-    </div>
-  </main>
-
-</div>
-
-<script src="../js/config.js"></script>
-<script src="../js/utils.js"></script>
-<script src="../js/cadastrarCoordenador.js"></script>
+  <button class="btn-abrir" id="btnAbrirMenu">☰ </button>
+  <script src="../js/config.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/cadastrarCoordenador.js"></script>
 </body>
+
 </html>

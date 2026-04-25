@@ -1,3 +1,10 @@
+.content{
+  margin-top: 100px;
+  margin-left: 0px;
+  width: 100%;
+}
+
+
 .card {
   background: white;
   border-radius: 12px;
@@ -9,6 +16,11 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.menu-icon{
+    width: 30px;
+    margin-top: 20px;
 }
 
 .cabecalho-pagina h1 {
