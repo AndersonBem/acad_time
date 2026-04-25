@@ -6,7 +6,7 @@ async function listarCursos() {
     const filtroStatus = document.getElementById("filtro-status").value;
 
     try {
-        const res = await fetch('https://acad-time.onrender.com/curso/', {
+        const res = await fetch(CONFIG.BASE_URL + CONFIG.ENDPOINTS.curso, { 
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + token,

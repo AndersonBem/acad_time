@@ -270,6 +270,7 @@ class SubmissaoReadSerializer(serializers.ModelSerializer):
     coordenador_nome = serializers.ReadOnlyField(source = 'coordenador.usuario.nome')
     status_submissao_nome = serializers.ReadOnlyField(source = 'status_submissao.nome_status')
     carga_horaria_solicitada = serializers.ReadOnlyField(source = 'atividade_complementar.carga_horaria_solicitada')
+    atividade_categoria = serializers.ReadOnlyField(source='atividade_complementar.tipo_atividade.nome')
     class Meta:
         model = Submissao
         fields = [
@@ -281,6 +282,7 @@ class SubmissaoReadSerializer(serializers.ModelSerializer):
             'curso',
             'curso_nome',
             'atividade_complementar',
+            'atividade_categoria',
             'status_submissao',
             'status_submissao_nome',
             'certificado',

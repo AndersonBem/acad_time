@@ -3,11 +3,9 @@ let cursos = [];
 let graficoStatus = null;
 let graficoCursos = null;
 
-const BASE_URL = "https://acad-time.onrender.com/";
-
 const ENDPOINTS = {
-  submissoes: `${BASE_URL}submissao/`,
-  cursos: `${BASE_URL}curso/`,
+  submissoes: CONFIG.BASE_URL + CONFIG.ENDPOINTS.submissao,
+  cursos: CONFIG.BASE_URL + CONFIG.ENDPOINTS.curso,
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -50,24 +48,29 @@ async function buscarDados(url) {
 
 async function carregarDashboard() {
   try {
-    const [dadosSubmissoes, dadosCursos] = await Promise.all([
-      buscarDados(ENDPOINTS.submissoes),
-      buscarDados(ENDPOINTS.cursos),
-    ]);
+    const dadosSubmissoes = await buscarDados(ENDPOINTS.submissoes);
 
     submissoes = Array.isArray(dadosSubmissoes)
       ? dadosSubmissoes
       : dadosSubmissoes.results || [];
 
-    cursos = Array.isArray(dadosCursos)
-      ? dadosCursos
-      : dadosCursos.results || [];
+    try {
+      const dadosCursos = await buscarDados(ENDPOINTS.cursos);
+
+      cursos = Array.isArray(dadosCursos)
+        ? dadosCursos
+        : dadosCursos.results || [];
+    } catch (erroCursos) {
+      console.warn("Não foi possível carregar cursos:", erroCursos);
+      cursos = [];
+    }
 
     preencherFiltroCursos();
     aplicarFiltros();
+
   } catch (error) {
     console.error(error);
-    mostrarErroTabela("Erro ao carregar dados do dashboard.");
+    mostrarErroTabela("Erro ao carregar submissões do dashboard.");
   }
 }
 
@@ -149,13 +152,7 @@ function obterNomeAluno(item) {
 }
 
 function obterNomeAtividade(item) {
-  return (
-    item.atividade_complementar_nome ||
-    item.atividade_nome ||
-    item.atividade_complementar?.descricao ||
-    item.descricao ||
-    "Não informado"
-  );
+  return item.atividade_categoria || "Não informado";
 }
 
 function atualizarCards(dados) {
