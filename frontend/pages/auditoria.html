@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditoria</title>
+
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/auditoria.css">
+</head>
+
+<body>
+    <div class="layout">
+        <div class="menu-lateral">
+            <div class="logo-box">
+                <a href="dashboard.html">
+                    <img src="../assets/Logo.png" alt="Logo AcadTime" class="logo">
+                </a>
+            </div>
+
+            <aside class="sidebar">
+                <button class="menu-btn" onclick="toggleMenu()">☰</button>
+                <ul>
+                    <li><a href="dashboard.html"><img src="../assets/img/Graph.png" class="menu-icon"><span>Dashboard</span></a></li>
+                    <li><a href="cursos.html"><img src="../assets/img/Graduation Cap (1).png" class="menu-icon"><span>Cursos</span></a></li>
+                    <li><a href="coordenadores.html"><img src="../assets/img/People.png" class="menu-icon"><span>Coordenadores</span></a></li>
+                    <li><a href="alunos.html"><img src="../assets/img/People.png" class="menu-icon"><span>Alunos</span></a></li>
+                    <li><a href="horasComplementares.html"><img src="../assets/img/Rollback.png" class="menu-icon"><span>Horas Complementares</span></a></li>
+                    <li><a href="listarCertificados.html"><img src="../assets/img/Diploma.png" class="menu-icon"><span>Análise de Certificados</span></a></li>
+                    <li><a href="auditoria.html"><img src="../assets/img/Gear.png" class="menu-icon"><span>Auditoria</span></a></li>
+                </ul>
+
+                <button class="btn-logout" onclick="logout()">
+                    <img src="../assets/img/logout.png" alt="" class="logout-icon">
+                    <span>Sair</span>
+                </button>
+            </aside>
+        </div>
+
+        <main class="content auditoria-page">
+            <button class="menu-menu" onclick="toggleMenu()">☰</button>
+
+            <h1>Logs de Auditoria</h1>
+            <p>Consulte os registros de ações realizadas no sistema</p>
+
+        <div class="card auditoria-card">
+            <div class="topo-auditoria">
+                <input type="text" id="buscar" placeholder="Buscar por usuário, ação ou entidade">
+            </div>
+
+            <div class="table-wrapper">
+                <table class="tabela-auditoria">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Usuário</th>
+                            <th>Ação</th>
+                            <th>Entidade</th>
+                            <th>Descrição</th>
+                            <th>Detalhes</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tabelaAuditoria"></tbody>
+                </table>
+            </div>
+
+            <div class="paginacao">
+                <button id="btnAnterior">Anterior</button>
+                <span id="infoPagina"></span>
+                <button id="btnProximo">Próximo</button>
+            </div>
+        </div>
+
+        <div id="modalAuditoria" class="modal-auditoria">
+            <div class="modal-content">
+                <button class="fechar-modal" onclick="fecharModal()">×</button>
+                <h2>Detalhes do Log</h2>
+
+                
+                <pre id="valorAnterior"></pre>
+
+                
+                <pre id="valorNovo"></pre>
+            </div>
+        </div>
+        </main>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/auditoria.js"></script>
+</body>
+
+</html>

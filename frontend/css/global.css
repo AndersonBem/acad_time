@@ -17,7 +17,7 @@ body {
   justify-content: center;
   align-items: center;
   padding: 20px 0;
-   display: block;
+
 }
 #openBtn {
   position: fixed;
@@ -65,28 +65,32 @@ body {
   height: 100vh;
   background: #0d3b82;
   transition: 0.3s;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.sidebar.active {
-  transform: translateX(-100%);
+.sidebar ul {
+  flex: 1;
 }
 
 .btn-logout {
-  margin-top: 46vh;
+  margin: 20px auto;
   background-color: orange;
   color: aliceblue;
-  width: 90%;      
-  height: 60px;      
-  padding: 15px;     
-  margin-left: 5%;   
-  bordEr-radius: 8px;
-  border:none;
-  font-size: 16px;   
+  width: 80%;
+  height: 48px;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  font-size: 15px;
   font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 .layout {
@@ -236,7 +240,7 @@ body {
     margin-top: 0;
     border-radius: 0;
     padding: 12px 16px;
-    margin-top: 0;
+
   }
 
   .sidebar.open {
