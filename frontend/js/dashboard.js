@@ -1,3 +1,4 @@
+protegerPagina();
 let submissoes = [];
 let cursos = [];
 let graficoStatus = null;

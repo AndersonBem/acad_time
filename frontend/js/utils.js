@@ -33,3 +33,12 @@ function toggleMenu() {
         sidebar.classList.toggle("active");
     }
 }
+
+function protegerPagina() {
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+        window.location.href = "login.html";
+        return;
+    }
+}
