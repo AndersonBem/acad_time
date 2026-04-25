@@ -1,3 +1,4 @@
+protegerPagina();
 let logs = [];
 let logsFiltrados = [];
 let paginaAtual = 1;

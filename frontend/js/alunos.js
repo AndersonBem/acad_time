@@ -1,3 +1,4 @@
+protegerPagina();
 async function listarAlunos() {
     const container = document.getElementById("lista-alunos");
     const busca = document.getElementById("buscar").value.toLowerCase().trim();
@@ -129,7 +130,7 @@ listarAlunos();
 
 function logout() {
     // Limpar dados de sessão
-    localStorage.clear();
+    localStorage.removeItem("access_token");
     sessionStorage.clear();
     
     // Redirecionar para a página de login
