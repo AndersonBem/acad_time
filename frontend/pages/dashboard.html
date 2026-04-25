@@ -2,182 +2,185 @@
 <html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
 
-    <link rel="stylesheet" href="../css/global.css">
-    <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
 </head>
 
 <body>
-    <div class="layout">
+  <div class="layout">
 
+    <div class="menu-lateral">
+      <div class="logo-box">
+        <a href="dashboard.html">
+          <img src="../assets/Logo.png" alt="Logo AcadTime" class="logo">
+        </a>
+      </div>
 
-        <div class="menu-lateral">
-            <div class="logo-box">
-                <a href="dashboard.html">
-                    <img src="../assets/Logo.png" alt="Logo AcadTime" class="logo">
-                </a>
-            </div>
+      <aside class="sidebar">
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
 
-            <aside class="sidebar">
+        <ul>
+          <li>
+            <a href="dashboard.html">
+              <img src="../assets/img/Graph.png" class="menu-icon">
+              <span>Dashboard</span>
+            </a>
+          </li>
 
+          <li>
+            <a href="cursos.html">
+              <img src="../assets/img/Graduation Cap (1).png" class="menu-icon">
+              <span>Cursos</span>
+            </a>
+          </li>
 
+          <li>
+            <a href="coordenadores.html">
+              <img src="../assets/img/People.png" class="menu-icon">
+              <span>Coordenadores</span>
+            </a>
+          </li>
 
-                <button class="menu-btn" onclick="toggleMenu()">☰</button>
+          <li>
+            <a href="alunos.html">
+              <img src="../assets/img/People.png" class="menu-icon">
+              <span>Alunos</span>
+            </a>
+          </li>
 
-                <ul>
-                    <li>
-                        <a href="dashboard.html">
-                            <img src="../assets/img/Graph.png" class="menu-icon">
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
+          <li>
+            <a href="horasComplementares.html">
+              <img src="../assets/img/Rollback.png" class="menu-icon">
+              <span>Horas Complementares</span>
+            </a>
+          </li>
 
-                    <li>
-                        <a href="cursos.html">
-                            <img src="../assets/img/Graduation Cap (1).png" class="menu-icon">
-                            <span>Cursos</span>
-                        </a>
-                    </li>
+          <li>
+            <a href="listarCertificados.html">
+              <img src="../assets/img/Diploma.png" class="menu-icon">
+              <span>Análise de Certificados</span>
+            </a>
+          </li>
+        </ul>
 
-                    <li>
-                        <a href="coordenadores.html">
-                            <img src="../assets/img/People.png" class="menu-icon">
-                            <span>Coordenadores</span>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="alunos.html">
-                            <img src="../assets/img/People.png" class="menu-icon">
-                            <span>Alunos</span>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="horasComplementares.html">
-                            <img src="../assets/img/Rollback.png" class="menu-icon">
-                            <span>Horas Complementares</span>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="listarCertificados.html">
-                            <img src="../assets/img/Diploma.png" class="menu-icon">
-                            <span>Análise de Certificados</span>
-                        </a>
-                    </li>
-                </ul>
-                <button class="btn-btn" onclick="logout()">
-                    <img src="../assets/img/logout.png" alt="" class="logout-icon">
-                    <span>Sair</span>
-                </button>
-
-
-
-            </aside>
-        </div>
-
-        <!-- CONTEÚDO -->
-        <main class="content">
-                
-            
-
-            <section class="section header-section">
-                 <button class="menu-menu" onclick="toggleMenu()">☰</button>
-                <h1>Dashboard</h1>
-                <p>Bem-vindo(a), Super Admin</p>
-
-
-            </section>
-
-            <!-- CARDS -->
-            <section class="section cards-section">
-
-                <div class="card">
-                    <img src="../assets/img/Graduation Cap (1).png" alt="Cursos" class="card-icon">
-                    <h3>Cursos</h3>
-                </div>
-
-                <div class="card">
-                    <img src="../assets/img/People.png" alt="Coordenadores" class="card-icon">
-                    <h3>Coordenadores</h3>
-                </div>
-
-                <div class="card">
-                    <img src="../assets/img/Student Male.png" alt="Alunos" class="card-icon">
-                    <h3>Alunos</h3>
-                </div>
-
-                <div class="card">
-                    <img src="../assets/img/Task Planning.png" alt="Solicitações" class="card-icon">
-                    <h3>Solicitações</h3>
-                </div>
-
-            </section>
-            <!-- STATUS -->
-            <section class="section status-section">
-                <div class="status aprovados">
-                    <h3>Aprovados</h3>
-                </div>
-                <div class="status pendentes">
-                    <h3>Pendentes</h3>
-                </div>
-                <div class="status reprovados">
-                    <h3>Reprovados</h3>
-                </div>
-            </section>
-
-            <!-- GRÁFICOS -->
-            <section class="section charts-section">
-
-                <div class="chart">
-                    <canvas id="grafico1"></canvas>
-                </div>
-
-                <div class="chart">
-                    <canvas id="grafico2"></canvas>
-                </div>
-
-            </section>
-
-            <!-- AÇÕES -->
-            <section class="section actions-section">
-
-                <button onclick="location.href='cursos.html'" class="btn-action">
-                    <img src="../assets/img/add.png" alt="Cursos">
-                    <span>
-                        <h3>Cadastrar Cursos</h3>
-                    </span>
-                </button>
-
-                <button onclick="location.href='coordenadores.html'" class="btn-action">
-                    <img src="../assets/img/people.png" alt="Coordenadores">
-                    <span>
-                        <h3>Cadastrar Coordenadores</h3>
-                    </span>
-                </button>
-
-                <button onclick="location.href='configuracoes.html'" class="btn-action">
-                    <img src="../assets/img/Gear.png" alt="Configurações">
-                    <span>
-                        <h3>Configurações</h3>
-                    </span>
-                </button>
-
-            </section>
-
-        </main>
+        <button class="btn-btn" onclick="logout()">
+          <img src="../assets/img/logout.png" alt="" class="logout-icon">
+          <span>Sair</span>
+        </button>
+      </aside>
     </div>
 
-    <!-- CHART.JS -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <main class="content dashboard-content">
 
-    <!-- SEU JS -->
-    <script src="../js/dashboard.js"></script>
+      <section class="dashboard-header">
+        <button class="menu-menu" onclick="toggleMenu()">☰</button>
 
+        <div>
+          <h1>Dashboard</h1>
+          <p>Visão geral das submissões e atividades complementares</p>
+        </div>
+      </section>
+
+      <section class="dashboard-filters">
+        <div class="filter-group">
+          <label for="filtroCurso">Curso</label>
+          <select id="filtroCurso">
+            <option value="">Todos os cursos</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filtroStatus">Status</label>
+          <select id="filtroStatus">
+            <option value="">Todos os status</option>
+            <option value="PENDENTE">Pendentes</option>
+            <option value="APROVADA">Aprovadas</option>
+            <option value="REPROVADA">Reprovadas</option>
+          </select>
+        </div>
+
+        <button id="btnAtualizarDashboard" class="btn-atualizar">
+          Atualizar
+        </button>
+      </section>
+
+      <section class="dashboard-cards">
+        <article class="metric-card">
+          <span class="metric-label">Total de submissões</span>
+          <strong id="totalSubmissoes">0</strong>
+        </article>
+
+        <article class="metric-card">
+          <span class="metric-label">Pendentes</span>
+          <strong id="totalPendentes">0</strong>
+        </article>
+
+        <article class="metric-card">
+          <span class="metric-label">Aprovadas</span>
+          <strong id="totalAprovadas">0</strong>
+        </article>
+
+        <article class="metric-card">
+          <span class="metric-label">Reprovadas</span>
+          <strong id="totalReprovadas">0</strong>
+        </article>
+      </section>
+
+      <section class="dashboard-charts">
+        <article class="chart-card">
+          <div class="chart-header">
+            <h2>Status das submissões</h2>
+            <p>Distribuição entre pendentes, aprovadas e reprovadas</p>
+          </div>
+          <canvas id="graficoStatus"></canvas>
+        </article>
+
+        <article class="chart-card">
+          <div class="chart-header">
+            <h2>Submissões por curso</h2>
+            <p>Quantidade de submissões agrupadas por curso</p>
+          </div>
+          <canvas id="graficoCursos"></canvas>
+        </article>
+      </section>
+
+      <section class="dashboard-table-card">
+        <div class="table-header">
+          <div>
+            <h2>Últimas submissões</h2>
+            <p>Registros mais recentes encontrados no sistema</p>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Aluno</th>
+                <th>Curso</th>
+                <th>Atividade</th>
+                <th>Status</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaUltimasSubmissoes">
+              <tr>
+                <td colspan="5">Carregando dados...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="../js/dashboard.js"></script>
 </body>
 
 </html>
