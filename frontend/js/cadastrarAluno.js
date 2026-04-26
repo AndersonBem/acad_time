@@ -102,9 +102,9 @@ async function carregarCursos() {
 	});
 
 	if (!response.ok) {
-		const erro = await response.text();
-		console.error("Erro ao carregar cursos:", erro);
-		alert("Erro ao carregar cursos.");
+		const mensagem = await obterMensagemErro(response, "Erro ao carregar cursos.");
+		console.error(mensagem);
+		mostrarErro(mensagem);
 		return;
 	}
 
@@ -124,8 +124,8 @@ async function buscarInscricoesAluno(matriculaAluno) {
 	});
 
 	if (!response.ok) {
-		const erro = await response.text();
-		console.error("Erro ao buscar inscrições:", erro);
+		const mensagem = await obterMensagemErro(response, "Erro ao buscar inscrições.");
+		console.error(mensagem);
 		return [];
 	}
 
@@ -153,9 +153,9 @@ async function carregarAluno() {
 	);
 
 	if (!response.ok) {
-		const erro = await response.text();
-		console.error("Erro ao carregar aluno:", erro);
-		alert("Erro ao carregar aluno.");
+		const mensagem = await obterMensagemErro(response, "Erro ao carregar aluno.");
+		console.error(mensagem);
+		mostrarErro(mensagem);
 		return;
 	}
 
@@ -182,6 +182,7 @@ async function carregarAluno() {
 			const idCurso = cursoEncontrado
 				? cursoEncontrado.id_curso || cursoEncontrado.id
 				: "";
+
 			const status = inscricao.status_matricula || "ATIVO";
 			const idInscricao = inscricao.id_inscricao || inscricao.id;
 
@@ -228,9 +229,9 @@ async function salvarAluno() {
 	});
 
 	if (!responseAluno.ok) {
-		const erro = await responseAluno.text();
-		console.error("Erro ao salvar aluno:", erro);
-		alert("Erro ao salvar aluno.");
+		const mensagem = await obterMensagemErro(responseAluno, "Erro ao salvar aluno.");
+		console.error(mensagem);
+		mostrarErro(mensagem);
 		return;
 	}
 
@@ -238,7 +239,7 @@ async function salvarAluno() {
 	const alunoId = id || alunoSalvo?.id;
 
 	if (!alunoId) {
-		alert("Aluno salvo, mas não foi possível identificar o ID.");
+		mostrarErro("Aluno salvo, mas não foi possível identificar o ID.");
 		return;
 	}
 
@@ -260,7 +261,7 @@ async function salvarAluno() {
 
 	for (const linha of linhas) {
 		if (cursosUnicos.has(linha.curso)) {
-			alert("Não é permitido repetir o mesmo curso para o aluno.");
+			mostrarErro("Não é permitido repetir o mesmo curso para o aluno.");
 			return;
 		}
 		cursosUnicos.add(linha.curso);
@@ -270,7 +271,7 @@ async function salvarAluno() {
 		const statusMatriculaId = mapearStatusParaId(linha.status);
 
 		if (!statusMatriculaId) {
-			alert("Selecione um status válido.");
+			mostrarErro("Selecione um status válido.");
 			return;
 		}
 
@@ -290,9 +291,12 @@ async function salvarAluno() {
 			);
 
 			if (!responsePatch.ok) {
-				const erro = await responsePatch.text();
-				console.error("Erro ao atualizar inscrição:", erro);
-				alert("Erro ao atualizar inscrição.");
+				const mensagem = await obterMensagemErro(
+					responsePatch,
+					"Erro ao atualizar inscrição.",
+				);
+				console.error(mensagem);
+				mostrarErro(mensagem);
 				return;
 			}
 		} else {
@@ -313,15 +317,18 @@ async function salvarAluno() {
 			);
 
 			if (!responsePost.ok) {
-				const erro = await responsePost.text();
-				console.error("Erro ao criar inscrição:", erro);
-				alert("Erro ao vincular curso ao aluno.");
+				const mensagem = await obterMensagemErro(
+					responsePost,
+					"Erro ao vincular curso ao aluno.",
+				);
+				console.error(mensagem);
+				mostrarErro(mensagem);
 				return;
 			}
 		}
 	}
 
-	alert("Aluno salvo com sucesso!");
+	mostrarSucesso("Aluno salvo com sucesso!");
 	window.location.href = "alunos.html";
 }
 
@@ -333,11 +340,8 @@ async function iniciarTelaAluno() {
 iniciarTelaAluno();
 
 function logout() {
-	// Limpar dados de sessão
 	localStorage.removeItem("access_token");
 	sessionStorage.clear();
-
-	// Redirecionar para a página de login
 	window.location.href = "login.html";
 }
 

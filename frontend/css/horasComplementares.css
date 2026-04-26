@@ -180,6 +180,36 @@ body {
   cursor: pointer;
 }
 
+.btn-cancelar-categoria {
+	background: #f3f4f6;
+	color: #1f2f5c;
+	border: 1px solid #d9dde7;
+	border-radius: 10px;
+	padding: 10px 18px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.btn-cancelar-categoria:hover {
+	background: #e7ebf3;
+}
+
+.btn-salvar-categoria {
+	background: #d98b12;
+	color: #fff;
+	border: none;
+	border-radius: 10px;
+	padding: 10px 18px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.btn-salvar-categoria:hover {
+	background: #bf7708;
+}
+
 
 
 /* ================= RESPONSIVO ================= */

@@ -6,6 +6,72 @@ const id = params.get("id");
 const API_BASE_URL = CONFIG.BASE_URL.replace(/\/$/, "");
 const token = localStorage.getItem("access_token");
 
+function formatarNomeCampo(campo) {
+	const nomes = {
+		nome: "Nome",
+		codigo: "Código",
+		carga_horaria_minima: "Carga horária mínima",
+		cargaHoraria: "Carga horária",
+		descricao: "Descrição",
+		status: "Status",
+	};
+
+	return (
+		nomes[campo] ||
+		campo
+			.replaceAll("_", " ")
+			.replace(/\b\w/g, (letra) => letra.toUpperCase())
+	);
+}
+
+async function extrairMensagemErro(response, mensagemPadrao) {
+	try {
+		const data = await response.json();
+
+		if (typeof data === "string") {
+			return data;
+		}
+
+		const mensagemDireta =
+			data.message ||
+			data.msg ||
+			data.erro ||
+			data.error ||
+			data.detail ||
+			data.details;
+
+		if (mensagemDireta) {
+			return mensagemDireta;
+		}
+
+		if (typeof data === "object" && data !== null) {
+			const mensagensPorCampo = Object.entries(data)
+				.map(([campo, mensagens]) => {
+					const nomeCampo = formatarNomeCampo(campo);
+
+					if (Array.isArray(mensagens)) {
+						return `${nomeCampo}: ${mensagens.join(" ")}`;
+					}
+
+					if (typeof mensagens === "object" && mensagens !== null) {
+						return `${nomeCampo}: ${Object.values(mensagens)
+							.flat()
+							.join(" ")}`;
+					}
+
+					return `${nomeCampo}: ${mensagens}`;
+				})
+				.join("\n");
+
+			return mensagensPorCampo || mensagemPadrao;
+		}
+
+		return mensagemPadrao;
+	} catch (error) {
+		return mensagemPadrao;
+	}
+}
+
 async function carregarCurso(id) {
 	try {
 		const response = await fetch(
@@ -19,7 +85,11 @@ async function carregarCurso(id) {
 		);
 
 		if (!response.ok) {
-			throw new Error("Erro ao carregar curso");
+			const mensagem = await extrairMensagemErro(
+				response,
+				"Erro ao carregar curso.",
+			);
+			throw new Error(mensagem);
 		}
 
 		const curso = await response.json();
@@ -44,7 +114,7 @@ async function carregarCurso(id) {
 		}
 	} catch (error) {
 		console.error("Erro ao carregar curso:", error);
-		alert("Erro ao carregar curso.");
+		alert(error.message || "Erro ao carregar curso.");
 	}
 }
 
@@ -88,26 +158,33 @@ form.addEventListener("submit", async function (event) {
 		});
 
 		if (response.ok) {
-			alert("Curso salvo com sucesso!");
+			const cursoSalvo = await response.json().catch(() => null);
+
+			alert(
+				cursoSalvo?.message ||
+					cursoSalvo?.msg ||
+					"Curso salvo com sucesso!",
+			);
+
 			window.location.href = "cursos.html";
 		} else {
-			const erro = await response.text();
-			console.error("Erro ao salvar curso:", erro);
-			alert("Erro ao salvar curso.");
+			const mensagem = await extrairMensagemErro(
+				response,
+				"Erro ao salvar curso.",
+			);
+
+			console.error("Erro ao salvar curso:", mensagem);
+			alert(mensagem);
 		}
 	} catch (error) {
 		console.error("Erro na requisição:", error);
-		alert("Erro de conexão com o servidor.");
+		alert(error.message || "Erro de conexão com o servidor.");
 	}
-}
-);
+});
 
 function logout() {
-	// Limpar dados de sessão
 	localStorage.removeItem("access_token");
 	sessionStorage.clear();
-
-	// Redirecionar para a página de login
 	window.location.href = "login.html";
 }
 

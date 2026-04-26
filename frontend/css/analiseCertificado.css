@@ -1,15 +1,20 @@
 .content {
-  margin-left: -200px;
+  padding: 32px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .analise-card {
-  display: flex;
-  flex-direction: column;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+  box-sizing: border-box;
 }
 
 .analise-layout {
   display: grid;
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: minmax(0, 1fr) 320px;
   gap: 24px;
   align-items: start;
 }
@@ -18,6 +23,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  min-width: 0;
 }
 
 .bloco-aluno h2,
@@ -49,7 +55,8 @@
 }
 
 .campo input,
-.campo textarea {
+.campo textarea,
+.campo select {
   border: 1px solid #d7d7d7;
   border-radius: 12px;
   padding: 12px 14px;
@@ -67,6 +74,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  min-width: 0;
 }
 
 .historico {
@@ -134,11 +142,6 @@
   gap: 10px;
 }
 
-.menu-icon {
-  width: 30px;
-  margin-top: 20px;
-}
-
 .arquivo-acoes button {
   background: none;
   border: none;
@@ -198,303 +201,74 @@
   color: white;
 }
 
-/* ===== RESPONSIVO ADICIONADO ===== */
-
-/* Tablet (1200px - 900px) */
-@media (max-width: 1200px) {
-  .content {
-    margin-left: -100px;
-  }
-  
-  .analise-layout {
-    gap: 20px;
-  }
-  
-  .grid-form {
-    gap: 15px;
-  }
-}
-
-/* Tablet pequeno (900px - 768px) */
 @media (max-width: 900px) {
   .content {
-    margin-left: 0;
-    padding: 15px;
+    padding: 16px;
   }
-  
+
+  .analise-card {
+    padding: 20px;
+  }
+
   .analise-layout {
     grid-template-columns: 1fr;
-    gap: 24px;
   }
-  
-  .coluna-direita {
-    order: 2;
-  }
-  
-  .coluna-esquerda {
-    order: 1;
-  }
-  
+
   .grid-form {
     grid-template-columns: 1fr;
-    gap: 15px;
   }
-  
+
   .historico {
     min-height: auto;
   }
-  
-  .arquivo-anexado {
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
-  }
-  
-  .arquivo-acoes {
-    width: 100%;
-    justify-content: flex-start;
-  }
-}
 
-/* Mobile (768px - 480px) */
-@media (max-width: 768px) {
-  .content {
-    margin-left: 0;
-    padding: 12px;
-  }
-  
-  .analise-card {
-    padding: 0;
-  }
-  
-  .analise-layout {
-    gap: 20px;
-  }
-  
-  .coluna-esquerda {
-    gap: 20px;
-  }
-  
-  .bloco-aluno h2,
-  .bloco-certificado h2,
-  .historico h3,
-  .anexo-box h3,
-  .ocr-box h3 {
-    font-size: 18px;
-    margin-bottom: 12px;
-  }
-  
-  .bloco-aluno p {
-    font-size: 14px;
-  }
-  
-  .campo label {
-    font-size: 13px;
-  }
-  
-  .campo input,
-  .campo textarea {
-    padding: 10px 12px;
-    font-size: 13px;
-  }
-  
-  .campo textarea {
-    min-height: 90px;
-  }
-  
-  .historico {
-    padding: 15px;
-  }
-  
-  .item-historico {
-    gap: 10px;
-  }
-  
-  .item-historico p {
-    font-size: 13px;
-  }
-  
-  .bolinha {
-    width: 8px;
-    height: 8px;
-    margin-top: 5px;
-  }
-  
-  .anexo-box,
-  .ocr-box {
-    margin-top: 20px;
-  }
-  
-  .arquivo-anexado {
-    padding: 12px;
-  }
-  
-  .arquivo-nome {
-    font-size: 13px;
-  }
-  
-  .arquivo-acoes button {
-    font-size: 16px;
-  }
-  
-  .tag-ocr {
-    font-size: 11px;
-    padding: 3px 8px;
-  }
-  
-  .ocr-conteudo {
-    padding: 12px;
-    font-size: 13px;
-  }
-  
-  .observacoes {
-    margin-top: 20px;
-  }
-  
   .acoes-final {
     flex-direction: column;
-    gap: 10px;
-    margin-top: 20px;
   }
-  
+
   .btn-correcao,
   .btn-reprovar,
   .btn-aprovar {
     width: 100%;
-    padding: 12px;
-    font-size: 14px;
-  }
-  
-  .menu-icon {
-    width: 25px;
-    margin-top: 15px;
   }
 }
 
-/* Mobile pequeno (480px - 320px) */
 @media (max-width: 480px) {
   .content {
     padding: 10px;
   }
-  
-  .analise-layout {
-    gap: 15px;
+
+  .analise-card {
+    padding: 14px;
   }
-  
-  .coluna-esquerda {
-    gap: 15px;
-  }
-  
+
   .bloco-aluno h2,
   .bloco-certificado h2,
   .historico h3,
   .anexo-box h3,
   .ocr-box h3 {
     font-size: 16px;
-    margin-bottom: 10px;
   }
-  
-  .bloco-aluno p {
-    font-size: 12px;
-    margin: 6px 0;
-  }
-  
-  .campo label {
-    font-size: 12px;
-  }
-  
+
   .campo input,
-  .campo textarea {
-    padding: 8px 10px;
-    font-size: 12px;
-    border-radius: 10px;
-  }
-  
-  .campo textarea {
-    min-height: 80px;
-  }
-  
-  .historico {
-    padding: 12px;
-  }
-  
-  .item-historico {
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-  
-  .item-historico p {
-    font-size: 12px;
-  }
-  
-  .bolinha {
-    width: 6px;
-    height: 6px;
-    margin-top: 4px;
-  }
-  
-  .arquivo-anexado {
+  .campo textarea,
+  .campo select {
     padding: 10px;
-  }
-  
-  .arquivo-nome {
     font-size: 12px;
   }
-  
-  .arquivo-acoes button {
-    font-size: 14px;
-  }
-  
+
   .tag-ocr {
-    font-size: 10px;
-    padding: 2px 6px;
-  }
-  
-  .ocr-conteudo {
-    padding: 10px;
-    font-size: 12px;
-  }
-  
-  .btn-correcao,
-  .btn-reprovar,
-  .btn-aprovar {
-    padding: 10px;
-    font-size: 13px;
-    border-radius: 10px;
-  }
-  
-  .menu-icon {
-    width: 22px;
-    margin-top: 12px;
+    display: inline-block;
+    margin-left: 0;
+    margin-top: 6px;
   }
 }
 
-/* Landscape (orientação horizontal em mobile) */
-@media (max-width: 900px) and (orientation: landscape) {
-  .analise-layout {
-    grid-template-columns: 1fr 1fr;
-  }
-  
-  .coluna-direita {
-    order: 1;
-  }
-  
-  .coluna-esquerda {
-    order: 2;
-  }
-  
-  .historico {
-    max-height: 400px;
-    overflow-y: auto;
-  }
-  
-  .acoes-final {
-    flex-direction: row;
-  }
-  
-  .btn-correcao,
-  .btn-reprovar,
-  .btn-aprovar {
-    width: auto;
-  }
+.obrigatorio {
+  color: red;
+  font-weight: bold;
+}
+
+#cargaAprovada {
+  width: 100%;
 }

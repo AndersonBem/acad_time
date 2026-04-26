@@ -14,6 +14,175 @@ function normalizarTexto(texto) {
 		.toLowerCase();
 }
 
+function obterIdTipoAtividade(tipo) {
+	return tipo.id || tipo.id_tipo_atividade || tipo.tipo_atividade;
+}
+
+function obterNomeTipoAtividade(tipo) {
+	return tipo.nome || tipo.tipo_atividade_nome || tipo.titulo || "";
+}
+
+function obterDescricaoTipoAtividade(tipo) {
+	return tipo.descricao || tipo.descrição || tipo.descricao_tipo || "";
+}
+
+function encontrarLinhaPorTipo(tipoNome) {
+	return Array.from(document.querySelectorAll(".linha-regra")).find(
+		(linha) => normalizarTexto(linha.dataset.tipo) === normalizarTexto(tipoNome),
+	);
+}
+
+function criarLinhaRegra(tipo) {
+	const nome = obterNomeTipoAtividade(tipo);
+	const descricao = obterDescricaoTipoAtividade(tipo);
+
+	if (!nome || encontrarLinhaPorTipo(nome)) return;
+
+	const div = document.createElement("div");
+	div.className = "linha-regra";
+	div.dataset.tipo = nome;
+
+	div.innerHTML = `
+		<div class="categoria">
+			<strong>${nome}</strong>
+			<p>${descricao || "Sem descrição"}</p>
+		</div>
+
+		<div class="limite">
+			<div class="input-com-texto">
+				<input type="number" value="0">
+				<span>Horas</span>
+			</div>
+		</div>
+
+		<div class="regra">
+			<textarea></textarea>
+		</div>
+
+		<div class="comprovante">
+			<label class="switch">
+				<input type="checkbox" class="chk-comprovante">
+				<span class="slider"></span>
+			</label>
+		</div>
+
+		<div class="status">
+			<label class="switch">
+				<input type="checkbox">
+				<span class="slider"></span>
+			</label>
+		</div>
+	`;
+
+	const acoesHoras = document.querySelector(".acoes-horas");
+	acoesHoras.parentNode.insertBefore(div, acoesHoras);
+
+	const inputLimite = div.querySelector(".limite input");
+	const checkboxStatus = div.querySelector('.status input[type="checkbox"]');
+
+	inputLimite.addEventListener("input", validarSomaHoras);
+	checkboxStatus.addEventListener("change", validarSomaHoras);
+}
+
+function renderizarTiposAtividade() {
+	tiposAtividadeCarregados.forEach((tipo) => {
+		criarLinhaRegra(tipo);
+	});
+}
+
+function abrirModalCategoria() {
+	if (document.getElementById("modalCategoria")) {
+		document.getElementById("modalCategoria").style.display = "flex";
+		return;
+	}
+
+	const modal = document.createElement("div");
+	modal.id = "modalCategoria";
+	modal.style.position = "fixed";
+	modal.style.top = "0";
+	modal.style.left = "0";
+	modal.style.width = "100%";
+	modal.style.height = "100%";
+	modal.style.background = "rgba(0, 0, 0, 0.45)";
+	modal.style.display = "flex";
+	modal.style.justifyContent = "center";
+	modal.style.alignItems = "center";
+	modal.style.zIndex = "9999";
+
+	modal.innerHTML = `
+		<div style="background:#fff; width:100%; max-width:480px; border-radius:12px; padding:24px; box-shadow:0 4px 20px rgba(0,0,0,0.2);">
+			<h2 style="margin-bottom:18px; color:#123b7a;">Nova Categoria de Atividade</h2>
+
+			<div class="campo">
+				<label for="nomeCategoria">Nome da categoria</label>
+				<input type="text" id="nomeCategoria" placeholder="Ex: Projeto de extensão">
+			</div>
+
+			<div class="campo">
+				<label for="descricaoCategoria">Descrição</label>
+				<textarea id="descricaoCategoria" placeholder="Ex: Atividades de extensão universitária"></textarea>
+			</div>
+			<div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px;">
+				<button type="button" id="btnCancelarCategoria" class="btn-cancelar-categoria" onclick="fecharModalCategoria()">Cancelar</button>
+				<button type="button" id="btnSalvarCategoria" class="btn-salvar-categoria" onclick="salvarNovaCategoria()">Salvar</button>
+			</div>
+		</div>
+	`;
+
+	document.body.appendChild(modal);
+}
+
+function fecharModalCategoria() {
+	const modal = document.getElementById("modalCategoria");
+	if (modal) modal.style.display = "none";
+}
+
+async function salvarNovaCategoria() {
+	const nome = document.getElementById("nomeCategoria").value.trim();
+	const descricao = document.getElementById("descricaoCategoria").value.trim();
+
+	if (!nome) {
+		alert("Informe o nome da categoria.");
+		return;
+	}
+
+	const payload = {
+		nome,
+		descricao,
+	};
+
+	try {
+		const response = await fetch(`${API_BASE_URL}${CONFIG.ENDPOINTS.tipoAtividade}`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify(payload),
+		});
+
+		if (!response.ok) {
+			const erro = await response.text();
+			console.error("Erro ao cadastrar categoria:", erro);
+			alert("Erro ao cadastrar categoria.");
+			return;
+		}
+
+		await carregarTiposAtividade();
+		renderizarTiposAtividade();
+		preencherCamposRegras();
+
+		document.getElementById("nomeCategoria").value = "";
+		document.getElementById("descricaoCategoria").value = "";
+		fecharModalCategoria();
+
+		alert("Categoria cadastrada com sucesso!");
+	} catch (error) {
+		console.error("Erro ao cadastrar categoria:", error);
+		alert("Erro ao conectar com o servidor.");
+	}
+}
+
 async function carregarCursos() {
 	const selectCurso = document.getElementById("curso");
 
@@ -132,9 +301,7 @@ function preencherCamposRegras() {
 
 	regrasCurso.forEach((regra) => {
 		const tipoNome = (regra.tipo_atividade_nome || "").trim();
-		const linha = document.querySelector(
-			`.linha-regra[data-tipo="${tipoNome}"]`,
-		);
+		const linha = encontrarLinhaPorTipo(tipoNome);
 
 		if (!linha) return;
 
@@ -286,9 +453,7 @@ async function salvarRegras() {
 			}
 		} else {
 			const tipoBase = tiposAtividadeCarregados.find(
-				(tipo) =>
-					normalizarTexto(tipo.nome || tipo.tipo_atividade_nome) ===
-					normalizarTexto(tipoNome),
+				(tipo) => normalizarTexto(obterNomeTipoAtividade(tipo)) === normalizarTexto(tipoNome),
 			);
 
 			if (!tipoBase) {
@@ -300,7 +465,7 @@ async function salvarRegras() {
 			const payload = obterPayloadLinha(
 				linha,
 				cursoId,
-				tipoBase.id || tipoBase.tipo_atividade || tipoBase.id_tipo_atividade,
+				obterIdTipoAtividade(tipoBase),
 			);
 
 			const response = await fetch(
@@ -342,6 +507,7 @@ document
 async function iniciarTelaHorasComplementares() {
 	await carregarCursos();
 	await carregarTiposAtividade();
+	renderizarTiposAtividade();
 	await carregarRegras();
 	configurarValidacaoHoras();
 }
@@ -349,11 +515,8 @@ async function iniciarTelaHorasComplementares() {
 iniciarTelaHorasComplementares();
 
 function logout() {
-	// Limpar dados de sessão
 	localStorage.removeItem("access_token");
 	sessionStorage.clear();
-
-	// Redirecionar para a página de login
 	window.location.href = "login.html";
 }
 

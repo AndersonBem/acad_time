@@ -4,6 +4,74 @@ const token = localStorage.getItem("access_token");
 
 let cursosDisponiveis = [];
 
+function formatarNomeCampo(campo) {
+	const nomes = {
+		nome: "Nome",
+		email: "E-mail",
+		senha: "Senha",
+		status: "Status",
+		curso: "Curso",
+		coordenador: "Coordenador",
+		data_inicio: "Data de início",
+		data_fim: "Data de fim",
+	};
+
+	return (
+		nomes[campo] ||
+		campo
+			.replaceAll("_", " ")
+			.replace(/\b\w/g, (letra) => letra.toUpperCase())
+	);
+}
+
+async function extrairMensagemErro(response, mensagemPadrao) {
+	try {
+		const data = await response.json();
+
+		if (typeof data === "string") {
+			return data;
+		}
+
+		const mensagemDireta =
+			data.message ||
+			data.msg ||
+			data.erro ||
+			data.error ||
+			data.detail ||
+			data.details;
+
+		if (mensagemDireta) {
+			return mensagemDireta;
+		}
+
+		if (typeof data === "object" && data !== null) {
+			const mensagensPorCampo = Object.entries(data)
+				.map(([campo, mensagens]) => {
+					const nomeCampo = formatarNomeCampo(campo);
+
+					if (Array.isArray(mensagens)) {
+						return `${nomeCampo}: ${mensagens.join(" ")}`;
+					}
+
+					if (typeof mensagens === "object" && mensagens !== null) {
+						return `${nomeCampo}: ${Object.values(mensagens)
+							.flat()
+							.join(" ")}`;
+					}
+
+					return `${nomeCampo}: ${mensagens}`;
+				})
+				.join("\n");
+
+			return mensagensPorCampo || mensagemPadrao;
+		}
+
+		return mensagemPadrao;
+	} catch (error) {
+		return mensagemPadrao;
+	}
+}
+
 function getCoordenadorId() {
 	const params = new URLSearchParams(window.location.search);
 	return params.get("id");
@@ -11,6 +79,15 @@ function getCoordenadorId() {
 
 function hojeISO() {
 	return new Date().toISOString().split("T")[0];
+}
+
+function formatarDataBR(data) {
+	if (!data) return "-";
+
+	const partes = String(data).split("-");
+	if (partes.length !== 3) return data;
+
+	return `${partes[2]}/${partes[1]}/${partes[0]}`;
 }
 
 function obterIdCurso(valor) {
@@ -31,6 +108,27 @@ function obterIdCurso(valor) {
 		: null;
 }
 
+function obterNomeCurso(vinculo) {
+	const idCurso = obterIdCurso(
+		vinculo.curso ||
+			vinculo.curso_id ||
+			vinculo.id_curso ||
+			vinculo.cursoId ||
+			vinculo.nome_curso,
+	);
+
+	const curso = cursosDisponiveis.find(
+		(curso) => Number(curso.id_curso || curso.id) === Number(idCurso),
+	);
+
+	return (
+		vinculo.nome_curso ||
+		vinculo.curso_nome ||
+		curso?.nome ||
+		"Curso não identificado"
+	);
+}
+
 function obterIdVinculo(vinculo) {
 	return (
 		vinculo.id_coordenacao_curso ||
@@ -40,6 +138,41 @@ function obterIdVinculo(vinculo) {
 		vinculo.pk ||
 		null
 	);
+}
+
+function criarLinhaHistoricoCurso(vinculo) {
+	const div = document.createElement("div");
+	div.className = "linha-historico-curso";
+
+	div.innerHTML = `
+		<div>${obterNomeCurso(vinculo)}</div>
+		<div>${formatarDataBR(vinculo.data_inicio)}</div>
+		<div>${formatarDataBR(vinculo.data_fim)}</div>
+		<div><span class="status-curso-inativo">Inativo</span></div>
+	`;
+
+	return div;
+}
+
+function renderizarHistoricoCursos(vinculosInativos) {
+	const historicoContainer = document.getElementById(
+		"historico-cursos-coordenador",
+	);
+
+	if (!historicoContainer) return;
+
+	historicoContainer.innerHTML = "";
+
+	if (!Array.isArray(vinculosInativos) || vinculosInativos.length === 0) {
+		historicoContainer.innerHTML = `
+			<p class="texto-sem-historico">Nenhum curso inativo no histórico.</p>
+		`;
+		return;
+	}
+
+	vinculosInativos.forEach((vinculo) => {
+		historicoContainer.appendChild(criarLinhaHistoricoCurso(vinculo));
+	});
 }
 
 function criarLinhaCurso(
@@ -121,9 +254,12 @@ async function carregarCursos() {
 	});
 
 	if (!response.ok) {
-		const erro = await response.text();
-		console.error("Erro ao carregar cursos:", erro);
-		alert("Erro ao carregar cursos.");
+		const mensagem = await extrairMensagemErro(
+			response,
+			"Erro ao carregar cursos.",
+		);
+		console.error("Erro ao carregar cursos:", mensagem);
+		alert(mensagem);
 		return;
 	}
 
@@ -154,9 +290,12 @@ async function carregarCoordenador() {
 	);
 
 	if (!response.ok) {
-		const erro = await response.text();
-		console.error("Erro ao carregar coordenador:", erro);
-		alert("Erro ao carregar coordenador.");
+		const mensagem = await extrairMensagemErro(
+			response,
+			"Erro ao carregar coordenador.",
+		);
+		console.error("Erro ao carregar coordenador:", mensagem);
+		alert(mensagem);
 		return;
 	}
 
@@ -180,6 +319,9 @@ async function carregarCoordenador() {
 
 	const vinculos = await buscarVinculosCoordenador(id);
 	const vinculosAtivos = vinculos.filter((vinculo) => !vinculo.data_fim);
+	const vinculosInativos = vinculos.filter((vinculo) => vinculo.data_fim);
+
+	renderizarHistoricoCursos(vinculosInativos);
 
 	if (Array.isArray(vinculosAtivos) && vinculosAtivos.length > 0) {
 		vinculosAtivos.forEach((vinculo, index) => {
@@ -220,8 +362,12 @@ async function buscarVinculosCoordenador(coordenadorId) {
 	);
 
 	if (!response.ok) {
-		const erro = await response.text();
-		console.error("Erro ao buscar vínculos do coordenador:", erro);
+		const mensagem = await extrairMensagemErro(
+			response,
+			"Erro ao buscar vínculos do coordenador.",
+		);
+		console.error("Erro ao buscar vínculos do coordenador:", mensagem);
+		alert(mensagem);
 		return [];
 	}
 
@@ -254,8 +400,12 @@ async function encerrarVinculo(vinculoId, dataFim) {
 	);
 
 	if (!response.ok) {
-		const erro = await response.text();
-		console.error("Erro ao encerrar vínculo de curso:", erro);
+		const mensagem = await extrairMensagemErro(
+			response,
+			"Erro ao encerrar vínculo de curso.",
+		);
+		console.error("Erro ao encerrar vínculo de curso:", mensagem);
+		alert(mensagem);
 		return false;
 	}
 
@@ -279,8 +429,12 @@ async function criarVinculo(coordenadorId, cursoId) {
 	);
 
 	if (!response.ok) {
-		const erro = await response.text();
-		console.error("Erro ao salvar vínculo coordenador-curso:", erro);
+		const mensagem = await extrairMensagemErro(
+			response,
+			"Erro ao salvar vínculo coordenador-curso.",
+		);
+		console.error("Erro ao salvar vínculo coordenador-curso:", mensagem);
+		alert(mensagem);
 		return false;
 	}
 
@@ -331,7 +485,6 @@ async function salvarVinculosCursos(coordenadorId) {
 		if (!linhaCorrespondente) {
 			const sucesso = await encerrarVinculo(idVinculo, hojeISO());
 			if (!sucesso) {
-				alert("Erro ao atualizar cursos do coordenador.");
 				return false;
 			}
 			continue;
@@ -343,7 +496,6 @@ async function salvarVinculosCursos(coordenadorId) {
 				linhaCorrespondente.dataFim,
 			);
 			if (!sucesso) {
-				alert("Erro ao atualizar cursos do coordenador.");
 				return false;
 			}
 		}
@@ -368,7 +520,6 @@ async function salvarVinculosCursos(coordenadorId) {
 	for (const cursoId of cursosNovos) {
 		const sucesso = await criarVinculo(coordenadorId, cursoId);
 		if (!sucesso) {
-			alert("Erro ao atualizar cursos do coordenador.");
 			return false;
 		}
 	}
@@ -413,9 +564,12 @@ async function salvarCoordenador() {
 		});
 
 		if (!response.ok) {
-			const erro = await response.text();
-			console.error("Erro ao salvar coordenador:", erro);
-			alert("Erro ao salvar coordenador.");
+			const mensagem = await extrairMensagemErro(
+				response,
+				"Erro ao salvar coordenador.",
+			);
+			console.error("Erro ao salvar coordenador:", mensagem);
+			alert(mensagem);
 			return;
 		}
 
@@ -436,11 +590,16 @@ async function salvarCoordenador() {
 			return;
 		}
 
-		alert("Coordenador salvo com sucesso!");
+		alert(
+			coordenadorSalvo?.message ||
+				coordenadorSalvo?.msg ||
+				"Coordenador salvo com sucesso!",
+		);
+
 		window.location.href = "coordenadores.html";
 	} catch (error) {
 		console.error("Erro ao salvar coordenador:", error);
-		alert("Erro ao salvar coordenador.");
+		alert(error.message || "Erro ao salvar coordenador.");
 	}
 }
 
@@ -452,11 +611,8 @@ async function iniciarTelaCoordenador() {
 iniciarTelaCoordenador();
 
 function logout() {
-	// Limpar dados de sessão
 	localStorage.removeItem("access_token");
 	sessionStorage.clear();
-
-	// Redirecionar para a página de login
 	window.location.href = "login.html";
 }
 

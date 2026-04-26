@@ -2,13 +2,41 @@ protegerPagina();
 const token = localStorage.getItem("access_token");
 const API_BASE_URL = CONFIG.BASE_URL.replace(/\/$/, "");
 
-async function listarCoordenadores() {
-	const container = document.getElementById("lista-coordenadores");
-	const busca = document.getElementById("buscar").value.toLowerCase().trim();
+function obterIdCoordenador(coordenador) {
+	return (
+		coordenador.id ||
+		coordenador.id_coordenador ||
+		coordenador.idCoordenador
+	);
+}
 
+function obterIdCoordenadorVinculo(vinculo) {
+	return (
+		vinculo.coordenador ||
+		vinculo.coordenador_id ||
+		vinculo.id_coordenador ||
+		vinculo.coordenadorId
+	);
+}
+
+function obterNomeCursoVinculo(vinculo) {
+	if (typeof vinculo.curso === "object" && vinculo.curso !== null) {
+		return vinculo.curso.nome || vinculo.curso.name || "-";
+	}
+
+	return (
+		vinculo.nome_curso ||
+		vinculo.curso_nome ||
+		vinculo.nome ||
+		vinculo.curso ||
+		"-"
+	);
+}
+
+async function buscarVinculosCoordenacaoCurso() {
 	try {
 		const response = await fetch(
-			`${API_BASE_URL}${CONFIG.ENDPOINTS.coordenadores}`,
+			`${API_BASE_URL}${CONFIG.ENDPOINTS.coordenacaoCurso}`,
 			{
 				method: "GET",
 				headers: {
@@ -18,7 +46,32 @@ async function listarCoordenadores() {
 			},
 		);
 
-		const coordenadores = await response.json();
+		if (!response.ok) return [];
+
+		return await response.json();
+	} catch (error) {
+		return [];
+	}
+}
+
+async function listarCoordenadores() {
+	const container = document.getElementById("lista-coordenadores");
+	const busca = document.getElementById("buscar").value.toLowerCase().trim();
+
+	try {
+		const [responseCoordenadores, vinculos] = await Promise.all([
+			fetch(`${API_BASE_URL}${CONFIG.ENDPOINTS.coordenadores}`, {
+				method: "GET",
+				headers: {
+					Authorization: `Bearer ${token}`,
+					"Content-Type": "application/json",
+				},
+			}),
+			buscarVinculosCoordenacaoCurso(),
+		]);
+
+		const coordenadores = await responseCoordenadores.json();
+
 		coordenadores.sort((a, b) =>
 			(a.nome || "").localeCompare(b.nome || "", "pt-BR"),
 		);
@@ -26,10 +79,7 @@ async function listarCoordenadores() {
 		const idsUsados = new Set();
 
 		const coordenadoresFiltrados = coordenadores.filter((coordenador) => {
-			const id =
-				coordenador.id ||
-				coordenador.id_coordenador ||
-				coordenador.idCoordenador;
+			const id = obterIdCoordenador(coordenador);
 
 			if (idsUsados.has(id)) return false;
 
@@ -45,47 +95,51 @@ async function listarCoordenadores() {
 
 		if (coordenadoresFiltrados.length === 0) {
 			container.innerHTML = `
-                <tr>
-                    <td colspan="5">Nenhum coordenador encontrado.</td>
-                </tr>
-            `;
+				<tr>
+					<td colspan="5">Nenhum coordenador encontrado.</td>
+				</tr>
+			`;
 			return;
 		}
 
 		coordenadoresFiltrados.forEach((coordenador) => {
 			const tr = document.createElement("tr");
-
-			const coordenadorId =
-				coordenador.id ||
-				coordenador.id_coordenador ||
-				coordenador.idCoordenador;
-
+			const coordenadorId = obterIdCoordenador(coordenador);
 			const statusTexto = coordenador.status ? "Ativo" : "Inativo";
 
-			const cursoTexto =
-				Array.isArray(coordenador.cursos) && coordenador.cursos.length
-					? coordenador.cursos.map((item) => item.curso).join(", ")
-					: "-";
+			const cursosAtivos = vinculos.filter((vinculo) => {
+				const idCoordenadorVinculo = obterIdCoordenadorVinculo(vinculo);
+
+				return (
+					Number(idCoordenadorVinculo) === Number(coordenadorId) &&
+					!vinculo.data_fim &&
+					!vinculo.dataFim
+				);
+			});
+
+			const cursoTexto = cursosAtivos.length
+				? cursosAtivos.map((vinculo) => obterNomeCursoVinculo(vinculo)).join(", ")
+				: "-";
 
 			tr.innerHTML = `
-                <td>${coordenador.nome || "-"}</td>
-                <td>${coordenador.email || "-"}</td>
-                <td>${cursoTexto}</td>
-                <td>${statusTexto}</td>
-                <td>
-                    <button class="btn-editar" onclick="editarCoordenador(${coordenadorId})">Editar</button>
-                    <button class="btn-excluir" onclick="excluirCoordenador(${coordenadorId})">Excluir</button>
-                </td>
-            `;
+				<td>${coordenador.nome || "-"}</td>
+				<td>${coordenador.email || "-"}</td>
+				<td>${cursoTexto}</td>
+				<td>${statusTexto}</td>
+				<td>
+					<button class="btn-editar" onclick="editarCoordenador(${coordenadorId})">Editar</button>
+					<button class="btn-excluir" onclick="excluirCoordenador(${coordenadorId})">Excluir</button>
+				</td>
+			`;
 
 			container.appendChild(tr);
 		});
 	} catch (error) {
 		container.innerHTML = `
-            <tr>
-                <td colspan="5">Erro ao carregar coordenadores.</td>
-            </tr>
-        `;
+			<tr>
+				<td colspan="5">Erro ao carregar coordenadores.</td>
+			</tr>
+		`;
 	}
 }
 
@@ -120,18 +174,13 @@ async function excluirCoordenador(id) {
 	}
 }
 
-document
-	.getElementById("buscar")
-	.addEventListener("input", listarCoordenadores);
+document.getElementById("buscar").addEventListener("input", listarCoordenadores);
 
 listarCoordenadores();
 
 function logout() {
-	// Limpar dados de sessão
 	localStorage.removeItem("access_token");
 	sessionStorage.clear();
-
-	// Redirecionar para a página de login
 	window.location.href = "login.html";
 }
 

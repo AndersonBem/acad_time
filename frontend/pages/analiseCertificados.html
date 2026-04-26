@@ -3,7 +3,6 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title>Análise de Certificados</title>
 
@@ -22,55 +21,13 @@
 
       <aside class="sidebar">
         <ul>
-          <li>
-            <a href="dashboard.html">
-              <img src="../assets/img/Graph.png" class="menu-icon">
-              <span>Dashboard</span>
-            </a>
-          </li>
-
-          <li>
-            <a href="cursos.html">
-              <img src="../assets/img/Graduation Cap (1).png" class="menu-icon">
-              <span>Cursos</span>
-            </a>
-          </li>
-
-          <li>
-            <a href="coordenadores.html">
-              <img src="../assets/img/People.png" class="menu-icon">
-              <span>Coordenadores</span>
-            </a>
-          </li>
-
-          <li>
-            <a href="alunos.html">
-              <img src="../assets/img/People.png" class="menu-icon">
-              <span>Alunos</span>
-            </a>
-          </li>
-
-          <li>
-            <a href="horasComplementares.html">
-              <img src="../assets/img/Rollback.png" class="menu-icon">
-              <span>Horas Complementares</span>
-            </a>
-          </li>
-
-          <li>
-            <a href="listarCertificados.html">
-              <img src="../assets/img/Diploma.png" class="menu-icon">
-              <span>Análise de Certificados</span>
-            </a>
-          </li>
-          <li>
-              <a href="auditoria.html">
-                  <img src="../assets/img/Gear.png" class="menu-icon">
-                  <span>Auditoria</span>
-              </a>
-          </li>
-          
-        </ul>
+          <li><a href="dashboard.html"><img src="../assets/img/Graph.png" class="menu-icon"><span>Dashboard</span></a></li>
+          <li><a href="cursos.html"><img src="../assets/img/Graduation Cap (1).png" class="menu-icon"><span>Cursos</span></a></li>
+          <li><a href="coordenadores.html"><img src="../assets/img/People.png" class="menu-icon"><span>Coordenadores</span></a></li>
+          <li><a href="alunos.html"><img src="../assets/img/People.png" class="menu-icon"><span>Alunos</span></a></li>
+          <li><a href="horasComplementares.html"><img src="../assets/img/Rollback.png" class="menu-icon"><span>Horas Complementares</span></a></li>
+          <li><a href="listarCertificados.html"><img src="../assets/img/Diploma.png" class="menu-icon"><span>Análise de Certificados</span></a></li>
+          <li><a href="auditoria.html"><img src="../assets/img/Gear.png" class="menu-icon"><span>Auditoria</span></a></li>
         </ul>
 
         <button class="btn-logout" onclick="logout()">
@@ -81,7 +38,8 @@
     </div>
 
     <main class="content">
-       <button class="menu-menu" onclick="toggleMenu()">☰</button>
+      <button class="menu-menu" onclick="toggleMenu()">☰</button>
+
       <div class="card analise-card">
         <div class="analise-layout">
 
@@ -97,6 +55,8 @@
 
             <section class="bloco-certificado">
               <h2>Dados da atividade complementar</h2>
+
+              <div class="campo">
 
               <div class="grid-form">
                 <div class="campo">
@@ -118,6 +78,15 @@
                   <label for="atividadeId">ID da atividade complementar</label>
                   <input type="text" id="atividadeId" readonly>
                 </div>
+
+                <div class="campo">
+                  <label for="cargaAprovada">
+                  Carga horária aprovada
+                  <span class="obrigatorio">*</span>
+                  </label>
+                <input type="number" id="cargaAprovada" min="0">
+                </div>
+                 
               </div>
 
               <div class="anexo-box">
@@ -144,13 +113,6 @@
                 </div>
               </div>
 
-              <div class="campo">
-                <label for="novoStatus">Novo status da submissão</label>
-                <select id="novoStatus">
-                  <option value="">Selecione um status</option>
-                </select>
-              </div>
-
               <div class="campo observacoes">
                 <label for="observacoes">Observação da análise</label>
                 <textarea id="observacoes" placeholder="Digite aqui a observação da análise"></textarea>
@@ -173,7 +135,6 @@
             </div>
 
             <div class="acoes-final">
-              <button type="button" class="btn-correcao" id="btnSolicitarCorrecao">Solicitar correção</button>
               <button type="button" class="btn-reprovar" id="btnReprovar">Reprovar</button>
               <button type="button" class="btn-aprovar" id="btnAprovar">Aprovar</button>
             </div>
@@ -186,7 +147,7 @@
 
   <script src="../js/config.js"></script>
   <script src="../js/utils.js"></script>
-  <script src="../js/analiseCertificado.js"></script>
+  <script src="../js/analiseCertificados.js"></script>
 </body>
 
 </html>
