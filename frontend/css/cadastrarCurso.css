@@ -147,6 +147,8 @@ textarea {
   margin-left: 90%;
 }
 
+
+
 .linha-curso {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 50px;
@@ -296,4 +298,74 @@ textarea {
 .btn-remover-curso {
   background: #d9534f;
   color: white;
+}
+
+.historico-cursos-box {
+	margin-top: 28px;
+}
+
+.cabecalho-historico-cursos,
+.linha-historico-curso {
+	display: grid;
+	grid-template-columns: 2fr 1fr 1fr 1fr;
+	gap: 12px;
+	align-items: center;
+}
+
+.cabecalho-historico-cursos {
+	font-weight: 700;
+	font-size: 14px;
+	color: #444;
+	padding: 10px 12px;
+	background: #f5f5f5;
+	border-radius: 8px;
+	margin-bottom: 10px;
+}
+
+.linha-historico-curso {
+	padding: 10px 12px;
+	border-bottom: 1px solid #ececec;
+	font-size: 14px;
+}
+
+.linha-historico-curso:last-child {
+	border-bottom: none;
+}
+
+.status-curso-inativo {
+	display: inline-block;
+	padding: 6px 10px;
+	border-radius: 8px;
+	background: #f8d7da;
+	color: #721c24;
+	font-weight: 600;
+	font-size: 13px;
+	text-align: center;
+	min-width: 80px;
+}
+
+.texto-sem-historico {
+	color: #777;
+	font-size: 14px;
+	padding: 10px 0;
+}
+
+
+@media (max-width: 768px) {
+	.cabecalho-historico-cursos,
+	.linha-historico-curso {
+		grid-template-columns: 1fr;
+		gap: 6px;
+	}
+
+	.cabecalho-historico-cursos {
+		display: none;
+	}
+
+	.linha-historico-curso {
+		background: #f9f9f9;
+		border-radius: 10px;
+		padding: 12px;
+		margin-bottom: 10px;
+	}
 }

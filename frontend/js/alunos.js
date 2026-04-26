@@ -101,7 +101,7 @@ async function listarAlunos() {
                 <td>${statusTexto}</td>
                 <td>${cursosTexto}</td>
                 <td>
-                    <button onclick="editarAluno(${aluno.id})">Editar</button>
+                    <button class="btn-editar" onclick="editarAluno(${aluno.id})">Editar</button>
                 </td>
             `;
 
