@@ -8,10 +8,6 @@ body {
 
 /* CONTEÚDO */
 .content {
-  position: relative;
-  top: 100px;
-  left: 0;
-  right: 0;
   width: 90%;
   padding: 20px;
   overflow-y: auto;
@@ -210,6 +206,28 @@ body {
 	background: #bf7708;
 }
 
+.topo-horas {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.topo-horas .campo {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.btn-nova-categoria {
+  background: #ff9800;
+  color: #fff;
+  border: none;
+  padding: 11px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  white-space: nowrap;
+}
 
 
 /* ================= RESPONSIVO ================= */
@@ -220,43 +238,104 @@ body {
     padding: 15px;
   }
 
-  .sidebar .btn-logout {
-    margin-top: 20px;
-  }
+
 }
 
 /* MOBILE */
 @media (max-width: 768px) {
+  .page-header {
+    display: grid;
+    grid-template-columns: 42px 1fr;
+    align-items: start;
+    gap: 14px;
+  }
 
-  .campo-inline {
+  .page-title h1 {
+    font-size: 30px;
+    line-height: 1.05;
+    word-break: normal;
+  }
+
+  .page-title p {
+    font-size: 14px;
+    line-height: 1.2;
+  }
+
+  .card-horas {
+    padding: 18px;
+  }
+  .topo-horas {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .cabecalho-regras,
+  .btn-nova-categoria {
+    width: 100%;
+  }
+  .cabecalho-regras {
+    display: none;
+  }
+
   .linha-regra {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 18px 0;
   }
 
-  .input-com-texto {
+  .limite,
+  .regra,
+  .comprovante,
+  .status {
+    justify-content: flex-start;
+  }
+
+  .limite::before {
+    content: "Limite de horas";
+    font-weight: 700;
+    color: #1f2f5c;
+  }
+
+  .regra::before {
+    content: "Regra específica";
+    font-weight: 700;
+    color: #1f2f5c;
+  }
+
+  .comprovante::before {
+    content: "Exige comprovante";
+    font-weight: 700;
+    color: #1f2f5c;
+    margin-right: 12px;
+  }
+
+  .status::before {
+    content: "Status";
+    font-weight: 700;
+    color: #1f2f5c;
+    margin-right: 12px;
+  }
+
+  .limite .input-com-texto {
+    max-width: 180px;
+  }
+
+  .regra textarea {
     width: 100%;
+    min-height: 80px;
   }
 
-  .input-com-texto input {
-    width: 100%;
+  .card-horas {
+    overflow: visible;
+  }
+}
+@media (max-width: 420px) {
+  .page-title h1 {
+    font-size: 26px;
   }
 
-  .acoes-horas {
-    justify-content: center;
-  }
-
-  .btn-salvar-alt {
-    width: 100%;
-  }
-
-  .menu-icon {
-    width: 24px;
-    margin-top: 10px;
+  .page-header {
+    grid-template-columns: 36px 1fr;
+    gap: 10px;
   }
 }

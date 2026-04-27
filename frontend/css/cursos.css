@@ -28,10 +28,7 @@ select {
   cursor: pointer;
 }
 
-.menu-icon {
-  width: 30px;
-  margin-top: 20px;
-}
+
 
 .menu-toggle {
   background: orange;
@@ -162,11 +159,7 @@ td {
     padding: 8px 12px;
     font-size: 14px;
   }
-  
-  .menu-icon {
-    width: 25px;
-    margin-top: 15px;
-  }
+
   
   table {
     display: block;
@@ -226,10 +219,7 @@ td {
     font-size: 12px;
   }
   
-  .menu-icon {
-    width: 22px;
-    margin-top: 12px;
-  }
+
   
   th, td {
     padding: 6px;
