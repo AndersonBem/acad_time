@@ -186,9 +186,9 @@ function preencherDadosAtividade() {
 function preencherArquivo() {
 	const nomeArquivo = document.getElementById("arquivoNome");
 
-	if (submissaoAtual?.certificado) {
+	if (submissaoAtual?.certificado_url) {
 		nomeArquivo.textContent =
-			`Certificado #${submissaoAtual.certificado}`;
+			submissaoAtual.certificado_nome || `Certificado #${submissaoAtual.certificado}`;
 	} else {
 		nomeArquivo.textContent = "Nenhum arquivo";
 	}
@@ -375,11 +375,45 @@ function configurarBotoes() {
 		salvarAnaliseComStatus("REPROVADA");
 
 	btnVisualizarArquivo.onclick = () => {
-		alert("Visualização depende do backend.");
+		if (!submissaoAtual?.certificado_url) {
+			alert("Nenhum arquivo disponível para visualização.");
+			return;
+		}
+
+		window.open(submissaoAtual.certificado_url, "_blank");
 	};
 
-	btnBaixarArquivo.onclick = () => {
-		alert("Download depende do backend.");
+	btnBaixarArquivo.onclick = async () => {
+		if (!submissaoAtual?.id_submissao) {
+			alert("Submissão não encontrada.");
+			return;
+		}
+
+		const url = `${API_BASE_URL}${CONFIG.ENDPOINTS.submissao}${submissaoAtual.id_submissao}/baixar-certificado/`;
+
+		const response = await fetch(url, {
+			method: "GET",
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+
+		if (!response.ok) {
+			alert("Erro ao baixar certificado.");
+			return;
+		}
+
+		const blob = await response.blob();
+		const blobUrl = window.URL.createObjectURL(blob);
+
+		const link = document.createElement("a");
+		link.href = blobUrl;
+		link.download = submissaoAtual.certificado_nome || "certificado";
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+
+		window.URL.revokeObjectURL(blobUrl);
 	};
 }
 

@@ -3,9 +3,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError,AuthenticationFailed
 from django.db import (connection, IntegrityError, DatabaseError,
                         InternalError, transaction)
+from django.http import FileResponse
 
 
 
@@ -1295,6 +1297,27 @@ class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         set_audit_context(request)
         raise PermissionDenied('Exclusão de submissão não é permitida. Utilize a alteração de status.')
+    
+    @action(detail=True, methods=['get'], url_path='baixar-certificado')
+    def baixar_certificado(self, request, pk=None):
+        submissao = self.get_object()
+        certificado = submissao.certificado
+
+        if not certificado:
+            raise ValidationError("Esta submissão não possui certificado.")
+
+        caminho_arquivo = f"certificados/{certificado.nome_arquivo}"
+
+        try:
+            arquivo = default_storage.open(caminho_arquivo, "rb")
+        except Exception:
+            raise ValidationError("Arquivo do certificado não encontrado no storage.")
+
+        return FileResponse(
+            arquivo,
+            as_attachment=True,
+            filename=certificado.nome_arquivo
+        )
     
 class LogAuditoriaViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
