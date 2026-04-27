@@ -337,24 +337,43 @@ class InscricaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         usuario = self.request.user
 
-        # Super admin
+        aluno_id = self.request.query_params.get('aluno')
+
+        if aluno_id:
+            return Inscricao.objects.select_related(
+                'aluno',
+                'aluno__usuario',
+                'curso',
+                'status_matricula'
+            ).filter(aluno_id=aluno_id)
 
         if hasattr(usuario, 'superadmin'):
-            return Inscricao.objects.all()
-        
-        # Coordenador 
+            return Inscricao.objects.select_related(
+                'aluno',
+                'aluno__usuario',
+                'curso',
+                'status_matricula'
+            ).all()
 
         if hasattr(usuario, 'coordenador'):
-            return Inscricao.objects.filter(
-                curso__coordenacaocurso__coordenador = usuario.coordenador,
-                curso__coordenacaocurso__data_fim__isnull = True
+            return Inscricao.objects.select_related(
+                'aluno',
+                'aluno__usuario',
+                'curso',
+                'status_matricula'
+            ).filter(
+                curso__coordenacaocurso__coordenador=usuario.coordenador,
+                curso__coordenacaocurso__data_fim__isnull=True
             )
-        
-        # Aluno
 
         if hasattr(usuario, 'aluno'):
-            return Inscricao.objects.filter(aluno = usuario.aluno)
-        
+            return Inscricao.objects.select_related(
+                'aluno',
+                'aluno__usuario',
+                'curso',
+                'status_matricula'
+            ).filter(aluno=usuario.aluno)
+
         return Inscricao.objects.none()
 
     def get_serializer_class(self):

@@ -3,7 +3,6 @@ const API_BASE_URL = CONFIG.BASE_URL.replace(/\/$/, "");
 const token = localStorage.getItem("access_token");
 
 let submissoesCarregadas = [];
-let atividadesCarregadas = [];
 let cursosCarregados = [];
 let statusCarregados = [];
 
@@ -63,11 +62,6 @@ function obterTextoBotao(status) {
 	return "Analisar";
 }
 
-function obterAtividade(id) {
-	return atividadesCarregadas.find(
-		(item) => Number(item.id_atividade_complementar || item.id) === Number(id),
-	);
-}
 
 async function carregarCursos() {
 	const response = await fetch(`${API_BASE_URL}${CONFIG.ENDPOINTS.curso}`, {
@@ -98,21 +92,7 @@ async function carregarStatus() {
 	statusCarregados = await response.json();
 }
 
-async function carregarAtividades() {
-	const response = await fetch(
-		`${API_BASE_URL}${CONFIG.ENDPOINTS.atividadeComplementar}`,
-		{
-			method: "GET",
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		},
-	);
 
-	if (!response.ok) throw new Error("Erro ao carregar atividades.");
-
-	atividadesCarregadas = await response.json();
-}
 
 async function carregarSubmissoes() {
 	const response = await fetch(`${API_BASE_URL}${CONFIG.ENDPOINTS.submissao}`, {
@@ -171,8 +151,8 @@ function preencherFiltroCategoria() {
 
 	const categorias = [
 		...new Set(
-			atividadesCarregadas
-				.map((item) => item.tipo_atividade_nome)
+			submissoesCarregadas
+				.map((item) => item.atividade_categoria)
 				.filter(Boolean),
 		),
 	];
@@ -202,8 +182,7 @@ function obterFiltrados() {
 		const cursoNome = item.curso_nome || "";
 		const statusNome = item.status_submissao_nome || "";
 
-		const atividade = obterAtividade(item.atividade_complementar);
-		const categoriaNome = atividade?.tipo_atividade_nome || "";
+		const categoriaNome = item.atividade_categoria || "";
 
 		const matchBusca = !busca || normalizarTexto(aluno).includes(busca);
 
@@ -239,10 +218,8 @@ function renderizarTabela() {
 	}
 
 	pagina.forEach((item) => {
-		const atividade = obterAtividade(item.atividade_complementar);
-
-		const categoria = atividade?.tipo_atividade_nome || "-";
-		const carga = atividade?.carga_horaria_solicitada || "-";
+		const categoria = item.atividade_categoria || "-";
+		const carga = item.carga_horaria_solicitada || "-"
 
 		const statusNome = item.status_submissao_nome || "-";
 		const classe = obterClasseStatus(statusNome);
@@ -358,10 +335,9 @@ function configurarEventos() {
 async function iniciarTela() {
 	try {
 		await Promise.all([
-			carregarCursos(),
-			carregarStatus(),
-			carregarAtividades(),
-			carregarSubmissoes(),
+		carregarCursos(),
+		carregarStatus(),
+		carregarSubmissoes(),
 		]);
 
 		preencherFiltroCursos();
