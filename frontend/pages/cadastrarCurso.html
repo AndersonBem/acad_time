@@ -8,83 +8,23 @@
   <title>Cursos</title>
 
   <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/sidebar.css">
   <link rel="stylesheet" href="../css/cadastrarCurso.css">
 </head>
 
 <body class="pagina-cadastro-curso">
   <div class="layout">
-    <div class="menu-lateral">
-      <div class="logo-box">
-        <a href="dashboard.html">
-          <img src="../assets/Logo.png" alt="Logo AcadTime" class="logo">
-        </a>
-      </div>
-
-      <aside class="sidebar">
-        
-        <ul>
-          <li>
-            <a href="dashboard.html">
-              <img src="../assets/img/Graph.png" class="menu-icon">
-              <span>Dashboard</span>
-            </a>
-          </li>
-
-          <li>
-            <a href="cursos.html">
-              <img src="../assets/img/Graduation Cap (1).png" class="menu-icon">
-              <span>Cursos</span>
-            </a>
-          </li>
-
-          <li>
-            <a href="coordenadores.html">
-              <img src="../assets/img/People.png" class="menu-icon">
-              <span>Coordenadores</span>
-            </a>
-          </li>
-
-          <li>
-            <a href="alunos.html">
-              <img src="../assets/img/People.png" class="menu-icon">
-              <span>Alunos</span>
-            </a>
-          </li>
-
-          <li>
-            <a href="horasComplementares.html">
-              <img src="../assets/img/Rollback.png" class="menu-icon">
-              <span>Horas Complementares</span>
-            </a>
-          </li>
-
-          <li>
-            <a href="listarCertificados.html">
-              <img src="../assets/img/Diploma.png" class="menu-icon">
-              <span>Análise de Certificados</span>
-            </a>
-          </li>
-
-          <li>
-              <a href="auditoria.html">
-                  <img src="../assets/img/Gear.png" class="menu-icon">
-                  <span>Auditoria</span>
-              </a>
-          </li>
-        </ul>
-        </ul>
-
-        <button class="btn-logout" onclick="logout()">
-          <img src="../assets/img/logout.png" alt="" class="logout-icon">
-          <span>Sair</span>
-        </button>
-      </aside>
-    </div>
+    <div id="sidebar-container"></div>   
 
     <main class="container">
-       <button class="menu-menu" onclick="toggleMenu()">☰</button>
-      <h1 id="titulo-pagina">Cadastro/Edição de Curso</h1>
-      <p>Preencha os campos para criar ou editar um curso</p>
+    <section class="page-header">
+      <button class="menu-menu" onclick="toggleMenu()">☰</button>
+
+      <div class="page-title">
+        <h1>Cadastro/Edição de Curso</h1>
+        <p>Preencha os campos para criar ou editar um curso</p>
+      </div>
+    </section>
 
       <div class="card-form">
         <h3>Cadastro/Edição de curso</h3>
@@ -137,14 +77,10 @@
   <button class="btn-abrir" id="btnAbrirMenu">☰ </button>
   <script src="../js/config.js"></script>
   <script src="../js/utils.js"></script>
+  <script src="../js/sidebar.js"></script>
   <script src="../js/cadastrarCurso.js"></script>
 
-  <script>
-    function toggleMenu() {
-      const sidebar = document.querySelector('.sidebar');
-      sidebar.classList.toggle('open');
-    }
-  </script>
+
 </body>
 
 </html>
