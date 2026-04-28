@@ -84,18 +84,15 @@ EXECUTE FUNCTION trg_log_auditoria_submissao();
 
 
 
-CREATE FUNCTION trg_validar_limite_horas_submissao()
+CREATE OR REPLACE FUNCTION trg_validar_limite_horas_submissao()
 RETURNS trigger
 LANGUAGE plpgsql
 AS
 $$
 DECLARE
     v_tipo integer;
-    v_curso integer;
     v_carga integer;
-    v_limite_restante numeric;
 BEGIN
-    -- Busca tipo e carga da atividade
     SELECT
         ac."tipoAtividade",
         ac."cargaHorariaSolicitada"
@@ -107,30 +104,6 @@ BEGIN
 
     IF v_tipo IS NULL THEN
         RAISE EXCEPTION 'Atividade complementar % não encontrada', NEW."atividadeComplementa";
-    END IF;
-
-    -- Busca curso do aluno
-    SELECT m."Curso_idCurso"
-    INTO v_curso
-    FROM "Matricula" m
-    WHERE m."Aluno_idUsuario" = NEW."idAluno"
-    LIMIT 1;
-
-    IF v_curso IS NULL THEN
-        RAISE EXCEPTION 'Aluno % não possui matrícula em curso', NEW."idAluno";
-    END IF;
-
-    -- Verifica o limite restante para o tipo de atividade
-    v_limite_restante := fn_limite_disponivel_tipo(
-        NEW."idAluno",
-        v_curso,
-        v_tipo
-    );
-
-    IF v_carga > v_limite_restante THEN
-        RAISE EXCEPTION
-        'Horas excedem o limite permitido para este tipo. Restante: %, solicitado: %',
-        v_limite_restante, v_carga;
     END IF;
 
     RETURN NEW;

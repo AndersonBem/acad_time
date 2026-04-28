@@ -388,7 +388,7 @@ function validarSomaHoras() {
 	const somaHoras = calcularSomaHorasAtivas();
 	const botaoSalvar = document.getElementById("btnSalvarRegras");
 
-	if (somaHoras === cargaMinima && cargaMinima > 0) {
+	if (somaHoras >= cargaMinima && cargaMinima > 0) {
 		botaoSalvar.disabled = false;
 		botaoSalvar.style.opacity = "1";
 		botaoSalvar.style.cursor = "pointer";
@@ -448,11 +448,11 @@ async function salvarRegras() {
 		return;
 	}
 
-	if (somaHoras !== cargaMinima) {
-		alert(
-			`A soma dos limites ativos (${somaHoras}h) deve ser igual à carga horária mínima do curso (${cargaMinima}h).`,
-		);
-		return;
+	if (somaHoras < cargaMinima) {
+	alert(
+		`A soma dos limites ativos (${somaHoras}h) deve ser igual ou maior que a carga horária mínima do curso (${cargaMinima}h).`
+	);
+	return;
 	}
 
 	const linhas = document.querySelectorAll(".linha-regra");
