@@ -1,7 +1,22 @@
 .content {
-  margin-top: 0px;
+  margin-top: 85px;
   margin-left: 0px;
-   width: 100%;
+  width: 100%;
+}
+
+.page-title {
+  position: fixed;
+  top: 0;
+  left: 280px;
+  right: 0; 
+  background: none;
+  z-index: 1000;
+  padding: 30px 50px;
+  margin: 0;
+}
+.conteudo {
+  position: relative;
+  z-index: 1;
 }
 
 
@@ -75,7 +90,9 @@ td {
 /* Tablet (1200px - 900px) */
 @media (max-width: 1200px) {
   .content {
-    margin-left: -15px;
+    margin-left: 0px;
+  
+  
   }
   
   .menu-toggle {
@@ -88,6 +105,8 @@ td {
   .content {
     margin-left: 0;
     padding: 15px;
+    margin-top: -40px;
+   
   }
   
   .topo-cursos {
@@ -131,8 +150,9 @@ td {
 @media (max-width: 768px) {
   .content {
     margin-left: 0;
-    margin-top: 5px;
+       margin-top: -40px;
     padding: 12px;
+    
   }
   
   .topo-cursos {
@@ -193,6 +213,7 @@ td {
   .content {
     padding: 10px;
     margin-top: 0;
+       margin-top: -30px;
   }
   
   .topo-cursos {
@@ -237,6 +258,7 @@ td {
 @media (max-width: 360px) {
   .content {
     padding: 8px;
+       margin-top: -30px;
   }
   
   .menu-toggle {
@@ -283,5 +305,33 @@ td {
   
   th, td {
     padding: 6px;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .page-title {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    right: 0;
+    color: #ccc;
+    background:#0d3b82;
+    z-index: 1000;
+    padding: 15px 20px;
+  }
+
+  body {
+    padding-top: 80px;
+  }
+
+  .page-title h1 {
+    font-size: 18px;
+    margin-left: 40px;
+  }
+
+  .page-title p {
+    font-size: 12px;
+     margin-left: 40px;
   }
 }

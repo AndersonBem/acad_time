@@ -1,8 +1,23 @@
 .dashboard-content {
   padding: 32px;
-  margin-top: 20px;
-  width: 100%;
+  margin-top: 85px;
+  width: 90%;
   box-sizing: border-box;
+}
+
+.topo {
+  position: fixed;
+  top: 0;
+  left: 280px;
+  right: 0; 
+  background: none;
+  z-index: 1000;
+  padding: 30px 50px;
+  margin: 0;
+}
+.conteudo {
+  position: relative;
+  z-index: 1;
 }
 
 .dashboard-header {
@@ -216,7 +231,9 @@
 @media (max-width: 768px) {
   .dashboard-content {
     padding: 18px;
+    margin-top: -40px;
   }
+    
 
   .dashboard-header {
     align-items: flex-start;
@@ -237,5 +254,32 @@
 
   .metric-card strong {
     font-size: 28px;
+  }
+}
+@media (max-width: 768px) {
+
+  .topo {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    right: 0;
+    color: #d8deea;
+    background:#0d3b82;
+    z-index: 1000;
+    padding: 15px 20px;
+  }
+
+  body {
+    padding-top: 80px;
+  }
+
+  .topo h1 {
+    font-size: 18px;
+    margin-left: 40px;
+  }
+
+  .topo p {
+    font-size: 12px;
+    margin-left: 40px;
   }
 }

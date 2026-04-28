@@ -1,4 +1,11 @@
 /* TOPO / FILTRO */
+.content {
+    margin-top: 85px;
+   
+}
+
+
+
 .topo-auditoria {
     margin-bottom: 20px;
 }
@@ -10,6 +17,23 @@
     border: 1px solid #ccc;
     border-radius: 8px;
 }
+
+
+.page-title {
+  position: fixed;
+  top: 0;
+  left: 280px;
+  right: 0; 
+  background: none;
+  z-index: 1000;
+  padding: 30px 50px;
+  margin: 0;
+}
+.conteudo {
+  position: relative;
+  z-index: 1;
+}
+
 
 /* TABELA */
 .table-wrapper {
@@ -153,6 +177,7 @@
 
     .auditoria-page {
         padding: 16px;
+        margin-top: -40px;
     }
 
     .tabela-auditoria th,
@@ -176,4 +201,39 @@
     .paginacao button {
         width: 120px;
     }
+}
+
+@media (max-width: 768px) {
+
+  .page-title {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    right: 0;
+    color: #ccc;
+    background:#0d3b82;
+    z-index: 1000;
+    padding: 15px 20px;
+  }
+
+  body {
+    padding-top: 80px;
+  }
+
+  .page-title h1 {
+    font-size: 18px;
+    margin-left: 40px;
+  }
+
+  .page-title p {
+    font-size: 12px;
+     margin-left: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .topo-auditoria input {
+    width: 97%; /* ocupa toda largura */
+    padding: 10px;
+  }
 }
