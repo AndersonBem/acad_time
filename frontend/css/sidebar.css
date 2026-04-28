@@ -105,7 +105,7 @@
 }
 
 .menu-menu {
-  
+  position: fixed;
   top: 15px;
   left: 15px;
   width: 40px;
@@ -124,7 +124,7 @@
 
 .btn-install {
   width: 100%;
-  background: #2f6fed; /* azul pra diferenciar do logout */
+  background: #2f6fed; 
   color: #fff;
   border: none;
   padding: 12px 16px;

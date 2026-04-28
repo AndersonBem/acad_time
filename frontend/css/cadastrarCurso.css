@@ -1,13 +1,25 @@
 .content{
-  margin-top: 20px;
+  margin-top: 110px;
 }
 
 .pagina-cadastro-curso {
   margin: 0;
   background: #f5f5f5;
 }
-
-
+.page-title {
+  position: fixed;
+  top: 0;
+  left: 280px;
+  right: 0; 
+  background: none;
+  z-index: 1000;
+  padding: 30px 50px;
+  margin: 0;
+}
+.conteudo {
+  position: relative;
+  z-index: 1;
+}
 
 
 .container {
@@ -15,6 +27,7 @@
   padding: 32px;
   width: 100vh;
   color: #0d3b82;
+  margin-top: 80px;
 }
 
 .container h1 {
@@ -343,7 +356,14 @@ textarea {
 	font-size: 14px;
 	padding: 10px 0;
 }
+@media (max-width: 900px) {
+  .content {
+    padding: 15px;
+    margin-top: -40px;
+  }
 
+
+}
 
 @media (max-width: 768px) {
 	.cabecalho-historico-cursos,
@@ -369,6 +389,7 @@ textarea {
     padding: 14px;
     width: 100%;
     box-sizing: border-box;
+    margin-top: -20px;
   }
 
   .card-form {
@@ -376,7 +397,7 @@ textarea {
     width: 100%;
     box-sizing: border-box;
   }
-
+  
   .container h1 {
     font-size: 26px;
     line-height: 1.1;
@@ -425,7 +446,43 @@ textarea {
 
   .btn-cancelar,
   .btn-salvar {
-    width: 100%;
-    margin-left: 0;
+   margin-left: -5px;
+  
+  }
+}
+
+@media (max-width: 768px) {
+
+  .page-title {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    right: 0;
+    color: #ccc;
+    background:#0d3b82;
+    z-index: 1000;
+    padding: 15px 20px;
+  }
+
+  body {
+    padding-top: 80px;
+  }
+
+  .page-title h1 {
+    font-size: 18px;
+    margin-left: 40px;
+  }
+
+  .page-title p {
+    font-size: 12px;
+     margin-left: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .acoes-form {
+    flex-direction: column; /* empilha os botões */
+    align-items: stretch;
+    gap: 10px;
   }
 }
