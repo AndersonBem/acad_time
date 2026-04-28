@@ -1,3 +1,14 @@
+function aplicarPermissoesSidebar() {
+  const usuario = JSON.parse(localStorage.getItem("usuario_logado") || "{}");
+  const tipo = usuario.tipo;
+
+  if (tipo === "superadmin") return;
+
+  document.querySelectorAll("[data-perfil='superadmin']").forEach((item) => {
+    item.remove();
+  });
+}
+
 async function carregarSidebar() {
   const container = document.getElementById("sidebar-container");
 
@@ -12,6 +23,7 @@ async function carregarSidebar() {
 
     const html = await response.text();
     container.innerHTML = html;
+    aplicarPermissoesSidebar();
 
     
 

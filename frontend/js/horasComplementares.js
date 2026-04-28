@@ -186,21 +186,55 @@ async function salvarNovaCategoria() {
 async function carregarCursos() {
 	const selectCurso = document.getElementById("curso");
 
-	const response = await fetch(`${API_BASE_URL}${CONFIG.ENDPOINTS.curso}`, {
-		method: "GET",
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
-	});
+	const usuario = JSON.parse(localStorage.getItem("usuario_logado") || "{}");
+	const tipoUsuario = usuario.tipo;
 
-	if (!response.ok) {
-		const erro = await response.text();
-		console.error("Erro ao carregar cursos:", erro);
-		alert("Erro ao carregar cursos.");
-		return;
+	let cursos = [];
+
+	if (tipoUsuario === "coordenador") {
+		const response = await fetch(`${API_BASE_URL}${CONFIG.ENDPOINTS.coordenacaoCurso}`, {
+			method: "GET",
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+
+		if (!response.ok) {
+			alert("Erro ao carregar cursos do coordenador.");
+			return;
+		}
+
+		const vinculos = await response.json();
+
+
+		cursos = vinculos
+		.filter((vinculo) => !vinculo.data_fim)
+		.map((vinculo) => ({
+			id_curso: vinculo.curso || vinculo.id_curso,
+			nome: vinculo.curso_nome || vinculo.nome_curso || vinculo.nome || `Curso ${vinculo.curso}`,
+			carga_horaria_minima:
+			vinculo.carga_horaria_minima ||
+			vinculo.carga_minima ||
+			vinculo.curso_carga_horaria_minima ||
+			"",
+		}));
+	} else {
+		const response = await fetch(`${API_BASE_URL}${CONFIG.ENDPOINTS.curso}`, {
+			method: "GET",
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+
+		if (!response.ok) {
+			alert("Erro ao carregar cursos.");
+			return;
+		}
+
+		cursos = await response.json();
 	}
 
-	cursosCarregados = await response.json();
+	cursosCarregados = cursos;
 
 	selectCurso.innerHTML = `<option value="">Selecione um curso</option>`;
 
@@ -234,8 +268,15 @@ async function carregarTiposAtividade() {
 }
 
 async function carregarRegras() {
+	const cursoId = document.getElementById("curso").value;
+
+	if (!cursoId) {
+		regrasCarregadas = [];
+		return;
+	}
+
 	const response = await fetch(
-		`${API_BASE_URL}${CONFIG.ENDPOINTS.regraAtividade}`,
+		`${API_BASE_URL}${CONFIG.ENDPOINTS.regraAtividade}?curso=${cursoId}`,
 		{
 			method: "GET",
 			headers: {
@@ -508,7 +549,6 @@ async function iniciarTelaHorasComplementares() {
 	await carregarCursos();
 	await carregarTiposAtividade();
 	renderizarTiposAtividade();
-	await carregarRegras();
 	configurarValidacaoHoras();
 }
 

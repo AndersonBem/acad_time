@@ -55,16 +55,19 @@ async function carregarDashboard() {
       ? dadosSubmissoes
       : dadosSubmissoes.results || [];
 
-    try {
-      const dadosCursos = await buscarDados(ENDPOINTS.cursos);
-
-      cursos = Array.isArray(dadosCursos)
-        ? dadosCursos
-        : dadosCursos.results || [];
-    } catch (erroCursos) {
-      console.warn("Não foi possível carregar cursos:", erroCursos);
-      cursos = [];
-    }
+    cursos = [
+      ...new Map(
+        submissoes
+          .filter((item) => item.curso && item.curso_nome)
+          .map((item) => [
+            item.curso,
+            {
+              id_curso: item.curso,
+              nome: item.curso_nome,
+            },
+          ])
+      ).values(),
+    ];
 
     preencherFiltroCursos();
     aplicarFiltros();
