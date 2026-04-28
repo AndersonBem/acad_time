@@ -2,6 +2,7 @@
   padding: 32px;
   width: 100%;
   box-sizing: border-box;
+  margin-top: 100px;
 }
 
 .analise-card {
@@ -10,6 +11,21 @@
   margin: 0 auto;
   padding: 32px;
   box-sizing: border-box;
+}
+
+.page-title {
+  position: fixed;
+  top: 0;
+  left: 250px;
+  right: 0; 
+  background: none;
+  z-index: 1000;
+  padding: 30px 50px;
+  margin: 0;
+}
+.conteudo {
+  position: relative;
+  z-index: 1;
 }
 
 .analise-layout {
@@ -204,6 +220,7 @@
 @media (max-width: 900px) {
   .content {
     padding: 16px;
+     margin-top: -10px;
   }
 
   .analise-card {
@@ -236,6 +253,7 @@
 @media (max-width: 480px) {
   .content {
     padding: 10px;
+   
   }
 
   .analise-card {
@@ -271,4 +289,32 @@
 
 #cargaAprovada {
   width: 100%;
+}
+
+@media (max-width: 768px) {
+
+  .page-title {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    right: 0;
+    color: #ccc;
+    background:#0d3b82;
+    z-index: 1000;
+    padding: 15px 20px;
+  }
+
+  body {
+    padding-top: 80px;
+  }
+
+  .page-title h1 {
+    font-size: 18px;
+    margin-left: 40px;
+  }
+
+  .page-title p {
+    font-size: 12px;
+     margin-left: 40px;
+  }
 }

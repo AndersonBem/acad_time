@@ -22,9 +22,9 @@ body {
   gap: 20px;
 }
 .page-title {
-  position: fixed;
+  position: relative;
   top: 0;
-  left: 280px;
+  left: -40px;
   right: 0; 
   background: none;
   z-index: 1000;
@@ -35,8 +35,6 @@ body {
   position: relative;
   z-index: 1;
 }
-
-
 
 .campo {
   display: flex;

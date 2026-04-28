@@ -230,8 +230,9 @@
 
 @media (max-width: 768px) {
   .dashboard-content {
-    padding: 18px;
-    margin-top: -40px;
+    padding: 0px;
+    margin-top: -20px;
+    margin-left: 5px;
   }
     
 
