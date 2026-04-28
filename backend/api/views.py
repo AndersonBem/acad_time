@@ -255,11 +255,25 @@ class CoordenadorViewSet(AuditContextMixin, viewsets.ModelViewSet):
 
 class CoordenadorCursoViewSet(AuditContextMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
-    queryset = CoordenacaoCurso.objects.select_related(
-        'coordenador',
-        'curso',
-        'coordenador__usuario'
-    ).order_by('id_coordenacao_curso')
+    def get_queryset(self):
+        usuario = self.request.user
+
+        queryset = CoordenacaoCurso.objects.select_related(
+            'coordenador',
+            'curso',
+            'coordenador__usuario'
+        ).order_by('id_coordenacao_curso')
+
+        if hasattr(usuario, 'superadmin'):
+            return queryset
+
+        if hasattr(usuario, 'coordenador'):
+            return queryset.filter(
+                coordenador=usuario.coordenador,
+                data_fim__isnull=True
+            )
+
+        return CoordenacaoCurso.objects.none()
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -853,7 +867,30 @@ class TipoAtividadeViewSet(AuditContextMixin, viewsets.ModelViewSet):
     
 class RegraAtividadeViewSet(AuditContextMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
-    queryset = RegraAtividade.objects.all().order_by('curso')
+    def get_queryset(self):
+        queryset = RegraAtividade.objects.select_related(
+            'curso',
+            'tipo_atividade'
+        ).order_by('curso')
+
+        curso_id = self.request.query_params.get('curso')
+
+        if curso_id:
+            queryset = queryset.filter(curso_id=curso_id)
+
+        usuario = self.request.user
+
+        if hasattr(usuario, 'superadmin'):
+            return queryset
+
+        if hasattr(usuario, 'coordenador'):
+            return queryset.filter(
+                curso__coordenacaocurso__coordenador=usuario.coordenador,
+                curso__coordenacaocurso__data_fim__isnull=True
+            ).distinct()
+
+        return RegraAtividade.objects.none()
+    
     serializer_class = RegraAtividadeSerializer
 
     def _validar_apenas_superadmin(self, request):

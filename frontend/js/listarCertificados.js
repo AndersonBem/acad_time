@@ -63,17 +63,16 @@ function obterTextoBotao(status) {
 }
 
 
-async function carregarCursos() {
-	const response = await fetch(`${API_BASE_URL}${CONFIG.ENDPOINTS.curso}`, {
-		method: "GET",
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
-	});
+function carregarCursos() {
+	const nomesCursos = [
+		...new Set(
+			submissoesCarregadas
+				.map((item) => item.curso_nome)
+				.filter(Boolean)
+		),
+	];
 
-	if (!response.ok) throw new Error("Erro ao carregar cursos.");
-
-	cursosCarregados = await response.json();
+	cursosCarregados = nomesCursos.map((nome) => ({ nome }));
 }
 
 async function carregarStatus() {
@@ -335,10 +334,11 @@ function configurarEventos() {
 async function iniciarTela() {
 	try {
 		await Promise.all([
-		carregarCursos(),
-		carregarStatus(),
-		carregarSubmissoes(),
+			carregarStatus(),
+			carregarSubmissoes(),
 		]);
+
+		carregarCursos();
 
 		preencherFiltroCursos();
 		preencherFiltroStatus();

@@ -33,6 +33,10 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
         if (response.ok) {
             const token = resultado.access;
             const usuario = resultado.usuario;
+            if (usuario?.tipo === "aluno") {
+                alert("Alunos não possuem acesso ao painel administrativo.");
+                return;
+            }
 
             if (token) {
                 localStorage.setItem('access_token', token);
@@ -40,10 +44,11 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
 
             if (usuario) {
                 localStorage.setItem('usuario_logado', JSON.stringify(usuario));
+                localStorage.setItem('tipo_usuario', usuario.tipo);
             }
 
             alert(resultado.mensagem || 'Login realizado com sucesso.');
-            window.location.href = '../pages/alunos.html';
+            window.location.href = '../pages/dashboard.html';
         } else {
             alert(resultado.erro || 'Email ou senha inválidos.');
         }
