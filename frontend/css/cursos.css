@@ -7,12 +7,14 @@
 .page-title {
   position: fixed;
   top: 0;
-  left: 280px;
+  left: 270px;
   right: 0; 
   background: none;
   z-index: 1000;
-  padding: 30px 50px;
+  padding: 10px 50px;
   margin: 0;
+   color:#0d3b82;
+  background-color:#f5f5f5;
 }
 .conteudo {
   position: relative;
