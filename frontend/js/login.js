@@ -15,9 +15,12 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
         senha: senha
     };
 
+    const loadingOverlay = document.getElementById("loadingOverlay");
+    loadingOverlay.style.display = "flex";
     const url = CONFIG.BASE_URL.replace(/\/$/, '') + CONFIG.ENDPOINTS.login;
 
     try {
+        loadingOverlay.style.display = "flex";
         const response = await fetch(url, {
             method: 'POST',
             headers: {
@@ -56,5 +59,7 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
     } catch (error) {
         console.error('Erro na requisição:', error);
         alert('Não foi possível conectar ao servidor.');
+    } finally {
+        loadingOverlay.style.display = "none";
     }
 });
