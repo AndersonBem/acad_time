@@ -1,7 +1,26 @@
 .content {
-  padding: 32px;
+  padding: 100px;
   width: 100%;
   box-sizing: border-box;
+}
+
+
+
+.page-title {
+  position: fixed;
+  top: 0;
+  left: 270px;
+  right: 0; 
+  background: none;
+  z-index: 1000;
+  padding: 10px 50px;
+  margin: 0;
+  color:#0d3b82;
+  background-color:#f5f5f5;
+}
+.conteudo {
+  position: relative;
+  z-index: 1;
 }
 
 .analise-card {
@@ -271,4 +290,32 @@
 
 #cargaAprovada {
   width: 100%;
+}
+
+@media (max-width: 768px) {
+
+  .topo {
+    position: fixed; 
+    top: 0px;
+    left: 0;
+    right: 0;
+    color: #d8deea;
+    background:#0d3b82;
+    z-index: 1000;
+    padding: 0px 20px;
+  }
+
+  body {
+    padding-top: 70px;
+  }
+
+  .topo h1 {
+    font-size: 16px;
+    margin-left: 40px;
+  }
+
+  .topo p {
+    font-size: 12px;
+    margin-left: 40px;
+  }
 }

@@ -13,15 +13,22 @@
 
 <body>
   <div class="layout">
-    <div id="sidebar-container"></div> 
+    <div id="sidebar-container"></div>
 
     <main class="content">
+
       <button class="menu-menu" onclick="toggleMenu()">☰</button>
+
+      <div class="page-title">
+        <h1>Dados de Submissões</h1>
+        <p>Resgristro de Dados</p>
+      </div>
 
       <div class="card analise-card">
         <div class="analise-layout">
 
           <div class="coluna-esquerda">
+
             <section class="bloco-aluno">
               <h2>Dados da submissão</h2>
               <p><strong>Aluno:</strong> <span id="alunoNome">-</span></p>
@@ -35,36 +42,37 @@
               <h2>Dados da atividade complementar</h2>
 
               <div class="campo">
+                <div class="grid-form">
 
-              <div class="grid-form">
-                <div class="campo">
-                  <label for="categoria">Categoria da atividade</label>
-                  <input type="text" id="categoria" readonly>
-                </div>
+                  <div class="campo">
+                    <label for="categoria">Categoria da atividade</label>
+                    <input type="text" id="categoria" readonly>
+                  </div>
 
-                <div class="campo">
-                  <label for="descricao">Descrição da atividade</label>
-                  <input type="text" id="descricao" readonly>
-                </div>
+                  <div class="campo">
+                    <label for="descricao">Descrição da atividade</label>
+                    <input type="text" id="descricao" readonly>
+                  </div>
 
-                <div class="campo">
-                  <label for="carga">Carga horária solicitada</label>
-                  <input type="text" id="carga" readonly>
-                </div>
+                  <div class="campo">
+                    <label for="carga">Carga horária solicitada</label>
+                    <input type="text" id="carga" readonly>
+                  </div>
 
-                <div class="campo">
-                  <label for="atividadeId">ID da atividade complementar</label>
-                  <input type="text" id="atividadeId" readonly>
-                </div>
+                  <div class="campo">
+                    <label for="atividadeId">ID da atividade complementar</label>
+                    <input type="text" id="atividadeId" readonly>
+                  </div>
 
-                <div class="campo">
-                  <label for="cargaAprovada">
-                  Carga horária aprovada
-                  <span class="obrigatorio">*</span>
-                  </label>
-                <input type="number" id="cargaAprovada" min="0">
+                  <div class="campo">
+                    <label for="cargaAprovada">
+                      Carga horária aprovada
+                      <span class="obrigatorio">*</span>
+                    </label>
+                    <input type="number" id="cargaAprovada" min="0">
+                  </div>
+
                 </div>
-                 
               </div>
 
               <div class="anexo-box">
@@ -74,14 +82,16 @@
                   <span class="arquivo-nome" id="arquivoNome">Nenhum arquivo</span>
 
                   <div class="arquivo-acoes">
-                    <button type="button" id="btnVisualizarArquivo">👁</button>
+                    <button type="button" id="btnVisualizarArquivo"></button>
                     <button type="button" id="btnBaixarArquivo">⬇</button>
                   </div>
                 </div>
               </div>
 
               <div class="ocr-box">
-                <h3>OCR - Dados extraídos <span class="tag-ocr">Extraído automaticamente</span></h3>
+                <h3>OCR - Dados extraídos
+                  <span class="tag-ocr">Extraído automaticamente</span>
+                </h3>
 
                 <div class="ocr-conteudo">
                   <p><strong>Nome:</strong> <span id="ocrNome">-</span></p>
@@ -95,12 +105,15 @@
                 <label for="observacoes">Observação da análise</label>
                 <textarea id="observacoes" placeholder="Digite aqui a observação da análise"></textarea>
               </div>
+
             </section>
           </div>
 
           <div class="coluna-direita">
+
             <div class="historico">
               <h3>Histórico de análise</h3>
+
               <div id="historicoAnalise">
                 <div class="item-historico">
                   <span class="bolinha"></span>
@@ -116,10 +129,12 @@
               <button type="button" class="btn-reprovar" id="btnReprovar">Reprovar</button>
               <button type="button" class="btn-aprovar" id="btnAprovar">Aprovar</button>
             </div>
+
           </div>
 
         </div>
       </div>
+
     </main>
   </div>
 
