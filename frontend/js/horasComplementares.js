@@ -192,32 +192,49 @@ async function carregarCursos() {
 	let cursos = [];
 
 	if (tipoUsuario === "coordenador") {
-		const response = await fetch(`${API_BASE_URL}${CONFIG.ENDPOINTS.coordenacaoCurso}`, {
+		const responseVinculos = await fetch(`${API_BASE_URL}${CONFIG.ENDPOINTS.coordenacaoCurso}`, {
 			method: "GET",
 			headers: {
 				Authorization: `Bearer ${token}`,
 			},
 		});
 
-		if (!response.ok) {
+		if (!responseVinculos.ok) {
 			alert("Erro ao carregar cursos do coordenador.");
 			return;
 		}
 
-		const vinculos = await response.json();
+		const vinculos = await responseVinculos.json();
 
+		const responseCursos = await fetch(`${API_BASE_URL}${CONFIG.ENDPOINTS.curso}`, {
+			method: "GET",
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+
+		if (!responseCursos.ok) {
+			alert("Erro ao carregar dados dos cursos.");
+			return;
+		}
+
+		const todosCursos = await responseCursos.json();
 
 		cursos = vinculos
-		.filter((vinculo) => !vinculo.data_fim)
-		.map((vinculo) => ({
-			id_curso: vinculo.curso || vinculo.id_curso,
-			nome: vinculo.curso_nome || vinculo.nome_curso || vinculo.nome || `Curso ${vinculo.curso}`,
-			carga_horaria_minima:
-			vinculo.carga_horaria_minima ||
-			vinculo.carga_minima ||
-			vinculo.curso_carga_horaria_minima ||
-			"",
-		}));
+			.filter((vinculo) => !vinculo.data_fim)
+			.map((vinculo) => {
+				const cursoCompleto = todosCursos.find(
+					(curso) => Number(curso.id_curso || curso.id) === Number(vinculo.curso)
+				);
+
+				return {
+					id_curso: vinculo.curso,
+					nome: vinculo.nome_curso || `Curso ${vinculo.curso}`,
+					carga_horaria_minima: cursoCompleto
+						? cursoCompleto.carga_horaria_minima || ""
+						: "",
+				};
+			});
 	} else {
 		const response = await fetch(`${API_BASE_URL}${CONFIG.ENDPOINTS.curso}`, {
 			method: "GET",
@@ -235,7 +252,7 @@ async function carregarCursos() {
 	}
 
 	cursosCarregados = cursos;
-
+	
 	selectCurso.innerHTML = `<option value="">Selecione um curso</option>`;
 
 	cursosCarregados.forEach((curso) => {
