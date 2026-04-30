@@ -6,17 +6,32 @@
 
 
 
+.content {
+  padding: 32px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
 .page-title {
-  position: fixed;
-  top: 0;
-  left: 270px;
-  right: 0; 
-  background: none;
-  z-index: 1000;
-  padding: 10px 50px;
+  color: #0d3b82;
+}
+
+.page-title h1 {
+  font-size: 34px;
+  line-height: 1.1;
   margin: 0;
-  color:#0d3b82;
-  background-color:#f5f5f5;
+}
+
+.page-title p {
+  margin-top: 6px;
+  color: #2f4f7f;
 }
 .conteudo {
   position: relative;
@@ -220,9 +235,18 @@
   color: white;
 }
 
+.obrigatorio {
+  color: red;
+  font-weight: bold;
+}
+
+#cargaAprovada {
+  width: 100%;
+}
+
 @media (max-width: 900px) {
   .content {
-    padding: 16px;
+    padding: 24px;
   }
 
   .analise-card {
@@ -251,71 +275,66 @@
     width: 100%;
   }
 }
-
-@media (max-width: 480px) {
-  .content {
-    padding: 10px;
-  }
-
-  .analise-card {
-    padding: 14px;
-  }
-
-  .bloco-aluno h2,
-  .bloco-certificado h2,
-  .historico h3,
-  .anexo-box h3,
-  .ocr-box h3 {
-    font-size: 16px;
-  }
-
-  .campo input,
-  .campo textarea,
-  .campo select {
-    padding: 10px;
-    font-size: 12px;
-  }
-
-  .tag-ocr {
-    display: inline-block;
-    margin-left: 0;
-    margin-top: 6px;
-  }
-}
-
-.obrigatorio {
-  color: red;
-  font-weight: bold;
-}
-
-#cargaAprovada {
-  width: 100%;
-}
-
 @media (max-width: 768px) {
+  .content {
+    padding: 92px 16px 20px;
+  }
 
-  .topo {
-    position: fixed; 
-    top: 0px;
+  .page-header {
+    position: fixed;
+    top: 0;
     left: 0;
     right: 0;
-    color: #d8deea;
-    background:#0d3b82;
+    background: #0d3b82;
+    color: #fff;
     z-index: 1000;
-    padding: 0px 20px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
 
-  body {
-    padding-top: 70px;
+  .page-title {
+    color: #fff;
+    margin-left: 45px;
   }
 
-  .topo h1 {
-    font-size: 16px;
-    margin-left: 40px;
+  .page-title h1 {
+    font-size: 18px;
+    line-height: 1.1;
+    margin: 0;
   }
 
-  .topo p {
+  .page-title p {
+    font-size: 11px;
+    line-height: 1.2;
+    margin: 4px 0 0;
+    color: #fff;
+  }
+
+  .menu-menu {
+    position: static;
+    flex-shrink: 0;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .page-header {
+    padding: 14px 16px;
+    gap: 10px;
+  }
+
+  .page-title h1 {
+    font-size: 18px;
+  }
+
+  .page-title p {
     font-size: 12px;
-    margin-left: 40px;
+  }
+
+  .analise-card,
+  .card-analise-lista {
+    margin: 16px;
   }
 }
