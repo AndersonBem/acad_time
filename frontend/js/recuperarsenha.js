@@ -1,5 +1,5 @@
-document.querySelector('.btn-login').onclick = function() {
-    window.location.href = 'login.html';
+document.querySelector(".btn-secondary").onclick = function() {
+    window.location.href = '../pages/login.html';
 };
 
 //montar URL
@@ -49,7 +49,23 @@ document.getElementById('recuperarForm').addEventListener('submit', async (event
                 localStorage.setItem('token_recuperacao', resultado.token);
             }
 
-            alert(resultado.mensagem || 'Email enviado com sucesso!');
+            const mensagem = document.createElement("div");
+            mensagem.innerText = "Link enviado! Redirecionando...";
+            mensagem.style.position = "fixed";
+            mensagem.style.bottom = "20px";
+            mensagem.style.left = "50%";
+            mensagem.style.transform = "translateX(-50%)";
+            mensagem.style.background = "#0d3b82";
+            mensagem.style.color = "#fff";
+            mensagem.style.padding = "12px 20px";
+            mensagem.style.borderRadius = "8px";
+            mensagem.style.zIndex = "9999";
+
+            document.body.appendChild(mensagem);
+
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 1500);
         } else {
             //  API respondeu com erro
             localStorage.setItem('email_recuperacao', email);
