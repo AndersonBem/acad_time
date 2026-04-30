@@ -1,4 +1,3 @@
-/* Reset remover os estilos padrões do navegador */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -6,195 +5,175 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Body */
 body {
-    background: linear-gradient(90deg, #F4F2F2 52.95%, #134381 95.9%);
     min-height: 100vh;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(13, 59, 130, 0.12), transparent 30%),
+        linear-gradient(135deg, #eef4fb 0%, #f4f8ff 50%, #e3ecf7 100%);
     display: flex;
     justify-content: center;
     align-items: center;
-    position: relative;
+    padding: 24px;
 }
 
-/* Container principal*/
-.login-container {
+.login-page {
     width: 100%;
-    max-width: 1000px;
+    max-width: 1080px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-radius: 30px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 24px 60px rgba(13, 59, 130, 0.2);
+}
+
+/* LADO ESQUERDO */
+.login-brand {
+    background: linear-gradient(135deg, #f8fbff, #eaf2ff);
+    padding: 60px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 40px;
+    flex-direction: column;
+    justify-content: center;
     position: relative;
 }
 
-/* Logo AcadTime */
+.login-brand::before {
+    content: "";
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    background: #0d3b82;
+    opacity: 0.08;
+    border-radius: 50%;
+    left: -150px;
+    top: -120px;
+}
+
+.login-brand::after {
+    content: "";
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    background: #0d3b82;
+    opacity: 0.05;
+    border-radius: 50%;
+    right: -120px;
+    bottom: -120px;
+}
+
 .logo {
-    width: 450px;
-    flex-shrink: 0;
-    margin-right: 20%;
-    transition: all 0.3s ease;
+    width: 320px;
+    margin-bottom: 30px;
+    z-index: 1;
 }
 
-/* Controlar o tamanho do form*/
-.form-side {
-    margin-left: 28%;
-    width: 200%;
-    max-width: 420px;
+.login-brand h1 {
+    color: #0d3b82;
+    font-size: 34px;
+    margin-bottom: 10px;
+    z-index: 1;
+}
+
+.login-brand p {
+    color: #4b5d75;
+    max-width: 400px;
+    z-index: 1;
+}
+
+/* LADO DIREITO */
+.login-card {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
+    align-items: center;
+    padding: 50px;
 }
 
-/* Div de Login e borda preta*/
 .login-box {
     width: 100%;
-    padding: 30px;
-    border-radius: 20px;
-    border: 1px solid #000409;
-    background: rgba(255,255,255,0.2);
-    backdrop-filter: blur(10px);
+    max-width: 360px;
 }
 
-/* Titulo*/
-h2 {
-    text-align: center;
-    color: #003366;
-    margin-bottom: 40px;
+.login-box h2 {
+    color: #0d3b82;
+    font-size: 28px;
+    margin-bottom: 8px;
 }
 
-/* Botão com ícone */
-.btn-icon {
-    padding-top: 1px;
-    width: 15px;    
-    height: 15px;
+.login-subtitle {
+    font-size: 14px;
+    color: #64748b;
+    margin-bottom: 25px;
 }
 
-/* Labels e Inputs */
+.input-group {
+    margin-bottom: 18px;
+}
+
 .input-group label {
-    display: block;
-    color: #003366;
+    color: #0d3b82;
+    font-weight: bold;
     font-size: 14px;
 }
+
 .input-group input {
-    width: 100%;  
-    margin-top: 4px;      
+    width: 100%;
+    height: 45px;
+    border-radius: 10px;
+    border: 1px solid #d4ddec;
     padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    background: #eee;
-}
-.forgot-password a {
-    font-size: 12px;
-    color: #003366;
+    margin-top: 5px;
+    background: #f8fafc;
 }
 
-/* Botão de Redefinir */
-.btn-redefinir {
-    width: 100%;          
-    padding: 10px;
-    margin: 30px 0 10px 0; 
-    background-color: #F8970A;
-    color: #15487D;
+.input-group input:focus {
+    border-color: #0d3b82;
+    outline: none;
+}
+
+/* BOTÕES */
+.btn-primary {
+    width: 100%;
+    height: 45px;
+    background: #ff9800;
+    color: #0d3b82;
     border: none;
     border-radius: 10px;
     font-weight: bold;
     cursor: pointer;
-    transition: 0.3s;
-    display: block;          
+    margin-top: 10px;
 }
 
-/* Botão de Login */
-.btn-login {
-    width: 100%;          
-    padding: 8px;
-    background-color: #15487D;
-    color: #F4F2F2;
+.btn-primary:hover {
+    background: #e78a00;
+}
+
+.btn-secondary {
+    width: 100%;
+    margin-top: 12px;
+    background: transparent;
     border: none;
-    border-radius: 10px;
+    color: #0d3b82;
     font-weight: bold;
     cursor: pointer;
-    transition: 0.3s;
-    margin: 90px 0 0 0;    
-    display: block; 
 }
 
-/* Setinha */
-.arrow-left {
-    display: inline-block;
-    transform: rotate(180deg); 
-    font-size: 18px;    
-    padding-bottom: 5px;   
-}
-
-/* Responsividade */
-
-/* Tablet e Celular */
+/* RESPONSIVO */
 @media (max-width: 768px) {
-    .login-container {
-        flex-direction: column;
-        align-items: center;
+    .login-page {
+        grid-template-columns: 1fr;
+    }
+
+    .login-brand {
         text-align: center;
-        gap: 20px;
-        position: relative;
-    }
-
-    /* Coloca a logo acima do formulário */
-    .logo {
-        position: absolute;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 220px;
-        margin: 0;
-        z-index: 10;
-    }
-
-    .form-side {
-        margin-left: 0;
-        width: 100%;
-        max-width: 420px;
-        justify-content: center;
-        padding-top: 120px; /* espaço para logo */
-    }
-}
-
-/* Celular pequeno */
-@media (max-width: 480px) {
-    .logo {
-        width: 180px;
-        top: 15px;
-    }
-
-    .login-box {
-        padding: 20px;
-        border-radius: 15px;
-    }
-
-    h2 {
-        font-size: 18px;
-    }
-
-    .btn-login {
-        font-size: 14px;
-        padding: 10px;
-    }
-}
-
-/* Para telas grandes */
-@media (min-width: 1200px) {
-    .login-container {
-        max-width: 900px;
-        gap: 100px; 
-    }
-
-    .logo {
-        width: 380px; 
-        margin-right: 20%;
-        position: static; /* volta ao normal */
-        transform: none;
-    }
-
-    .login-box {
+        align-items: center;
         padding: 40px;
     }
+
+    .logo {
+        width: 220px;
+    }
+
+    .login-card {
+        padding: 30px;
+    }
 }
---

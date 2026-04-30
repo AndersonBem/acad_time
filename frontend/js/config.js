@@ -19,8 +19,8 @@ const CONFIG = {
         notificacaoEmail: '/notificacaoEmail/',
         recuperarsenha: '/recuperar-senha/',
         redefinirsenha: '/redefinir-senha/'
-    }
-};
+      }
+  };
 
 /*
 =====================================================

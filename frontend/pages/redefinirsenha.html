@@ -11,48 +11,49 @@
 
 <body>
 
-    <div class="redefinir-container">
+<section class="login-page">
 
-      
+    <div class="login-brand">
         <img src="../assets/img/logo.png" alt="Logo AcadTime" class="logo">
-
-       
-        <section class="redefinir-container">
-
-            <div class="form-side">
-                <div class="login-box">
-
-                    <h2>Redefinir Senha</h2>
-
-                    <form id="redefinirForm">
-
-                        <div class="input-group">
-                            <label for="novaSenha">Nova senha</label>
-                            <input type="password" id="novaSenha" placeholder="Digite a nova senha" required>
-                         <small class="erro" id="erroSenha"></small>
-                             
-                        </div>
-                        <small class="erro" id="erroSenha"></small>
-                        <div class="input-group">
-                            <label for="confirmarSenha">Confirmar nova senha</label>
-                            <input type="password" id="confirmarSenha" placeholder="Confirme a senha" required>
-                             <small class="erro" id="erroConfirmar"></small>
-                        </div>
-
-                        <button type="submit" class="button1">Salvar</button>
-
-                    </form>
-                    
-                </div>
-            </div>
-        
-        </section>
-        
+        <h1>Crie uma nova senha</h1>
+        <p>Escolha uma senha segura para voltar a acessar o AcadTime.</p>
     </div>
-      
-   
-    <script src="../js/config.js"></script>
-    <script src="../js/redefinirsenha.js"></script>
+
+    <div class="login-card">
+        <div class="login-box">
+            <h2>Redefinir Senha</h2>
+            <p class="login-subtitle">Digite e confirme sua nova senha</p>
+
+            <form id="redefinirForm">
+
+                <div class="input-group">
+                    <label for="novaSenha">Nova senha</label>
+                    <input type="password" id="novaSenha" placeholder="Digite a nova senha" required>
+                    <small class="erro" id="erroSenha"></small>
+                </div>
+
+                <div class="input-group">
+                    <label for="confirmarSenha">Confirmar nova senha</label>
+                    <input type="password" id="confirmarSenha" placeholder="Confirme a senha" required>
+                    <small class="erro" id="erroConfirmar"></small>
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    Salvar nova senha
+                </button>
+
+                <button type="button" class="btn-secondary" onclick="window.location.href='login.html'">
+                    ← Voltar para login
+                </button>
+
+            </form>
+        </div>
+    </div>
+
+</section>
+
+<script src="../js/config.js"></script>
+<script src="../js/redefinirsenha.js"></script>
 
 </body>
 </html>
