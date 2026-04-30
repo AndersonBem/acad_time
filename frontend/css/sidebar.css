@@ -27,18 +27,20 @@
 
 .sidebar {
   position: fixed;
-  top: 80px;
+  top: 140px;
   left: 0;
   width: 270px;
-  height: calc(106vh - 140px);
+  height: calc(100vh - 140px);
   background: #0d3b82;
   color: white;
   padding: 24px 20px;
   box-sizing: border-box;
   transition: 0.3s;
   display: flex;
+  border-top-right-radius: 20px;
   flex-direction: column;
   z-index: 900;
+ 
 }
 
 .sidebar ul {
@@ -61,6 +63,14 @@
   width: 100%;
   font-weight: bold;
   line-height: 1.2;
+}
+
+.sidebar ul li a:hover{
+  background-color: orange; 
+  color: #0d3b82;
+  border-radius: 10px;
+  padding: 2px;
+  transition: 0.3s;
 }
 
 .sidebar li a:visited,
@@ -143,6 +153,8 @@
 @media (max-width: 900px) {
   .menu-lateral {
     width: 0;
+    
+    
   }
 
   .logo-box {
@@ -156,6 +168,8 @@
     height: 36px;
     font-size: 20px;
     display: flex;
+    color:#f5f5f5;
+    
   }
 
   .sidebar {
@@ -166,15 +180,17 @@
     border-radius: 0;
     transform: translateX(-100%);
     z-index: 1100;
-    padding: 24px 20px;
+    padding: 24px 20px; 
   }
-
+  
   .sidebar.active {
     transform: translateX(0);
+   
   }
 
-  .sidebar ul {
+  .sidebar ul{
     margin-top: 70px;
+  
   }
 
   .btn-logout,

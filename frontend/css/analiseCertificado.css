@@ -1,8 +1,10 @@
 .content {
-  padding: 32px;
+  padding: 100px;
   width: 100%;
   box-sizing: border-box;
 }
+
+
 
 .page-title {
   position: fixed;
