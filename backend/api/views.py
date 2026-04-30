@@ -1083,14 +1083,17 @@ class CursoViewSet(AuditContextMixin, viewsets.ModelViewSet):
         tags=["08 - Curso"]
     )
 
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         self._validar_apenas_superadmin(request)
         return super().create(request, *args, **kwargs)
 
+    @transaction.atomic
     def update(self, request, *args, **kwargs):
         self._validar_apenas_superadmin(request)
         return super().update(request, *args, **kwargs)
-
+      
+    @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
         self._validar_apenas_superadmin(request)
         return super().partial_update(request, *args, **kwargs)
