@@ -38,6 +38,7 @@ function renderizarTabela() {
         linha.innerHTML = `
             <td>${formatarData(log.data_hora)}</td>
             <td>${log.usuario_nome || "-"}</td>
+            <td>${log.ip_origem || "-"}</td>
             <td>${log.tipo_acao_nome || "-"}</td>
             <td>${log.nome_entidade || "-"}</td>
             <td>${log.descricao || "-"}</td>
