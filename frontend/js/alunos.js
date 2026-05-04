@@ -23,7 +23,7 @@ async function listarAlunos() {
         if (!response.ok) {
             container.innerHTML = `
                 <tr>
-                    <td colspan="4">Erro ao carregar alunos.</td>
+                    <td colspan="6">Erro ao carregar alunos.</td>
                 </tr>
             `;
             return;
@@ -32,7 +32,7 @@ async function listarAlunos() {
         if (!Array.isArray(alunos) || alunos.length === 0) {
             container.innerHTML = `
                 <tr>
-                    <td colspan="4">Nenhum aluno encontrado.</td>
+                    <td colspan="6">Nenhum aluno encontrado.</td>
                 </tr>
             `;
             return;
@@ -70,7 +70,7 @@ async function listarAlunos() {
         if (alunosFiltrados.length === 0) {
             container.innerHTML = `
                 <tr>
-                    <td colspan="4">Nenhum aluno encontrado.</td>
+                    <td colspan="6">Nenhum aluno encontrado.</td>
                 </tr>
             `;
             return;
@@ -98,6 +98,8 @@ async function listarAlunos() {
 
             tr.innerHTML = `
                 <td>${aluno.nome ?? "-"}</td>
+                <td>${aluno.matricula ?? "-"}</td>
+                <td>${aluno.total_horas ?? aluno.totalHoras ?? "0.00"}h</td>
                 <td>${statusTexto}</td>
                 <td>${cursosTexto}</td>
                 <td>
@@ -111,7 +113,7 @@ async function listarAlunos() {
     } catch (error) {
         container.innerHTML = `
             <tr>
-                <td colspan="4">Não foi possível conectar ao servidor.</td>
+                <td colspan="6">Não foi possível conectar ao servidor.</td>
             </tr>
         `;
     }
