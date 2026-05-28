@@ -22,7 +22,8 @@ from api.models import (Usuario, Coordenador, Aluno,
                         SuperAdmin, Inscricao, CoordenacaoCurso,
                         TipoAtividade,RegraAtividade, StatusSubmissao,
                         AtividadeComplementar,  Submissao, Curso,
-                        LogAuditoria, NotificacaoEmail,Certificado)
+                        LogAuditoria, NotificacaoEmail,Certificado,
+                        NotificacaoMobileLeitura, AlunoFotoPerfil)
 
 from api.serializers import (
     UsuarioSerializer, 
@@ -1604,6 +1605,7 @@ class NotificacaoEmailViewSet(viewsets.ReadOnlyModelViewSet):
     )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
+
     
 class RecuperarSenhaAPIView(APIView):
     permission_classes = [AllowAny]
@@ -1832,35 +1834,63 @@ class ExtrairDadosCertificadoViewMock(APIView):
 class MobileNotificacoesAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
+    status_map = {
+        'APROVADA': 'Aprovado',
+        'REPROVADA': 'Rejeitado',
+        'PENDENTE': 'Pendente',
+    }
+
+    def _get_aluno(self, request):
         usuario = request.user
 
         if not hasattr(usuario, 'aluno'):
             raise PermissionDenied('Apenas alunos podem acessar notificações mobile.')
 
-        submissoes = Submissao.objects.select_related(
+        return usuario.aluno
+
+    def _get_submissoes(self, aluno):
+        return Submissao.objects.select_related(
             'curso',
             'atividade_complementar',
             'atividade_complementar__tipo_atividade',
             'status_submissao',
             'certificado'
         ).filter(
-            aluno=usuario.aluno
+            aluno=aluno
         ).order_by('-data_envio', '-id_submissao')[:50]
 
+    def _parse_notification_id(self, notification_id):
+        partes = notification_id.split('-', 2)
+
+        if len(partes) != 3 or partes[0] != 'submissao':
+            raise ValidationError('Identificador de notificação inválido.')
+
+        try:
+            submissao_id = int(partes[1])
+        except ValueError:
+            raise ValidationError('Identificador de submissão inválido.')
+
+        status_nome = partes[2]
+
+        return submissao_id, status_nome
+
+    def _build_notificacoes(self, aluno, submissoes):
         hoje = timezone.now().date()
 
-        status_map = {
-            'APROVADA': 'Aprovado',
-            'REPROVADA': 'Rejeitado',
-            'PENDENTE': 'Pendente',
-        }
+        leituras = NotificacaoMobileLeitura.objects.filter(
+            aluno=aluno,
+            submissao__in=submissoes
+        ).values_list(
+            'submissao_id',
+            'status_submissao_id'
+        )
 
+        leituras_set = set(leituras)
         notificacoes = []
 
         for submissao in submissoes:
             status_nome = submissao.status_submissao.nome_status
-            status_label = status_map.get(status_nome, status_nome.title())
+            status_label = self.status_map.get(status_nome, status_nome.title())
 
             dias = (hoje - submissao.data_envio).days
 
@@ -1874,6 +1904,11 @@ class MobileNotificacoesAPIView(APIView):
             categoria = submissao.atividade_complementar.tipo_atividade.nome
             descricao = submissao.atividade_complementar.descricao
 
+            lida = (
+                submissao.id_submissao,
+                submissao.status_submissao_id
+            ) in leituras_set
+
             notificacoes.append({
                 'id': f'submissao-{submissao.id_submissao}-{status_nome}',
                 'submissao_id': submissao.id_submissao,
@@ -1885,13 +1920,76 @@ class MobileNotificacoesAPIView(APIView):
                 'status_original': status_nome,
                 'tempo_relativo': tempo_relativo,
                 'data_envio': submissao.data_envio,
-                'lida': False,
+                'lida': lida,
                 'certificado_nome': submissao.certificado.nome_arquivo if submissao.certificado else None,
             })
+
+        return notificacoes
+
+    def get(self, request):
+        aluno = self._get_aluno(request)
+        submissoes = self._get_submissoes(aluno)
+        notificacoes = self._build_notificacoes(aluno, submissoes)
 
         return Response({
             'count': len(notificacoes),
             'results': notificacoes
+        }, status=status.HTTP_200_OK)
+
+    @transaction.atomic
+    def patch(self, request, notification_id):
+        aluno = self._get_aluno(request)
+        submissao_id, status_nome = self._parse_notification_id(notification_id)
+
+        try:
+            submissao = Submissao.objects.select_related(
+                'status_submissao'
+            ).get(
+                id_submissao=submissao_id,
+                aluno=aluno,
+                status_submissao__nome_status=status_nome
+            )
+        except Submissao.DoesNotExist:
+            raise ValidationError('Notificação não encontrada para este aluno.')
+
+        leitura, created = NotificacaoMobileLeitura.objects.update_or_create(
+            aluno=aluno,
+            submissao=submissao,
+            status_submissao=submissao.status_submissao,
+            defaults={
+                'data_leitura': timezone.now()
+            }
+        )
+
+        return Response({
+            'mensagem': 'Notificação marcada como lida.',
+            'id': notification_id,
+            'lida': True
+        }, status=status.HTTP_200_OK)
+
+    @transaction.atomic
+    def post(self, request):
+        aluno = self._get_aluno(request)
+        submissoes = self._get_submissoes(aluno)
+
+        total = 0
+
+        for submissao in submissoes:
+            _, created = NotificacaoMobileLeitura.objects.update_or_create(
+                aluno=aluno,
+                submissao=submissao,
+                status_submissao=submissao.status_submissao,
+                defaults={
+                    'data_leitura': timezone.now()
+                }
+            )
+
+            if created:
+                total += 1
+
+        return Response({
+            'mensagem': 'Todas as notificações foram marcadas como lidas.',
+            'total_marcadas': total
         }, status=status.HTTP_200_OK)
     
 class MobileDashboardAPIView(APIView):
@@ -2028,4 +2126,108 @@ class MobileDashboardAPIView(APIView):
             },
             'progresso_por_tipo': progresso_por_tipo,
             'ultimas_submissoes': ultimas,
+        }, status=status.HTTP_200_OK)
+    
+class MobilePerfilAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        usuario = request.user
+
+        if not hasattr(usuario, 'aluno'):
+            raise PermissionDenied('Apenas alunos podem acessar o perfil mobile.')
+        
+        aluno = usuario.aluno
+
+        inscricao_atual = Inscricao.objects.select_related(
+            'curso',
+            'status_matricula'
+        ).filter(
+            aluno = aluno,
+            status_matricula_id = 1
+        ).first()
+
+        foto = getattr(aluno, 'foto_perfil', None)
+
+        return Response({
+            'id': aluno.usuario.id_usuario,
+            'nome': aluno.usuario.nome,
+            'email': aluno.usuario.email,
+            'matricula': aluno.matricula,
+            'total_horas': aluno.total_horas,
+            'curso_atual': {
+                'id': inscricao_atual.curso.id_curso,
+                'nome': inscricao_atual.curso.nome,
+            } if inscricao_atual else None,
+            'foto_perfil_url': foto.url_arquivo if foto else None,
+        }, status=status.HTTP_200_OK)
+    
+class MobilePerfilFotoAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    @transaction.atomic
+    def patch(self, request):
+        usuario = request.user
+
+        if not hasattr(usuario, 'aluno'):
+            raise PermissionDenied('Apenas alunos podem alterar foto de perfil.')
+
+        aluno = usuario.aluno
+        arquivo = request.FILES.get('foto')
+
+        if not arquivo:
+            raise ValidationError({'foto': 'A foto é obrigatória.'})
+
+        extensao = os.path.splitext(arquivo.name)[1].lower()
+        extensoes_permitidas = ['.jpg', '.jpeg', '.png', '.webp']
+
+        if extensao not in extensoes_permitidas:
+            raise ValidationError({
+                'foto': 'Formato inválido. Envie JPG, JPEG, PNG ou WEBP.'
+            })
+
+        limite_mb = 3
+        tamanho_maximo = limite_mb * 1024 * 1024
+
+        if arquivo.size > tamanho_maximo:
+            raise ValidationError({
+                'foto': f'A foto deve ter no máximo {limite_mb}MB.'
+            })
+
+        foto_antiga = getattr(aluno, 'foto_perfil', None)
+
+        nome_unico = f'{uuid.uuid4()}{extensao}'
+        caminho_arquivo = default_storage.save(
+            f'fotos-perfil/{nome_unico}',
+            arquivo
+        )
+        url_arquivo = default_storage.url(caminho_arquivo)
+
+        if foto_antiga:
+            nome_antigo = foto_antiga.nome_arquivo
+            caminho_antigo = f'fotos-perfil/{nome_antigo}'
+
+            foto_antiga.nome_arquivo = nome_unico
+            foto_antiga.url_arquivo = url_arquivo
+            foto_antiga.data_upload = timezone.now()
+            foto_antiga.save()
+
+            try:
+                default_storage.delete(caminho_antigo)
+            except Exception as e:
+                print(f'Erro ao remover foto antiga: {e}')
+
+            foto = foto_antiga
+        else:
+            foto = AlunoFotoPerfil.objects.create(
+                aluno=aluno,
+                nome_arquivo=nome_unico,
+                url_arquivo=url_arquivo,
+                data_upload=timezone.now()
+            )
+
+        return Response({
+            'mensagem': 'Foto de perfil atualizada com sucesso.',
+            'foto_perfil_url': foto.url_arquivo,
         }, status=status.HTTP_200_OK)

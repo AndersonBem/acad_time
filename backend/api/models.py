@@ -55,6 +55,35 @@ class Aluno(models.Model):
     def __str__(self):
         return f'{self.usuario.nome} - {self.matricula}'
 
+class AlunoFotoPerfil(models.Model):
+    id_aluno_foto_perfil = models.AutoField(
+        db_column='idAlunoFotoPerfil',
+        primary_key=True
+    )
+    aluno = models.OneToOneField(
+        Aluno,
+        models.DO_NOTHING,
+        db_column='Aluno_idUsuario',
+        related_name='foto_perfil'
+    )
+    nome_arquivo = models.CharField(
+        db_column='nomeArquivo',
+        unique=True,
+        max_length=150
+    )
+    url_arquivo = models.CharField(
+        db_column='urlArquivo',
+        unique=True,
+        max_length=500
+    )
+    data_upload = models.DateTimeField(db_column='dataUpload')
+
+    class Meta:
+        managed = False
+        db_table = 'AlunoFotoPerfil'
+
+    def __str__(self):
+        return f'Foto de {self.aluno}'
 
 class SuperAdmin(models.Model):
     usuario = models.OneToOneField(
@@ -311,6 +340,35 @@ class NotificacaoEmail(models.Model):
     def __str__(self):
         return self.assunto
 
+class NotificacaoMobileLeitura(models.Model):
+    id_notificacao_mobile_leitura = models.AutoField(
+        db_column='idNotificacaoMobileLeitura',
+        primary_key=True
+    )
+    aluno = models.ForeignKey(
+        Aluno,
+        models.DO_NOTHING,
+        db_column='Aluno_idUsuario'
+    )
+    submissao = models.ForeignKey(
+        Submissao,
+        models.DO_NOTHING,
+        db_column='idSubmissao'
+    )
+    status_submissao = models.ForeignKey(
+        StatusSubmissao,
+        models.DO_NOTHING,
+        db_column='statusSubmissao'
+    )
+    data_leitura = models.DateTimeField(db_column='dataLeitura')
+
+    class Meta:
+        managed = False
+        db_table = 'NotificacaoMobileLeitura'
+        unique_together = (('aluno', 'submissao', 'status_submissao'),)
+
+    def __str__(self):
+        return f'{self.aluno} - {self.submissao} - {self.status_submissao}'
 
 class Telefone(models.Model):
     id_telefone = models.AutoField(db_column='idTelefone', primary_key=True)
