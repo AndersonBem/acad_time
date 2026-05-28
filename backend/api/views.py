@@ -2100,6 +2100,8 @@ class MobileDashboardAPIView(APIView):
             for inscricao in inscricoes
         ]
 
+        foto = getattr(aluno, 'foto_perfil', None)
+
         return Response({
             'aluno': {
                 'id': aluno.usuario.id_usuario,
@@ -2107,6 +2109,7 @@ class MobileDashboardAPIView(APIView):
                 'email': aluno.usuario.email,
                 'matricula': aluno.matricula,
                 'total_horas': aluno.total_horas,
+                'foto_perfil_url': foto.url_arquivo if foto else None,
             },
             'curso_atual': {
                 'id': curso_atual.id_curso,
