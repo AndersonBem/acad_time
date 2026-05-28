@@ -8,7 +8,7 @@ from api.views import (
     StatusSubmissaoViewSet,AtividadeComplementarViewSet,SubmissaoViewSet, CursoViewSet,
     LogAuditoriaViewSet,NotificacaoEmailViewSet, RecuperarSenhaAPIView,
     RedefinirSenhaAPIView,ExtrairDadosCertificadoView,ExtrairDadosCertificadoViewMock,
-    MobileNotificacoesAPIView, MobileDashboardAPIView)
+    MobileNotificacoesAPIView, MobileDashboardAPIView, MobilePerfilAPIView, MobilePerfilFotoAPIView)
 
 router = routers.DefaultRouter()
 router.register('usuarios', UsuarioViewSet, basename='usuarios')
@@ -32,6 +32,18 @@ urlpatterns = [
     path('recuperar-senha/', RecuperarSenhaAPIView.as_view(), name='recuperar-senha'),
     path('mobile/notificacoes/', MobileNotificacoesAPIView.as_view(), name='mobile-notificacoes'),
     path('mobile/dashboard/', MobileDashboardAPIView.as_view(), name='mobile-dashboard'),
+    path(
+        'mobile/notificacoes/<str:notification_id>/marcar-lida/',
+        MobileNotificacoesAPIView.as_view(),
+        name='mobile-notificacao-marcar-lida'
+    ),
+    path(
+        'mobile/notificacoes/marcar-todas-lidas/',
+        MobileNotificacoesAPIView.as_view(),
+        name='mobile-notificacoes-marcar-todas-lidas'
+    ),
+    path('mobile/perfil/', MobilePerfilAPIView.as_view(), name='mobile-perfil'),
+    path('mobile/perfil/foto/', MobilePerfilFotoAPIView.as_view(), name='mobile-perfil-foto'),
 
     # produção (Render)
     path('ocr/', ExtrairDadosCertificadoViewMock.as_view()),
