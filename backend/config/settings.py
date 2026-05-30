@@ -147,6 +147,7 @@ RESEND_FROM_EMAIL = config(
     'RESEND_FROM_EMAIL',
     default='AcadTime <onboarding@resend.dev>'
 )
+GEMINI_API_KEY = config('GEMINI_API_KEY', default='')
 
 
 STORAGES = {

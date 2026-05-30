@@ -46,9 +46,9 @@ urlpatterns = [
     path('mobile/perfil/foto/', MobilePerfilFotoAPIView.as_view(), name='mobile-perfil-foto'),
 
     # produção (Render)
-    path('ocr/', ExtrairDadosCertificadoViewMock.as_view()),
+    #path('ocr/', ExtrairDadosCertificadoViewMock.as_view()),
     # local (troca manual)
-    # path('ocr/', ExtrairDadosCertificadoViewReal.as_view()),
+    path('ocr/', ExtrairDadosCertificadoView.as_view()),
     path('', include(router.urls)),
 
 ]
