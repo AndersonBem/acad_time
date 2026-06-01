@@ -2018,16 +2018,15 @@ class MobileDashboardAPIView(APIView):
             'status_matricula'
         ).filter(aluno=aluno)
 
+        inscricoes_ativas = inscricoes.filter(status_matricula_id=1)
+
         if curso_id:
-            inscricao_atual = inscricoes.filter(curso_id=curso_id).first()
+            inscricao_atual = inscricoes_ativas.filter(curso_id=curso_id).first()
 
             if not inscricao_atual:
-                raise PermissionDenied('Este curso não pertence ao aluno logado.')
+                raise PermissionDenied('Este curso não está ativo para o aluno logado.')
         else:
-            inscricao_atual = (
-                inscricoes.filter(status_matricula_id=1).first()
-                or inscricoes.first()
-            )
+            inscricao_atual = inscricoes_ativas.first()
 
         curso_atual = inscricao_atual.curso if inscricao_atual else None
 
@@ -2106,7 +2105,7 @@ class MobileDashboardAPIView(APIView):
                 'status_matricula': inscricao.status_matricula.nome,
                 'data_inscricao': inscricao.data_inscricao,
             }
-            for inscricao in inscricoes
+            for inscricao in inscricoes_ativas
         ]
 
         foto = getattr(aluno, 'foto_perfil', None)
