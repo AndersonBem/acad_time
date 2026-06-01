@@ -138,7 +138,9 @@ async function buscarLogsAuditoria() {
 
 	if (!response.ok) return [];
 
-	return await response.json();
+	const data = await response.json();
+
+	return data.results || data;
 }
 
 function preencherDadosAluno(aluno = null) {
