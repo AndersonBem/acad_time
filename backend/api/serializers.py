@@ -298,9 +298,45 @@ class SubmissaoReadSerializer(serializers.ModelSerializer):
 
 class SubmissaoCreateSerializer(serializers.ModelSerializer):
     certificado_arquivo = serializers.FileField(write_only=True, required=True)
+    
+    texto_extraido_ocr = serializers.CharField(
+        write_only=True,
+        required=False,
+        allow_blank=True
+    )
+    carga_horaria_ocr = serializers.CharField(
+        write_only=True,
+        required=False,
+        allow_blank=True
+    )
+    data_certificado_ocr = serializers.CharField(
+        write_only=True,
+        required=False,
+        allow_blank=True
+    )
+    curso_ocr = serializers.CharField(
+        write_only=True,
+        required=False,
+        allow_blank=True
+    )
+    instituicao_ocr = serializers.CharField(
+        write_only=True,
+        required=False,
+        allow_blank=True
+    )
+
     class Meta:
         model = Submissao
-        fields = ['curso', 'atividade_complementar', 'certificado_arquivo']
+        fields = [
+            'curso',
+            'atividade_complementar',
+            'certificado_arquivo',
+            'texto_extraido_ocr',
+            'carga_horaria_ocr',
+            'data_certificado_ocr',
+            'curso_ocr',
+            'instituicao_ocr',
+        ]
 
     def validate(self, attrs):
         curso = attrs.get('curso')

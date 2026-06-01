@@ -1374,7 +1374,11 @@ class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
         aluno = usuario.aluno
         curso = serializer.validated_data.get('curso')
         arquivo =  serializer.validated_data.pop('certificado_arquivo', None)
-       
+        texto_extraido_ocr = serializer.validated_data.pop('texto_extraido_ocr', '')
+        carga_horaria_ocr = serializer.validated_data.pop('carga_horaria_ocr', '')
+        data_certificado_ocr = serializer.validated_data.pop('data_certificado_ocr', '')
+        curso_ocr = serializer.validated_data.pop('curso_ocr', '')
+        instituicao_ocr = serializer.validated_data.pop('instituicao_ocr', '')
 
         possui_inscricao_ativa = Inscricao.objects.filter(
             aluno = aluno,
@@ -1402,9 +1406,14 @@ class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
         status_pendente = StatusSubmissao.objects.get(nome_status = 'PENDENTE')   
 
         certificado = Certificado.objects.create(
-             nome_arquivo=nome_unico,
-             url_arquivo=default_storage.url(caminho_arquivo),
-             data_upload=timezone.now().date()
+            nome_arquivo=nome_unico,
+            url_arquivo=default_storage.url(caminho_arquivo),
+            data_upload=timezone.now().date(),
+            texto_extraido_ocr=texto_extraido_ocr,
+            carga_horaria_ocr=carga_horaria_ocr,
+            data_certificado_ocr=data_certificado_ocr,
+            curso_ocr=curso_ocr,
+            instituicao_ocr=instituicao_ocr,
         ) 
         coordenacao_ativa = CoordenacaoCurso.objects.filter(
             curso=curso,
