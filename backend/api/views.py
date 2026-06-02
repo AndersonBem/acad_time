@@ -2048,6 +2048,9 @@ class MobileDashboardAPIView(APIView):
         horas_aprovadas = 0
         horas_pendentes = 0
         horas_rejeitadas = 0
+        submissoes_aprovadas = 0
+        submissoes_pendentes = 0
+        submissoes_rejeitadas = 0
 
         for submissao in submissoes:
             status_nome = submissao.status_submissao.nome_status
@@ -2055,10 +2058,13 @@ class MobileDashboardAPIView(APIView):
 
             if status_nome == 'APROVADA':
                 horas_aprovadas += submissao.carga_horaria_aprovada or 0
+                submissoes_aprovadas += 1
             elif status_nome == 'PENDENTE':
                 horas_pendentes += horas_solicitadas
+                submissoes_pendentes += 1
             elif status_nome == 'REPROVADA':
                 horas_rejeitadas += horas_solicitadas
+                submissoes_rejeitadas += 1
 
         progresso_por_tipo = []
 
@@ -2129,6 +2135,9 @@ class MobileDashboardAPIView(APIView):
                 'horas_aprovadas': horas_aprovadas,
                 'horas_pendentes': horas_pendentes,
                 'horas_rejeitadas': horas_rejeitadas,
+                'submissoes_aprovadas': submissoes_aprovadas,
+                'submissoes_pendentes': submissoes_pendentes,
+                'submissoes_rejeitadas': submissoes_rejeitadas,
                 'total_submissoes': submissoes.count(),
                 'meta_horas': curso_atual.carga_horaria_minima if curso_atual else 0,
                 'percentual_geral': round(
