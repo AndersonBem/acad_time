@@ -10,7 +10,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from api.models import Submissao
 
-LIMITE_RAPIDFUZZ = 52
+LIMITE_RAPIDFUZZ = 85
 LIMITE_COSSENO = 70
 TAMANHO_MINIMO_TEXTO = 20
 LIMITE_DISTANCIA_HASH_VISUAL = 8
@@ -97,7 +97,7 @@ def comparar_textos(texto_novo, texto_antigo):
             'score_rapidfuzz': 0,
             'score_cosseno': 0,
             'suspeito': False,
-            'motivo': 'Texto insuficiente para comparação',
+            'motivo': 'Texto insuficiente para comparacao',
         }
     
     score_rapidfuzz = fuzz.token_sort_ratio(texto_novo, texto_antigo)
@@ -208,6 +208,7 @@ def verificar_submissao(submissao):
 
         suspeitas.append({
             'certificado_id': antiga.certificado.id_certificado if antiga.certificado else None,
+            'certificado_url': antiga.certificado.url_arquivo if antiga.certificado else None,
             'submissao_id': antiga.id_submissao,
             'aluno_id': antiga.aluno.usuario.id_usuario if antiga.aluno else None,
             'aluno_nome': antiga.aluno.usuario.nome if antiga.aluno else None,
@@ -221,7 +222,10 @@ def verificar_submissao(submissao):
         })
 
     suspeitas.sort(
-        key=lambda item: max(item['score_rapidfuzz'], item['score_cosseno']),
+            key=lambda item: (
+                1 if item['suspeitas_hash'] else 0,
+                max(item['score_rapidfuzz'], item['score_cosseno'])
+            ),
         reverse=True
     )
 
