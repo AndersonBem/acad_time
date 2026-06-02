@@ -143,6 +143,23 @@ async function buscarLogsAuditoria() {
 	return data.results || data;
 }
 
+async function verificarSuspeitaCertificado(idSubmissao) {
+  const token = localStorage.getItem('access_token');
+
+  const resposta = await fetch(`${API_BASE_URL}/submissao/${idSubmissao}/verificar-suspeita/`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!resposta.ok) {
+    throw new Error('Erro ao verificar suspeitas do certificado.');
+  }
+
+  return await resposta.json();
+}
+
 function preencherDadosAluno(aluno = null) {
 	document.getElementById("alunoNome").textContent =
 		submissaoAtual?.aluno_nome || aluno?.nome || "-";
@@ -353,6 +370,82 @@ async function salvarAnaliseComStatus(nomeStatus) {
 	window.location.href = "listarCertificados.html";
 }
 
+function abrirModalSuspeitas(resultado) {
+	const modal = document.getElementById("modalSuspeitas");
+	const resumo = document.getElementById("resumoSuspeitas");
+	const lista = document.getElementById("listaSuspeitas");
+
+	resumo.textContent =
+		`Foram encontradas ${resultado.total_suspeitas} possiveis suspeitas.`;
+
+	lista.innerHTML = "";
+
+	const certificadoAtualUrl = submissaoAtual?.certificado_url || "";
+
+	lista.innerHTML = `
+		<div class="comparacao-certificados">
+			<div class="certificado-preview">
+				<h3>Certificado atual</h3>
+				<iframe src="${certificadoAtualUrl}"></iframe>
+			</div>
+
+			<div class="certificado-preview">
+				<h3 id="tituloCertificadoSuspeito">Certificado suspeito</h3>
+				<iframe id="iframeCertificadoSuspeito" src=""></iframe>
+			</div>
+		</div>
+
+		<div class="lista-suspeitas-itens"></div>
+	`;
+
+	const listaItens = lista.querySelector(".lista-suspeitas-itens");
+	const iframeSuspeito = document.getElementById("iframeCertificadoSuspeito");
+	const tituloSuspeito = document.getElementById("tituloCertificadoSuspeito");
+
+	resultado.suspeitas.forEach((suspeita, index) => {
+		const item = document.createElement("div");
+		item.className = "item-suspeita";
+
+		item.innerHTML = `
+			<h3>Submissao #${suspeita.submissao_id}</h3>
+			<p><strong>Aluno:</strong> ${suspeita.aluno_nome || "-"}</p>
+			<p><strong>Curso:</strong> ${suspeita.curso_nome || "-"}</p>
+			<p><strong>RapidFuzz:</strong> ${suspeita.score_rapidfuzz}%</p>
+			<p><strong>Cosseno:</strong> ${suspeita.score_cosseno}%</p>
+			<p><strong>Motivo:</strong> ${suspeita.motivo || "-"}</p>
+
+			<button type="button">Comparar este certificado</button>
+		`;
+
+		item.querySelector("button").onclick = () => {
+			if (!suspeita.certificado_url) {
+				alert("Esta suspeita ainda nao possui URL do certificado.");
+				return;
+			}
+
+			iframeSuspeito.src = suspeita.certificado_url;
+			tituloSuspeito.textContent =
+				`Certificado suspeito - Submissao #${suspeita.submissao_id}`;
+		};
+
+		listaItens.appendChild(item);
+
+		if (index === 0 && suspeita.certificado_url) {
+			iframeSuspeito.src = suspeita.certificado_url;
+			tituloSuspeito.textContent =
+				`Certificado suspeito - Submissao #${suspeita.submissao_id}`;
+		}
+	});
+
+	modal.classList.remove("escondido");
+}
+
+function fecharModalSuspeitas() {
+	const modal = document.getElementById("modalSuspeitas");
+
+	modal.classList.add("escondido");
+}
+
 function configurarBotoes() {
 	const btnAprovar =
 		document.getElementById("btnAprovar");
@@ -369,12 +462,49 @@ function configurarBotoes() {
 		document.getElementById(
 			"btnBaixarArquivo",
 		);
+	
+	const btnVerificarSuspeita =
+		document.getElementById(
+			"btn-verificar-suspeita",
+		);
+	const btnFecharModalSuspeitas =
+	document.getElementById("btnFecharModalSuspeitas");
+
+	btnFecharModalSuspeitas.onclick = fecharModalSuspeitas;
 
 	btnAprovar.onclick = () =>
 		salvarAnaliseComStatus("APROVADA");
 
 	btnReprovar.onclick = () =>
 		salvarAnaliseComStatus("REPROVADA");
+		btnVerificarSuspeita.onclick = async () => {
+		if (!submissaoAtual?.id_submissao) {
+			alert("Submissao nao encontrada.");
+			return;
+		}
+
+		try {
+			btnVerificarSuspeita.disabled = true;
+			btnVerificarSuspeita.textContent = "Verificando...";
+
+			const resultado = await verificarSuspeitaCertificado(
+				submissaoAtual.id_submissao,
+			);
+
+			if (resultado.total_suspeitas > 0) {
+				abrirModalSuspeitas(resultado);
+			} else {
+				alert("Nenhuma suspeita encontrada.");
+			}
+		} catch (error) {
+			console.error(error);
+			alert("Erro ao verificar suspeitas.");
+		} finally {
+			btnVerificarSuspeita.disabled = false;
+			btnVerificarSuspeita.textContent =
+				"Verificar possivel reutilizacao";
+		}
+	};
 
 	btnVisualizarArquivo.onclick = () => {
 		if (!submissaoAtual?.certificado_url) {
