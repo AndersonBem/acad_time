@@ -2169,6 +2169,13 @@ class MobilePerfilAPIView(APIView):
 
         foto = getattr(aluno, 'foto_perfil', None)
 
+        inscricoes = Inscricao.objects.select_related(
+            'curso',
+            'status_matricula'
+        ).filter(
+            aluno=aluno
+        ).order_by('curso__nome')
+
         return Response({
             'id': aluno.usuario.id_usuario,
             'nome': aluno.usuario.nome,
@@ -2179,6 +2186,15 @@ class MobilePerfilAPIView(APIView):
                 'id': inscricao_atual.curso.id_curso,
                 'nome': inscricao_atual.curso.nome,
             } if inscricao_atual else None,
+            'cursos': [
+                {
+                    'id': inscricao.curso.id_curso,
+                    'nome': inscricao.curso.nome,
+                    'status': inscricao.status_matricula.nome,
+                    'data_inscricao': inscricao.data_inscricao,
+                }
+                for inscricao in inscricoes
+            ],
             'foto_perfil_url': foto.url_arquivo if foto else None,
         }, status=status.HTTP_200_OK)
     
