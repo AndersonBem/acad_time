@@ -47,6 +47,12 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from api.pagination import (AlunoPagination, SubmissaoPagination,
                             AuditoriaPagination)
+from api.services.verificacao_certificado import (
+    calcular_hash_arquivo,
+    calcular_hash_visual,
+    verificar_submissao,
+)
+
 
 class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
     """Listando usuários, sem permitir criação, deleteção e etc, esses metodos
@@ -1399,7 +1405,10 @@ class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
         if extensao not in extensoes_permitidas:
             raise ValidationError({
             'certificado_arquivo': 'Formato inválido. Envie PDF, JPG, JPEG ou PNG.'
-        })
+            })
+        hash_arquivo = calcular_hash_arquivo(arquivo)
+        hash_visual = calcular_hash_visual(arquivo, arquivo.name)
+
         caminho_arquivo = default_storage.save(f'certificados/{nome_unico}', arquivo)
 
 
@@ -1414,6 +1423,8 @@ class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
             data_certificado_ocr=data_certificado_ocr,
             curso_ocr=curso_ocr,
             instituicao_ocr=instituicao_ocr,
+            hash_arquivo=hash_arquivo,
+            hash_visual=hash_visual,
         ) 
         coordenacao_ativa = CoordenacaoCurso.objects.filter(
             curso=curso,
@@ -1506,6 +1517,29 @@ class SubmissaoViewSet(AuditContextMixin, viewsets.ModelViewSet):
         set_audit_context(request)
         raise PermissionDenied('Exclusão de submissão não é permitida. Utilize a alteração de status.')
     
+    @action(detail=True, methods=['post'], url_path='verificar-suspeita')
+    def verificar_suspeita(self, request, pk=None):
+        submissao = self.get_object()
+
+        usuario = request.user
+
+        if hasattr(usuario, 'aluno') and submissao.aluno != usuario.aluno:
+            raise PermissionDenied('Aluno só pode verificar as próprias submissões.')
+
+        if hasattr(usuario, 'coordenador'):
+            vinculo_ativo = CoordenacaoCurso.objects.filter(
+                coordenador=usuario.coordenador,
+                curso=submissao.curso,
+                data_fim__isnull=True
+            ).exists()
+
+            if not vinculo_ativo:
+                raise PermissionDenied('Coordenador não pode verificar submissões deste curso.')
+
+        resultado = verificar_submissao(submissao)
+
+        return Response(resultado, status=status.HTTP_200_OK)
+
     @action(detail=True, methods=['get'], url_path='baixar-certificado')
     def baixar_certificado(self, request, pk=None):
         submissao = self.get_object()

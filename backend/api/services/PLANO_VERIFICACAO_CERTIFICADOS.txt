@@ -1,0 +1,47 @@
+PLANO - VERIFICACAO DE CERTIFICADOS
+
+Objetivo:
+Detectar possivel reutilizacao de certificados no AcadTime.
+
+A verificacao nao reprova automaticamente.
+Ela apenas retorna suspeitas para analise humana.
+
+Models usados:
+- Certificado
+- Submissao
+- AtividadeComplementar
+- Aluno
+- Curso
+
+Campos principais:
+- Certificado.texto_extraido_ocr
+- Certificado.curso_ocr
+- Certificado.instituicao_ocr
+- Certificado.carga_horaria_ocr
+- Certificado.data_certificado_ocr
+- AtividadeComplementar.descricao
+- AtividadeComplementar.carga_horaria_solicitada
+- TipoAtividade.nome
+- Curso.nome
+
+Camada 1:
+RapidFuzz compara textos quase iguais.
+
+Camada 2:
+TF-IDF + cosseno compara contexto geral dos textos.
+
+Texto de comparacao:
+O service monta um texto unico juntando OCR + dados preenchidos da atividade.
+
+Endpoint planejado:
+POST /submissao/{id}/verificar-suspeita/
+
+Esse endpoint:
+- busca a submissao
+- monta o texto de comparacao
+- compara com certificados antigos
+- retorna possiveis suspeitas
+- nao altera o status automaticamente
+
+Camada 3:
+Comparacao visual ou hash do arquivo ficara para etapa futura.
