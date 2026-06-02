@@ -370,6 +370,28 @@ async function salvarAnaliseComStatus(nomeStatus) {
 	window.location.href = "listarCertificados.html";
 }
 
+function urlEhImagem(url) {
+	return /\.(jpg|jpeg|png|webp)(\?|$)/i.test(url || "");
+}
+
+function montarPreviewCertificado(url) {
+	if (!url) {
+		return `<div class="certificado-vazio">Certificado sem URL.</div>`;
+	}
+
+	if (urlEhImagem(url)) {
+		return `<img class="certificado-imagem" src="${url}" alt="Certificado">`;
+	}
+
+	return `<iframe class="certificado-iframe" src="${url}"></iframe>`;
+}
+
+function atualizarPreviewCertificado(containerId, url) {
+	const container = document.getElementById(containerId);
+
+	container.innerHTML = montarPreviewCertificado(url);
+}
+
 function abrirModalSuspeitas(resultado) {
 	const modal = document.getElementById("modalSuspeitas");
 	const resumo = document.getElementById("resumoSuspeitas");
@@ -386,12 +408,14 @@ function abrirModalSuspeitas(resultado) {
 		<div class="comparacao-certificados">
 			<div class="certificado-preview">
 				<h3>Certificado atual</h3>
-				<iframe src="${certificadoAtualUrl}"></iframe>
+				<div id="previewCertificadoAtual" class="certificado-preview-area">
+					${montarPreviewCertificado(certificadoAtualUrl)}
+				</div>
 			</div>
 
 			<div class="certificado-preview">
 				<h3 id="tituloCertificadoSuspeito">Certificado suspeito</h3>
-				<iframe id="iframeCertificadoSuspeito" src=""></iframe>
+				<div id="previewCertificadoSuspeito" class="certificado-preview-area"></div>
 			</div>
 		</div>
 
@@ -399,7 +423,6 @@ function abrirModalSuspeitas(resultado) {
 	`;
 
 	const listaItens = lista.querySelector(".lista-suspeitas-itens");
-	const iframeSuspeito = document.getElementById("iframeCertificadoSuspeito");
 	const tituloSuspeito = document.getElementById("tituloCertificadoSuspeito");
 
 	resultado.suspeitas.forEach((suspeita, index) => {
@@ -410,28 +433,52 @@ function abrirModalSuspeitas(resultado) {
 			<h3>Submissao #${suspeita.submissao_id}</h3>
 			<p><strong>Aluno:</strong> ${suspeita.aluno_nome || "-"}</p>
 			<p><strong>Curso:</strong> ${suspeita.curso_nome || "-"}</p>
-			<p><strong>RapidFuzz:</strong> ${suspeita.score_rapidfuzz}%</p>
-			<p><strong>Cosseno:</strong> ${suspeita.score_cosseno}%</p>
+			<p><strong>Similaridade do texto:</strong> ${suspeita.score_rapidfuzz}%</p>
+			<p><strong>Similaridade do conteudo:</strong> ${suspeita.score_cosseno}%</p>
 			<p><strong>Motivo:</strong> ${suspeita.motivo || "-"}</p>
 
-			<button type="button">Comparar este certificado</button>
+			<div class="item-suspeita-acoes">
+			<button type="button" class="btn-comparar-certificado">
+				Comparar certificado
+			</button>
+
+			<button type="button" class="btn-abrir-submissao">
+				Abrir submissao antiga
+			</button>
+			</div>
 		`;
 
-		item.querySelector("button").onclick = () => {
+		const btnComparar = item.querySelector(".btn-comparar-certificado");
+		const btnAbrirSubmissao = item.querySelector(".btn-abrir-submissao");
+
+		btnComparar.onclick = () => {
 			if (!suspeita.certificado_url) {
 				alert("Esta suspeita ainda nao possui URL do certificado.");
 				return;
 			}
 
-			iframeSuspeito.src = suspeita.certificado_url;
+			atualizarPreviewCertificado(
+				"previewCertificadoSuspeito",
+				suspeita.certificado_url,
+			);
 			tituloSuspeito.textContent =
 				`Certificado suspeito - Submissao #${suspeita.submissao_id}`;
+		};
+
+		btnAbrirSubmissao.onclick = () => {
+			window.open(
+				`analiseCertificados.html?id=${suspeita.submissao_id}`,
+				"_blank",
+			);
 		};
 
 		listaItens.appendChild(item);
 
 		if (index === 0 && suspeita.certificado_url) {
-			iframeSuspeito.src = suspeita.certificado_url;
+			atualizarPreviewCertificado(
+				"previewCertificadoSuspeito",
+				suspeita.certificado_url,
+			);
 			tituloSuspeito.textContent =
 				`Certificado suspeito - Submissao #${suspeita.submissao_id}`;
 		}
