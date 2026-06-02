@@ -253,6 +253,8 @@ class Certificado(models.Model):
     data_certificado_ocr = models.CharField(db_column='dataCertificadoOcr', max_length=250, blank=True, null=True)
     curso_ocr = models.CharField(db_column='cursoOcr', max_length=250, blank=True, null=True)
     instituicao_ocr = models.CharField(db_column='instituicaoOcr', max_length=250, blank=True, null=True)
+    hash_arquivo = models.CharField(db_column='hashArquivo', max_length=128, blank=True, null=True)
+    hash_visual = models.CharField(db_column='hashVisual', max_length=64, blank=True, null=True)
     data_upload = models.DateField(db_column='dataUpload')
 
     class Meta:
