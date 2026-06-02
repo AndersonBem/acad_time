@@ -143,6 +143,23 @@ async function buscarLogsAuditoria() {
 	return data.results || data;
 }
 
+async function verificarSuspeitaCertificado(idSubmissao) {
+  const token = localStorage.getItem('access_token');
+
+  const resposta = await fetch(`${API_BASE_URL}/submissao/${idSubmissao}/verificar-suspeita/`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!resposta.ok) {
+    throw new Error('Erro ao verificar suspeitas do certificado.');
+  }
+
+  return await resposta.json();
+}
+
 function preencherDadosAluno(aluno = null) {
 	document.getElementById("alunoNome").textContent =
 		submissaoAtual?.aluno_nome || aluno?.nome || "-";
@@ -353,6 +370,68 @@ async function salvarAnaliseComStatus(nomeStatus) {
 	window.location.href = "listarCertificados.html";
 }
 
+function abrirModalSuspeitas(resultado) {
+	const modal = document.getElementById("modalSuspeitas");
+	const resumo = document.getElementById("resumoSuspeitas");
+	const lista = document.getElementById("listaSuspeitas");
+
+	resumo.textContent =
+		`Foram encontradas ${resultado.total_suspeitas} possiveis suspeitas para esta submissao.`;
+
+	lista.innerHTML = "";
+
+	resultado.suspeitas.forEach((suspeita) => {
+		const item = document.createElement("div");
+		item.className = "item-suspeita";
+
+		item.innerHTML = `
+			<h3>Submissao #${suspeita.submissao_id}</h3>
+			<p><strong>Aluno:</strong> ${suspeita.aluno_nome || "-"}</p>
+			<p><strong>Curso:</strong> ${suspeita.curso_nome || "-"}</p>
+			<p><strong>RapidFuzz:</strong> ${suspeita.score_rapidfuzz}%</p>
+			<p><strong>Cosseno:</strong> ${suspeita.score_cosseno}%</p>
+			<p><strong>Motivo:</strong> ${suspeita.motivo || "-"}</p>
+
+			<div class="item-suspeita-acoes">
+				<button type="button" data-url="${suspeita.certificado_url || ""}">
+					Abrir certificado
+				</button>
+				<button type="button" data-submissao="${suspeita.submissao_id}">
+					Abrir submissao
+				</button>
+			</div>
+		`;
+
+		const botoes = item.querySelectorAll("button");
+
+		botoes[0].onclick = () => {
+			if (!suspeita.certificado_url) {
+				alert("Certificado sem URL.");
+				return;
+			}
+
+			window.open(suspeita.certificado_url, "_blank");
+		};
+
+		botoes[1].onclick = () => {
+			window.open(
+				`analiseCertificados.html?id=${suspeita.submissao_id}`,
+				"_blank",
+			);
+		};
+
+		lista.appendChild(item);
+	});
+
+	modal.classList.remove("escondido");
+}
+
+function fecharModalSuspeitas() {
+	const modal = document.getElementById("modalSuspeitas");
+
+	modal.classList.add("escondido");
+}
+
 function configurarBotoes() {
 	const btnAprovar =
 		document.getElementById("btnAprovar");
@@ -369,12 +448,49 @@ function configurarBotoes() {
 		document.getElementById(
 			"btnBaixarArquivo",
 		);
+	
+	const btnVerificarSuspeita =
+		document.getElementById(
+			"btn-verificar-suspeita",
+		);
+	const btnFecharModalSuspeitas =
+	document.getElementById("btnFecharModalSuspeitas");
+
+	btnFecharModalSuspeitas.onclick = fecharModalSuspeitas;
 
 	btnAprovar.onclick = () =>
 		salvarAnaliseComStatus("APROVADA");
 
 	btnReprovar.onclick = () =>
 		salvarAnaliseComStatus("REPROVADA");
+		btnVerificarSuspeita.onclick = async () => {
+		if (!submissaoAtual?.id_submissao) {
+			alert("Submissao nao encontrada.");
+			return;
+		}
+
+		try {
+			btnVerificarSuspeita.disabled = true;
+			btnVerificarSuspeita.textContent = "Verificando...";
+
+			const resultado = await verificarSuspeitaCertificado(
+				submissaoAtual.id_submissao,
+			);
+
+			if (resultado.total_suspeitas > 0) {
+				abrirModalSuspeitas(resultado);
+			} else {
+				alert("Nenhuma suspeita encontrada.");
+			}
+		} catch (error) {
+			console.error(error);
+			alert("Erro ao verificar suspeitas.");
+		} finally {
+			btnVerificarSuspeita.disabled = false;
+			btnVerificarSuspeita.textContent =
+				"Verificar possivel reutilizacao";
+		}
+	};
 
 	btnVisualizarArquivo.onclick = () => {
 		if (!submissaoAtual?.certificado_url) {
