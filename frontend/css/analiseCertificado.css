@@ -423,3 +423,36 @@
   border-radius: 6px;
   cursor: pointer;
 }
+
+.comparacao-certificados {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.certificado-preview {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fafafa;
+}
+
+.certificado-preview iframe {
+  width: 100%;
+  height: 480px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: white;
+}
+
+.lista-suspeitas-itens {
+  display: grid;
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .comparacao-certificados {
+    grid-template-columns: 1fr;
+  }
+}

@@ -376,11 +376,33 @@ function abrirModalSuspeitas(resultado) {
 	const lista = document.getElementById("listaSuspeitas");
 
 	resumo.textContent =
-		`Foram encontradas ${resultado.total_suspeitas} possiveis suspeitas para esta submissao.`;
+		`Foram encontradas ${resultado.total_suspeitas} possiveis suspeitas.`;
 
 	lista.innerHTML = "";
 
-	resultado.suspeitas.forEach((suspeita) => {
+	const certificadoAtualUrl = submissaoAtual?.certificado_url || "";
+
+	lista.innerHTML = `
+		<div class="comparacao-certificados">
+			<div class="certificado-preview">
+				<h3>Certificado atual</h3>
+				<iframe src="${certificadoAtualUrl}"></iframe>
+			</div>
+
+			<div class="certificado-preview">
+				<h3 id="tituloCertificadoSuspeito">Certificado suspeito</h3>
+				<iframe id="iframeCertificadoSuspeito" src=""></iframe>
+			</div>
+		</div>
+
+		<div class="lista-suspeitas-itens"></div>
+	`;
+
+	const listaItens = lista.querySelector(".lista-suspeitas-itens");
+	const iframeSuspeito = document.getElementById("iframeCertificadoSuspeito");
+	const tituloSuspeito = document.getElementById("tituloCertificadoSuspeito");
+
+	resultado.suspeitas.forEach((suspeita, index) => {
 		const item = document.createElement("div");
 		item.className = "item-suspeita";
 
@@ -392,35 +414,27 @@ function abrirModalSuspeitas(resultado) {
 			<p><strong>Cosseno:</strong> ${suspeita.score_cosseno}%</p>
 			<p><strong>Motivo:</strong> ${suspeita.motivo || "-"}</p>
 
-			<div class="item-suspeita-acoes">
-				<button type="button" data-url="${suspeita.certificado_url || ""}">
-					Abrir certificado
-				</button>
-				<button type="button" data-submissao="${suspeita.submissao_id}">
-					Abrir submissao
-				</button>
-			</div>
+			<button type="button">Comparar este certificado</button>
 		`;
 
-		const botoes = item.querySelectorAll("button");
-
-		botoes[0].onclick = () => {
+		item.querySelector("button").onclick = () => {
 			if (!suspeita.certificado_url) {
-				alert("Certificado sem URL.");
+				alert("Esta suspeita ainda nao possui URL do certificado.");
 				return;
 			}
 
-			window.open(suspeita.certificado_url, "_blank");
+			iframeSuspeito.src = suspeita.certificado_url;
+			tituloSuspeito.textContent =
+				`Certificado suspeito - Submissao #${suspeita.submissao_id}`;
 		};
 
-		botoes[1].onclick = () => {
-			window.open(
-				`analiseCertificados.html?id=${suspeita.submissao_id}`,
-				"_blank",
-			);
-		};
+		listaItens.appendChild(item);
 
-		lista.appendChild(item);
+		if (index === 0 && suspeita.certificado_url) {
+			iframeSuspeito.src = suspeita.certificado_url;
+			tituloSuspeito.textContent =
+				`Certificado suspeito - Submissao #${suspeita.submissao_id}`;
+		}
 	});
 
 	modal.classList.remove("escondido");
