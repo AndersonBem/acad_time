@@ -1,17 +1,19 @@
-from rapidfuzz import fuzz
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 import hashlib
 import os
 
 from PIL import Image
 import imagehash
 
+from rapidfuzz import fuzz
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
 from api.models import Submissao
 
-LIMITE_RAPIDFUZZ = 85
+LIMITE_RAPIDFUZZ = 52
 LIMITE_COSSENO = 70
 TAMANHO_MINIMO_TEXTO = 20
+LIMITE_DISTANCIA_HASH_VISUAL = 8
 
 def normalizar_texto(texto):
     return ' '.join(str(texto or '').lower().split())
@@ -50,8 +52,6 @@ def calcular_hash_visual(arquivo, nome_arquivo):
         arquivo.seek(0)
         return None
 
-
-
 def montar_texto_comparacao(submissao):
     certificado = submissao.certificado
     atividade = submissao.atividade_complementar
@@ -72,21 +72,6 @@ def montar_texto_comparacao(submissao):
 
     return normalizar_texto(texto)
 
-def montar_texto_principal(submissao):
-    certificado = submissao.certificado
-    atividade = submissao.atividade_complementar
-
-    partes = [
-        certificado.texto_extraido_ocr if certificado else '',
-        certificado.curso_ocr if certificado else '',
-        certificado.data_certificado_ocr if certificado else '',
-        atividade.descricao if atividade else '',
-        atividade.carga_horaria_solicitada if atividade else '',
-    ]
-
-    texto = ' '.join([str(parte) for parte in partes if parte])
-
-    return normalizar_texto(texto)
 
 
 def calcular_score_cosseno(texto_novo, texto_antigo):
@@ -137,40 +122,53 @@ def comparar_textos(texto_novo, texto_antigo):
         'motivo': ' '.join(motivos) if motivos else 'Nenhuma suspeita encontrada.',
     }
 
-def escolher_melhor_resultado(resultado_completo, resultado_principal):
-    maior_completo = max(
-        resultado_completo['score_rapidfuzz'],
-        resultado_completo['score_cosseno']
-    )
 
-    maior_principal = max(
-        resultado_principal['score_rapidfuzz'],
-        resultado_principal['score_cosseno']
-    )
+def calcular_distancia_hash_visual(hash_novo, hash_antigo):
+    if not hash_novo or not hash_antigo:
+        return None
     
-    if maior_principal > maior_completo:
-        resultado_principal['motivo'] = (
-            resultado_principal['motivo']
-            + ' Comparacao feita pelos campos principais.'
-        )
-        return resultado_principal
+    try:
+        hash_novo_convertido = imagehash.hex_to_hash(hash_novo)
+        hash_antigo_convertido = imagehash.hex_to_hash(hash_antigo)
 
-    resultado_completo['motivo'] = (
-        resultado_completo['motivo']
-        + ' Comparacao feita pelo texto completo.'
+        return hash_novo_convertido - hash_antigo_convertido
+    
+    except Exception:
+        return None
+    
+def comparar_hashes(certificado_novo, certificado_antigo):
+    suspeitas = []
+
+    if certificado_novo.hash_arquivo and certificado_antigo.hash_arquivo:
+        if certificado_novo.hash_arquivo == certificado_antigo.hash_arquivo:
+            suspeitas.append({
+                'tipo': 'hash_arquivo',
+                'motivo': 'Arquivo exatamente igual a outro certificado enviado.',
+            })
+
+    distancia_visual = calcular_distancia_hash_visual(
+        certificado_novo.hash_visual,
+        certificado_antigo.hash_visual
     )
-    return resultado_completo
 
+    if distancia_visual is not None and distancia_visual <= LIMITE_DISTANCIA_HASH_VISUAL:
+        suspeitas.append({
+            'tipo': 'hash_visual',
+            'motivo': 'Certificado visualmente parecido com outro arquivo enviado.',
+            'distancia_visual': distancia_visual,
+        })
 
+    return suspeitas
 
 def verificar_submissao(submissao):
     texto_novo = montar_texto_comparacao(submissao)
-    texto_principal_novo = montar_texto_principal(submissao)
+    certificado_novo = submissao.certificado
 
-    if len(texto_novo) < TAMANHO_MINIMO_TEXTO and len(texto_principal_novo) < TAMANHO_MINIMO_TEXTO:
+    if not certificado_novo:
         return {
             'submissao_id': submissao.id_submissao,
             'texto_suficiente': False,
+            'total_suspeitas': 0,
             'suspeitas': [],
         }
 
@@ -191,29 +189,36 @@ def verificar_submissao(submissao):
 
     for antiga in submissoes_antigas:
         texto_antigo = montar_texto_comparacao(antiga)
-        texto_principal_antigo = montar_texto_principal(antiga)
 
-        resultado_completo = comparar_textos(texto_novo, texto_antigo)
-        resultado_principal = comparar_textos(texto_principal_novo, texto_principal_antigo)
+        resultado_texto = comparar_textos(texto_novo, texto_antigo)
+        suspeitas_hash = comparar_hashes(certificado_novo, antiga.certificado)
 
-        resultado = escolher_melhor_resultado(
-            resultado_completo,
-            resultado_principal
-        )
+        suspeito = resultado_texto['suspeito'] or bool(suspeitas_hash)
 
-        if resultado['suspeito']:
-            suspeitas.append({
-                'certificado_id': antiga.certificado.id_certificado if antiga.certificado else None,
-                'submissao_id': antiga.id_submissao,
-                'aluno_id': antiga.aluno.usuario.id_usuario if antiga.aluno else None,
-                'aluno_nome': antiga.aluno.usuario.nome if antiga.aluno else None,
-                'curso_id': antiga.curso.id_curso if antiga.curso else None,
-                'curso_nome': antiga.curso.nome if antiga.curso else None,
-                'score_rapidfuzz': resultado['score_rapidfuzz'],
-                'score_cosseno': resultado['score_cosseno'],
-                'suspeito': resultado['suspeito'],
-                'motivo': resultado['motivo'],
-            })
+        if not suspeito:
+            continue
+
+        motivos = []
+
+        if resultado_texto['suspeito']:
+            motivos.append(resultado_texto['motivo'])
+
+        if suspeitas_hash:
+            motivos.extend([item['motivo'] for item in suspeitas_hash])
+
+        suspeitas.append({
+            'certificado_id': antiga.certificado.id_certificado if antiga.certificado else None,
+            'submissao_id': antiga.id_submissao,
+            'aluno_id': antiga.aluno.usuario.id_usuario if antiga.aluno else None,
+            'aluno_nome': antiga.aluno.usuario.nome if antiga.aluno else None,
+            'curso_id': antiga.curso.id_curso if antiga.curso else None,
+            'curso_nome': antiga.curso.nome if antiga.curso else None,
+            'score_rapidfuzz': resultado_texto['score_rapidfuzz'],
+            'score_cosseno': resultado_texto['score_cosseno'],
+            'suspeito': True,
+            'motivo': ' '.join(motivos),
+            'suspeitas_hash': suspeitas_hash,
+        })
 
     suspeitas.sort(
         key=lambda item: max(item['score_rapidfuzz'], item['score_cosseno']),
@@ -222,7 +227,7 @@ def verificar_submissao(submissao):
 
     return {
         'submissao_id': submissao.id_submissao,
-        'texto_suficiente': True,
+        'texto_suficiente': len(texto_novo) >= TAMANHO_MINIMO_TEXTO,
         'total_suspeitas': len(suspeitas),
         'suspeitas': suspeitas,
     }
