@@ -198,6 +198,7 @@ class TurnoCurso(models.Model):
 class TipoAtividade(models.Model):
     id_tipo_atividade = models.AutoField(db_column='idTipoAtividade', primary_key=True)
     nome = models.CharField(max_length=30, unique=True)
+    descricao = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = False
